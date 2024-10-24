@@ -361,7 +361,17 @@ a, a:link, a:hover, a:visited, a:active {
 		<script>
 			var lgsize = 0;
 			var lghigh = 0;
-
+			if (window.innerWidth > 820){
+				lgsize = (window.innerWidth - 820)/2;
+				lghigh = window.innerHeight;
+				document.getElementById("leftgutter").style.width = lgsize + "px";
+				document.getElementById("leftgutter").style.height = lghigh + "px";
+				document.getElementById("rightgutter").style.width = lgsize + "px";
+				document.getElementById("rightgutter").style.height = lghigh + "px";
+				document.getElementById("maincontd").style.marginLeft = lgsize + "px";
+				lgsize+=820;
+				document.getElementById("rightgutter").style.marginLeft = lgsize + "px";
+			}
 		</script>	
 
 </body>
