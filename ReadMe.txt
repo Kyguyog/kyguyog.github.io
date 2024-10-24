@@ -1,0 +1,1 @@
+open snowrider3d.html if needed select browser to open with

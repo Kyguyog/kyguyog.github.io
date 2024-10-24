@@ -1,1 +1,0 @@
-# kyguyog.github.io
