@@ -5,3 +5,5 @@ Go to https://kyguyog.github.io/ to open online/no download version Both offline
 If you use on a phone or tablet you need a keyboard and controllers dont work 
 
 W, A, S, D, Space are the reqired keys
+
+Disclaimer: I only edited the code I did not make it I got the code from hoodamath
