@@ -1,1 +1,1 @@
-open snowrider3d.html if needed select browser to open with
+open index.html if needed select open with browser
