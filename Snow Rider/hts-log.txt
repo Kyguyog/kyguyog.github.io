@@ -1,0 +1,12 @@
+HTTrack3.49-2+htsswf+htsjava launched on Sat, 26 Oct 2024 11:45:35 at http://www.hoodamath.com/mobile/games/snow-rider-3d/game.html?nocheckorient=1 +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar
+(winhttrack -qwC2%Ps2u1%s%uN0%I0p3DaK0H0%kf2A25000%f#f -F "Mozilla/4.5 (compatible; HTTrack 3.0x; Windows 98)" -%F "<!-- Mirrored from %s%s by HTTrack Website Copier/3.x [XR&CO'2014], %s -->" -%l "en, *" http://www.hoodamath.com/mobile/games/snow-rider-3d/game.html?nocheckorient=1 -O1 "C:\My Web Sites\snow rider" +*.png +*.gif +*.jpg +*.jpeg +*.css +*.js -ad.doubleclick.net/* -mime:application/foobar )
+
+Information, Warnings and Errors reported for this mirror:
+note:	the hts-log.txt file, and hts-cache folder, may contain sensitive information,
+	such as username/password authentication for websites mirrored in this project
+	do not share these files/folders if you want these information to remain private
+
+11:45:36	Warning: 	Note: due to https://www.hoodamath.com remote robots.txt rules, links beginning with these path will be forbidden: /games/flash/, /mobile/games/, /description-afg.html, /badges/, /phplist/, /adnetworks/, /advertising/, /cargo/, /cgi-bin/, /contests/, /facebook/, /houseads/, /html5/, /images/, /phpfiles/, /rss/, /Scripts/, /secure/, /sounds/, /teachingtools/, /tpt/, /answer/, /mobile/android/, /games/ajax/, /games/bloxorz.php/, /games/redremover.php/, /games/highscores/show_top_20_slug.php, /games/brainpop_dublox_800.php, /games/locker.php, /headercode.php (see in the options to disable this)
+
+HTTrack Website Copier/3.49-2 mirror complete in 1 seconds : 2 links scanned, 1 files written (1518 bytes overall) [3797 bytes received at 3797 bytes/sec], 1.5 requests per connection
+(No errors, 1 warnings, 0 messages)

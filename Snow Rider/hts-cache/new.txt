@@ -1,0 +1,4 @@
+date	size'/'remotesize	flags(request:Update,Range state:File response:Modified,Chunked,gZipped)	statuscode	status ('servermsg')	MIME	Etag|Date	URL	localfile	(from URL)
+11:45:36	167/167	---M--	301	error ('Moved%20Permanently')	text/html	date:Sat,%2026%20Oct%202024%2005:47:49%20GMT	http://www.hoodamath.com/mobile/games/snow-rider-3d/game.html?nocheckorient=1	C:/My%20Web%20Sites/snow%20rider/www.hoodamath.com/mobile/games/snow-rider-3d/game.00bdc.delayed	(from )
+11:45:36	1518/1518	---M--	200	added ('OK')	text/html	etag:%221aa89d8a6d25985c4121208968ce2439%22	https://www.hoodamath.com/mobile/games/snow-rider-3d/game.html?nocheckorient=1	C:/My%20Web%20Sites/snow%20rider/www.hoodamath.com/mobile/games/snow-rider-3d/game0bdc.html	(from )
+11:45:36	778/778	---M--	200	added ('OK')	text/plain	etag:%22b5c66c7fd3297d11f1e32b7f1aa28c2b%22	https://www.hoodamath.com/robots.txt		(from )
