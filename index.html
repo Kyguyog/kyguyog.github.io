@@ -1,70 +1,51 @@
-<!-- Go to line 58 to add html selector entries -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Site Selector</title>
+    <title>Website Selector</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background-color: #515DFF;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            background-color: #77b;
-            font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
         }
-
-        h1 {
-            text-align: center;
-            color: #fff;
-        }
-
-        #container {
-            width: 76%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #ccd;
-        }
-
-        #siteNavigation a {
-            color: #448;
-            font-weight: bold;
-            text-decoration: none;
-            padding: 10px;
-            display: block;
-            background-color: #99c;
-            margin-bottom: 5px;
-        }
-
-        #siteNavigation a:hover {
+        .container {
             background-color: #fff;
-            color: #000;
-        }
-
-        #footer {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            font-size: 12px;
-            margin-top: 20px;
+        }
+        select, button {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
         }
     </style>
 </head>
-
 <body>
-
-    <h1>Site Selector:</h1>
-    <div id="container">
-        <!-- Navigation Links -->
-        <div id="siteNavigation">
-            <a href="snowrider3d.html" target="_blank">Snow Rider 3D</a>
-            <a href="Youareaidiot/lol.html" target="_blank">You are a idiot</a>
-            <!--  Example Line:  <a href="Selector Pages/Name of html file" target="_blank">Name for Entre</a>   -->
-        </div>
-
-        <div id="footer">
-            <small>&copy; 2024 Kyan Thayne - Simple Local HTML Browser</small>
-        </div>
+    <div class="container">
+        <h1>Select a Website</h1>
+        <select id="websiteSelector">
+            <option value="https://www.google.com">Google</option>
+            <option value="https://www.github.com">GitHub</option>
+            <option value="https://www.stackoverflow.com">Stack Overflow</option>
+        </select>
+        <br>
+        <button onclick="navigateToWebsite()">Go</button>
     </div>
 
+    <script>
+        function navigateToWebsite() {
+            var selector = document.getElementById('websiteSelector');
+            var url = selector.value;
+            window.location.href = url;
+        }
+    </script>
 </body>
-
 </html>
