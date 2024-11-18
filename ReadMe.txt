@@ -8,4 +8,6 @@ Only Keyboards work!
 
 W, A, S, D, Space are the reqired keys
 
-Disclaimer: I only edited the code I did not make it I got the code from hoodamath
+Disclaimer: I only edited the code I did not make it I got the code from hoodamath.com
+
+git.kyguy.site is currently disabled
