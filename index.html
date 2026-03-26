@@ -859,6 +859,265 @@
     /* ── SCROLL REVEAL ── */
     .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
     .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── ADMIN PANEL ── */
+    #admin-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(6px);
+      padding: 1.5rem;
+      overflow-y: auto;
+    }
+    #admin-panel.open { display: flex; align-items: flex-start; justify-content: center; }
+    .admin-modal {
+      background: #0d0d14;
+      border: 1px solid rgba(168,85,247,0.4);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 860px;
+      box-shadow: 0 0 80px rgba(168,85,247,0.15);
+      overflow: hidden;
+      margin: auto;
+    }
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 1.75rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(168,85,247,0.05);
+    }
+    .admin-header-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .admin-close {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: var(--font-display);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .admin-close:hover { border-color: var(--danger); color: var(--danger); }
+    .admin-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      background: #0a0a0f;
+      scrollbar-width: none;
+    }
+    .admin-tabs::-webkit-scrollbar { display: none; }
+    .admin-tab {
+      flex-shrink: 0;
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+    .admin-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+    .admin-tab:hover:not(.active) { color: var(--text); }
+    .admin-body { padding: 1.75rem; }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .admin-field { margin-bottom: 1.1rem; }
+    .admin-field label {
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .admin-input {
+      width: 100%;
+      background: #111118;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.65rem 0.9rem;
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .admin-input:focus { border-color: var(--primary); }
+    .admin-textarea {
+      width: 100%;
+      background: #111118;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.7rem 0.9rem;
+      color: var(--text);
+      font-size: 0.82rem;
+      font-family: monospace;
+      outline: none;
+      resize: vertical;
+      min-height: 200px;
+      line-height: 1.65;
+      transition: border-color 0.2s;
+    }
+    .admin-textarea:focus { border-color: var(--primary); }
+    .admin-hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 0.35rem;
+      line-height: 1.5;
+    }
+    .admin-hint code {
+      background: #1a1a26;
+      border-radius: 3px;
+      padding: 0.1rem 0.3rem;
+      font-size: 0.7rem;
+      color: var(--secondary);
+    }
+    .admin-save-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+    }
+    .admin-save-btn {
+      padding: 0.7rem 1.75rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(168,85,247,0.3);
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .admin-save-btn:hover { opacity: 0.85; transform: scale(1.02); }
+    .admin-save-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .admin-status { font-size: 0.8rem; font-weight: 600; }
+    .admin-status.ok { color: #22c55e; }
+    .admin-status.err { color: var(--danger); }
+    .admin-row-list { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 0.5rem; }
+    .admin-row-item { display: flex; gap: 0.5rem; align-items: flex-start; }
+    .admin-card-item {
+      background: #111118;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .admin-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+    .admin-card-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .admin-row-input {
+      flex: 1;
+      background: #111118;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.52rem 0.75rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+      min-width: 0;
+    }
+    .admin-row-input:focus { border-color: var(--primary); }
+    .admin-row-input::placeholder { color: var(--muted); }
+    .admin-card-input {
+      width: 100%;
+      background: #0d0d14;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      color: var(--text);
+      font-size: 0.85rem;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .admin-card-input:focus { border-color: var(--primary); }
+    .admin-card-input::placeholder { color: var(--muted); }
+    .admin-row-remove {
+      flex-shrink: 0;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.8rem;
+      line-height: 1;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .admin-row-remove:hover { border-color: var(--danger); color: var(--danger); }
+    .admin-add-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px dashed rgba(168,85,247,0.4);
+      border-radius: 6px;
+      color: var(--primary);
+      cursor: pointer;
+      padding: 0.55rem 1rem;
+      font-size: 0.7rem;
+      font-family: var(--font-display);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: border-color 0.2s, background 0.2s;
+      margin-top: 0.25rem;
+    }
+    .admin-add-btn:hover { border-color: var(--primary); background: var(--primary-dim); }
+    .admin-sublabel {
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--secondary);
+      margin: 1.25rem 0 0.6rem;
+    }
+    .admin-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
   </style>
 </head>
 <body>
@@ -1042,6 +1301,12 @@
     <div class="popup-header-name" id="popup-display-name"></div>
     <div class="popup-header-email" id="popup-email"></div>
   </div>
+  <div class="popup-section" id="admin-popup-section" style="display:none;">
+    <button class="popup-btn" id="admin-popup-btn" onclick="openAdminPanel()" style="color:var(--primary);display:none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Edit Site Content
+    </button>
+  </div>
   <div class="popup-section">
     <button class="popup-btn" onclick="togglePopupForm('username-form')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -1083,7 +1348,7 @@
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword }
     from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ",
@@ -1099,6 +1364,11 @@
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const db = getFirestore(app);
+
+  // Expose update bridge for admin panel (non-module script)
+  window._firestoreUpdate = async function(patch) {
+    await updateDoc(doc(db, 'siteContent', 'main'), patch);
+  };
 
   // ── Tab switching ──
   let currentTab = 'login';
@@ -1278,6 +1548,32 @@
         document.getElementById('popup-display-name').textContent = username;
         document.getElementById('popup-email').textContent = user.email;
       }
+
+      // Load site content from Firestore (protected — logged-in users only)
+      try {
+        const contentSnap = await getDoc(doc(db, 'siteContent', 'main'));
+        if (contentSnap.exists()) {
+          window._siteData = contentSnap.data();
+          populatePage(window._siteData);
+        }
+      } catch (e) {
+        console.error('Failed to load site content:', e);
+      }
+
+      // Check admin flag — show Edit Site button if admin: true
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.email));
+        if (userSnap.exists() && userSnap.data().admin === true) {
+          window._isAdmin = true;
+          const adminBtn = document.getElementById('admin-popup-btn');
+          const adminSection = document.getElementById('admin-popup-section');
+          if (adminBtn) adminBtn.style.display = 'flex';
+          if (adminSection) adminSection.style.display = 'block';
+        }
+      } catch(e) {
+        console.warn('Could not check admin status:', e);
+      }
+
     } else {
       wall.classList.remove('hidden');
       main.classList.remove('visible');
@@ -1347,7 +1643,7 @@
     let totalMatches = 0;
     let html = '';
 
-    for (const [letter, games] of Object.entries(GAMES)) {
+    for (const [letter, games] of Object.entries(GAMES).sort(([a],[b]) => a.localeCompare(b))) {
       const matched = q ? games.filter(g => g.name.toLowerCase().includes(q)) : games;
       if (matched.length === 0) continue;
       totalMatches += matched.length;
@@ -1500,11 +1796,390 @@
     searchInput.focus();
   });
 
-  // Load content.json and init
-  fetch('content.json')
-    .then(r => r.json())
-    .then(data => populatePage(data))
-    .catch(err => console.error('Failed to load content.json:', err));
+  // Content loaded from Firestore after login.
 </script>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel">
+  <div class="admin-modal">
+    <div class="admin-header">
+      <div class="admin-header-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Site Editor
+      </div>
+      <button class="admin-close" onclick="closeAdminPanel()">✕ Close</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" onclick="switchAdminTab('games')">🎮 Games</button>
+      <button class="admin-tab" onclick="switchAdminTab('toptier')">⭐ Top Tier</button>
+      <button class="admin-tab" onclick="switchAdminTab('banned')">🚫 Banned</button>
+      <button class="admin-tab" onclick="switchAdminTab('hero')">Hero</button>
+      <button class="admin-tab" onclick="switchAdminTab('notice')">Notice</button>
+      <button class="admin-tab" onclick="switchAdminTab('sites')">Sites</button>
+      <button class="admin-tab" onclick="switchAdminTab('command')">Command</button>
+    </div>
+    <div class="admin-body">
+
+      <!-- HERO -->
+      <div class="admin-section active" id="admin-hero">
+        <div class="admin-field"><label>Subtitle</label><input class="admin-input" id="ae-hero-subtitle" /></div>
+        <div class="admin-field"><label>Primary Button Label</label><input class="admin-input" id="ae-hero-btn1-label" /></div>
+        <div class="admin-field"><label>Primary Button Link</label><input class="admin-input" id="ae-hero-btn1-href" /></div>
+        <div class="admin-field"><label>Secondary Button Label</label><input class="admin-input" id="ae-hero-btn2-label" /></div>
+        <div class="admin-field"><label>Secondary Button Link</label><input class="admin-input" id="ae-hero-btn2-href" /></div>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('hero')">Save Hero</button><span class="admin-status" id="status-hero"></span></div>
+      </div>
+
+      <!-- NOTICE -->
+      <div class="admin-section" id="admin-notice">
+        <div class="admin-field"><label>Notice Title</label><input class="admin-input" id="ae-notice-title" /></div>
+        <div class="admin-field"><label>Notice Text (HTML allowed)</label><textarea class="admin-textarea" id="ae-notice-text" style="min-height:100px;"></textarea></div>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('notice')">Save Notice</button><span class="admin-status" id="status-notice"></span></div>
+      </div>
+
+      <!-- TOP TIER -->
+      <div class="admin-section" id="admin-toptier">
+        <p class="admin-hint" style="margin-bottom:1rem;">Fill in name, badge, game URL, and background image URL for each card.</p>
+        <div id="ae-toptier-list"></div>
+        <button class="admin-add-btn" onclick="adminAddTopTier()">+ Add Card</button>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('toptier')">Save Top Tier</button><span class="admin-status" id="status-toptier"></span></div>
+      </div>
+
+      <!-- GAMES -->
+      <div class="admin-section" id="admin-games">
+        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name; URL is optional.</p>
+        <div id="ae-games-list" class="admin-row-list"></div>
+        <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
+      </div>
+
+      <!-- SITES -->
+      <div class="admin-section" id="admin-sites">
+        <div id="ae-sites-list" class="admin-row-list"></div>
+        <button class="admin-add-btn" onclick="adminAddSite()">+ Add Site</button>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('sites')">Save Sites</button><span class="admin-status" id="status-sites"></span></div>
+      </div>
+
+      <!-- BANNED -->
+      <div class="admin-section" id="admin-banned">
+        <div id="ae-banned-list" class="admin-row-list"></div>
+        <button class="admin-add-btn" onclick="adminAddBanned()">+ Add Person</button>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('banned')">Save Banned</button><span class="admin-status" id="status-banned"></span></div>
+      </div>
+
+      <!-- COMMAND -->
+      <div class="admin-section" id="admin-command">
+        <div class="admin-sublabel" style="margin-top:0;">Hiring Banner</div>
+        <div class="admin-field">
+          <label>Active?</label>
+          <select class="admin-input" id="ae-hiring-active" style="cursor:pointer;">
+            <option value="true">Yes — show banner</option>
+            <option value="false">No — hide banner</option>
+          </select>
+        </div>
+        <div class="admin-field"><label>Badge Label</label><input class="admin-input" id="ae-hiring-badge" /></div>
+        <div class="admin-field"><label>Title</label><input class="admin-input" id="ae-hiring-title" /></div>
+        <div class="admin-field"><label>Description</label><input class="admin-input" id="ae-hiring-desc" /></div>
+        <div class="admin-field"><label>Form URL</label><input class="admin-input" id="ae-hiring-url" /></div>
+        <hr class="admin-divider">
+        <div class="admin-sublabel">Links</div>
+        <div id="ae-command-links-list"></div>
+        <button class="admin-add-btn" onclick="adminAddCommandLink()">+ Add Link</button>
+        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('command')">Save Command</button><span class="admin-status" id="status-command"></span></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  ADMIN PANEL
+// ═══════════════════════════════════════════
+window._isAdmin = false;
+window._siteData = null;
+
+function escAttr(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+window.openAdminPanel = function() {
+  if (!window._isAdmin) return;
+  const data = window._siteData;
+  if (!data) { alert('Site data not loaded yet. Try again in a moment.'); return; }
+
+  // Hero
+  document.getElementById('ae-hero-subtitle').value = data.hero?.subtitle || '';
+  document.getElementById('ae-hero-btn1-label').value = data.hero?.buttons?.primary?.label || '';
+  document.getElementById('ae-hero-btn1-href').value = data.hero?.buttons?.primary?.href || '';
+  document.getElementById('ae-hero-btn2-label').value = data.hero?.buttons?.secondary?.label || '';
+  document.getElementById('ae-hero-btn2-href').value = data.hero?.buttons?.secondary?.href || '';
+
+  // Notice
+  document.getElementById('ae-notice-title').value = data.notice?.title || '';
+  document.getElementById('ae-notice-text').value = data.notice?.text || '';
+
+  // Top Tier
+  renderTopTierEditor(data.topTier || []);
+
+  // Games
+  renderGamesEditor(data.games || {});
+
+  // Sites
+  renderSitesEditor(data.sites || []);
+
+  // Banned
+  renderBannedEditor(data.banned || []);
+
+  // Command
+  const h = data.command?.hiring || {};
+  document.getElementById('ae-hiring-active').value = h.active ? 'true' : 'false';
+  document.getElementById('ae-hiring-badge').value = h.badge || '';
+  document.getElementById('ae-hiring-title').value = h.title || '';
+  document.getElementById('ae-hiring-desc').value = h.description || '';
+  document.getElementById('ae-hiring-url').value = h.url || '';
+  renderCommandLinksEditor(data.command?.links || []);
+
+  // Clear statuses & open
+  document.querySelectorAll('.admin-status').forEach(el => { el.textContent=''; el.className='admin-status'; });
+  switchAdminTab('games');
+  document.getElementById('admin-panel').classList.add('open');
+  document.getElementById('user-popup').classList.remove('open');
+};
+
+window.closeAdminPanel = function() {
+  document.getElementById('admin-panel').classList.remove('open');
+};
+
+document.getElementById('admin-panel').addEventListener('click', function(e) {
+  if (e.target === this) closeAdminPanel();
+});
+
+window.switchAdminTab = function(tab) {
+  document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('admin-' + tab).classList.add('active');
+  event && event.target && event.target.classList && event.target.classList.add('active');
+  // fallback: match by onclick attr
+  document.querySelectorAll('.admin-tab').forEach(t => {
+    if (t.getAttribute('onclick') === "switchAdminTab('" + tab + "')") t.classList.add('active');
+  });
+};
+
+// ── Top Tier ──
+function makeCardInput(cls, placeholder, val) {
+  return `<input class="${cls} admin-card-input" placeholder="${placeholder}" value="${escAttr(val)}" />`;
+}
+
+function renderTopTierEditor(items) {
+  document.getElementById('ae-toptier-list').innerHTML = items.map((item, i) => `
+    <div class="admin-card-item">
+      <div class="admin-card-header">
+        <span class="admin-card-label">Card ${i+1}</span>
+        <button class="admin-row-remove" onclick="this.closest('.admin-card-item').remove()">✕</button>
+      </div>
+      ${makeCardInput('tt-name','Game name', item.name)}
+      ${makeCardInput('tt-badge',"Badge (e.g. Editor's Choice)", item.badge||'')}
+      ${makeCardInput('tt-url','Game URL', item.url||'')}
+      ${makeCardInput('tt-bg','Background image URL', item.backgroundImage||'')}
+    </div>`).join('');
+}
+
+window.adminAddTopTier = function() {
+  const div = document.createElement('div');
+  div.className = 'admin-card-item';
+  const i = document.getElementById('ae-toptier-list').children.length + 1;
+  div.innerHTML = `
+    <div class="admin-card-header">
+      <span class="admin-card-label">New Card</span>
+      <button class="admin-row-remove" onclick="this.closest('.admin-card-item').remove()">✕</button>
+    </div>
+    <input class="tt-name admin-card-input" placeholder="Game name" />
+    <input class="tt-badge admin-card-input" placeholder="Badge label" />
+    <input class="tt-url admin-card-input" placeholder="Game URL" />
+    <input class="tt-bg admin-card-input" placeholder="Background image URL" />`;
+  document.getElementById('ae-toptier-list').appendChild(div);
+};
+
+// ── Games ──
+function renderGamesEditor(gamesObj) {
+  const flat = [];
+  for (const [, games] of Object.entries(gamesObj || {}).sort(([a],[b]) => a.localeCompare(b))) {
+    for (const g of games) flat.push(g);
+  }
+  document.getElementById('ae-games-list').innerHTML = flat.map(g => `
+    <div class="admin-row-item">
+      <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name)}" style="flex:1;" />
+      <input class="admin-row-input game-url-input" placeholder="https://... (optional)" value="${escAttr(g.url||'')}" style="flex:2;" />
+      <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
+    </div>`).join('');
+}
+
+window.adminAddGame = function() {
+  const div = document.createElement('div');
+  div.className = 'admin-row-item';
+  div.innerHTML = `
+    <input class="admin-row-input game-name-input" placeholder="Game name" style="flex:1;" />
+    <input class="admin-row-input game-url-input" placeholder="https://... (optional)" style="flex:2;" />
+    <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
+  document.getElementById('ae-games-list').appendChild(div);
+  div.querySelector('input').focus();
+};
+function renderSitesEditor(items) {
+  document.getElementById('ae-sites-list').innerHTML = items.map(s => `
+    <div class="admin-row-item">
+      <input class="admin-row-input" placeholder="Display name" value="${escAttr(s.name)}" style="flex:1;" />
+      <input class="admin-row-input" placeholder="https://..." value="${escAttr(s.url)}" style="flex:2;" />
+      <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
+    </div>`).join('');
+}
+
+window.adminAddSite = function() {
+  const div = document.createElement('div');
+  div.className = 'admin-row-item';
+  div.innerHTML = `
+    <input class="admin-row-input" placeholder="Display name" style="flex:1;" />
+    <input class="admin-row-input" placeholder="https://..." style="flex:2;" />
+    <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
+  document.getElementById('ae-sites-list').appendChild(div);
+};
+
+// ── Banned ──
+function renderBannedEditor(items) {
+  document.getElementById('ae-banned-list').innerHTML = items.map(name => `
+    <div class="admin-row-item">
+      <input class="admin-row-input" placeholder="Name" value="${escAttr(name)}" />
+      <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
+    </div>`).join('');
+}
+
+window.adminAddBanned = function() {
+  const div = document.createElement('div');
+  div.className = 'admin-row-item';
+  div.innerHTML = `
+    <input class="admin-row-input" placeholder="Name" />
+    <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
+  document.getElementById('ae-banned-list').appendChild(div);
+};
+
+// ── Command links ──
+function renderCommandLinksEditor(items) {
+  document.getElementById('ae-command-links-list').innerHTML = items.map((link, i) => `
+    <div class="admin-card-item">
+      <div class="admin-card-header">
+        <span class="admin-card-label">Link ${i+1}</span>
+        <button class="admin-row-remove" onclick="this.closest('.admin-card-item').remove()">✕</button>
+      </div>
+      <input class="cl-title admin-card-input" placeholder="Title" value="${escAttr(link.title)}" />
+      <input class="cl-desc admin-card-input" placeholder="Description" value="${escAttr(link.description||'')}" />
+      <input class="cl-url admin-card-input" placeholder="URL (leave blank = 'coming soon')" value="${escAttr(link.url||'')}" />
+    </div>`).join('');
+}
+
+window.adminAddCommandLink = function() {
+  const div = document.createElement('div');
+  div.className = 'admin-card-item';
+  div.innerHTML = `
+    <div class="admin-card-header">
+      <span class="admin-card-label">New Link</span>
+      <button class="admin-row-remove" onclick="this.closest('.admin-card-item').remove()">✕</button>
+    </div>
+    <input class="cl-title admin-card-input" placeholder="Title" />
+    <input class="cl-desc admin-card-input" placeholder="Description" />
+    <input class="cl-url admin-card-input" placeholder="URL (leave blank = 'coming soon')" />`;
+  document.getElementById('ae-command-links-list').appendChild(div);
+};
+
+// ── Save ──
+window.adminSave = async function(section) {
+  if (!window._isAdmin) return;
+  const statusEl = document.getElementById('status-' + section);
+  const btn = document.querySelector('#admin-' + section + ' .admin-save-btn');
+  statusEl.textContent = 'Saving...';
+  statusEl.className = 'admin-status';
+  if (btn) btn.disabled = true;
+
+  try {
+    let patch = {};
+
+    if (section === 'hero') {
+      patch.hero = {
+        subtitle: document.getElementById('ae-hero-subtitle').value.trim(),
+        buttons: {
+          primary:   { label: document.getElementById('ae-hero-btn1-label').value.trim(), href: document.getElementById('ae-hero-btn1-href').value.trim() },
+          secondary: { label: document.getElementById('ae-hero-btn2-label').value.trim(), href: document.getElementById('ae-hero-btn2-href').value.trim() }
+        }
+      };
+    } else if (section === 'notice') {
+      patch.notice = {
+        title: document.getElementById('ae-notice-title').value.trim(),
+        text:  document.getElementById('ae-notice-text').value.trim()
+      };
+    } else if (section === 'toptier') {
+      patch.topTier = [...document.querySelectorAll('#ae-toptier-list .admin-card-item')].map(card => ({
+        name:            card.querySelector('.tt-name').value.trim(),
+        badge:           card.querySelector('.tt-badge').value.trim(),
+        url:             card.querySelector('.tt-url').value.trim(),
+        backgroundImage: card.querySelector('.tt-bg').value.trim()
+      }));
+    } else if (section === 'games') {
+      const games = {};
+      for (const row of document.querySelectorAll('#ae-games-list .admin-row-item')) {
+        const name = row.querySelector('.game-name-input').value.trim();
+        const url  = row.querySelector('.game-url-input').value.trim();
+        if (!name) continue;
+        const letter = name[0].toUpperCase();
+        if (!games[letter]) games[letter] = [];
+        games[letter].push({ name, url });
+      }
+      patch.games = games;
+    } else if (section === 'sites') {
+      patch.sites = [...document.querySelectorAll('#ae-sites-list .admin-row-item')].map(row => {
+        const [n, u] = row.querySelectorAll('input');
+        return { name: n.value.trim(), url: u.value.trim() };
+      }).filter(s => s.name);
+    } else if (section === 'banned') {
+      patch.banned = [...document.querySelectorAll('#ae-banned-list .admin-row-item')]
+        .map(row => row.querySelector('input').value.trim()).filter(Boolean);
+    } else if (section === 'command') {
+      patch.command = {
+        hiring: {
+          active:      document.getElementById('ae-hiring-active').value === 'true',
+          badge:       document.getElementById('ae-hiring-badge').value.trim(),
+          title:       document.getElementById('ae-hiring-title').value.trim(),
+          description: document.getElementById('ae-hiring-desc').value.trim(),
+          url:         document.getElementById('ae-hiring-url').value.trim()
+        },
+        links: [...document.querySelectorAll('#ae-command-links-list .admin-card-item')].map(card => {
+          const url = card.querySelector('.cl-url').value.trim();
+          return {
+            title:       card.querySelector('.cl-title').value.trim(),
+            description: card.querySelector('.cl-desc').value.trim(),
+            status:      url ? 'Active' : 'soon',
+            url
+          };
+        }).filter(l => l.title)
+      };
+    }
+
+    await window._firestoreUpdate(patch);
+
+    // Merge patch into local cache and re-render page live
+    window._siteData = Object.assign({}, window._siteData, patch);
+    populatePage(window._siteData);
+
+    statusEl.textContent = '✓ Saved';
+    statusEl.className = 'admin-status ok';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'admin-status'; }, 3000);
+  } catch(e) {
+    console.error('Admin save error:', e);
+    statusEl.textContent = '✗ ' + (e.message || 'Save failed');
+    statusEl.className = 'admin-status err';
+  }
+
+  if (btn) btn.disabled = false;
+};
+</script>
+
 </body>
 </html>
