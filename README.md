@@ -1,1 +1,1 @@
-NOT DONE! I dont reconmend exposing this to worldwide web, yet
+still in a very beta stage, but should be safe to expose to the Internet 
