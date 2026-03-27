@@ -1118,6 +1118,191 @@
       margin: 1.25rem 0 0.6rem;
     }
     .admin-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* ── AI CHAT ── */
+    #ai-chat {
+      padding: 5rem 2rem;
+      background: var(--bg);
+    }
+    .chat-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .chat-box {
+      background: var(--card);
+      border: 1px solid rgba(168,85,247,0.25);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(168,85,247,0.07);
+    }
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(168,85,247,0.04);
+    }
+    .chat-header-icon {
+      width: 32px; height: 32px;
+      background: var(--primary-dim);
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .chat-header-info { flex: 1; }
+    .chat-header-name {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+    }
+    .chat-header-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.05rem;
+    }
+    .chat-status-dot {
+      width: 8px; height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(34,197,94,0.7);
+      flex-shrink: 0;
+    }
+    .chat-status-dot.offline { background: var(--muted); box-shadow: none; }
+    .chat-messages {
+      height: 400px;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(168,85,247,0.3) transparent;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: rgba(168,85,247,0.3); border-radius: 2px; }
+    .chat-msg {
+      display: flex;
+      gap: 0.65rem;
+      align-items: flex-end;
+      max-width: 85%;
+      animation: msgIn 0.2s ease;
+    }
+    @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+    .chat-msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .chat-avatar {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .chat-msg.ai .chat-avatar { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(168,85,247,0.3); }
+    .chat-msg.user .chat-avatar { background: rgba(34,211,238,0.1); color: var(--secondary); border: 1px solid rgba(34,211,238,0.25); }
+    .chat-bubble {
+      padding: 0.65rem 0.9rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      line-height: 1.55;
+    }
+    .chat-msg.ai .chat-bubble {
+      background: #16161f;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-bottom-left-radius: 2px;
+    }
+    .chat-msg.user .chat-bubble {
+      background: var(--primary);
+      color: #fff;
+      border-bottom-right-radius: 2px;
+    }
+    .chat-bubble.typing span {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--muted);
+      border-radius: 50%;
+      animation: blink 1.2s infinite;
+    }
+    .chat-bubble.typing span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-bubble.typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+    .chat-no-key {
+      text-align: center;
+      padding: 2.5rem 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      display: none;
+    }
+    .chat-no-key svg { margin: 0 auto 0.75rem; display: block; opacity: 0.3; }
+    .chat-no-key strong { color: var(--primary); font-weight: 600; }
+    .chat-footer {
+      border-top: 1px solid var(--border);
+      padding: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      background: rgba(168,85,247,0.02);
+    }
+    #chat-input {
+      flex: 1;
+      background: #0d0d14;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.7rem 0.9rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: var(--font-body);
+      outline: none;
+      resize: none;
+      line-height: 1.5;
+      max-height: 120px;
+      transition: border-color 0.2s;
+    }
+    #chat-input:focus { border-color: rgba(168,85,247,0.5); }
+    #chat-input::placeholder { color: var(--muted); }
+    #chat-input:disabled { opacity: 0.5; cursor: not-allowed; }
+    #chat-send {
+      background: var(--primary);
+      border: none;
+      border-radius: 8px;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      flex-shrink: 0;
+      transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 0 16px rgba(168,85,247,0.3);
+    }
+    #chat-send:hover:not(:disabled) { opacity: 0.85; transform: scale(1.05); }
+    #chat-send:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+    #chat-clear {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    #chat-clear:hover { border-color: var(--danger); color: var(--danger); }
+    .chat-model-badge {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 0.4rem 0.75rem;
+      border-top: 1px solid var(--border);
+      background: #0a0a0f;
+      letter-spacing: 0.05em;
+    }
+    .chat-model-badge span { color: var(--primary); }
   </style>
 </head>
 <body>
@@ -1166,6 +1351,7 @@
     <a href="#top-tier">Tier</a>
     <a href="#games">Games</a>
     <a href="#sites">Sites</a>
+    <a href="#ai-chat">AI</a>
     <a href="#staff">Outcasts</a>
   </div>
   <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
@@ -1248,6 +1434,46 @@
       <p>Approved external networks and utilities.</p>
     </div>
     <div class="sites-flex" id="sites-list"></div>
+  </div>
+</section>
+
+<!-- AI CHAT -->
+<section id="ai-chat">
+  <div class="container">
+    <div class="section-heading center">
+      <h2>AI <span style="color:var(--primary)">Assistant</span></h2>
+      <p>Chat with Gemini AI — your gaming co-pilot.</p>
+    </div>
+    <div class="chat-wrap reveal">
+      <div class="chat-box">
+        <div class="chat-header">
+          <div class="chat-header-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="19" cy="5" r="3"/></svg>
+          </div>
+          <div class="chat-header-info">
+            <div class="chat-header-name">GEMINI AI</div>
+            <div class="chat-header-sub" id="chat-model-label">Loading model...</div>
+          </div>
+          <div class="chat-status-dot" id="chat-dot"></div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+          <div class="chat-no-key" id="chat-no-key" style="display:none;">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+            No Gemini API key configured.<br><strong>Admins</strong> can add keys in the Site Editor → AI Settings.
+          </div>
+        </div>
+        <div class="chat-footer">
+          <textarea id="chat-input" placeholder="Ask anything about games..." rows="1"></textarea>
+          <button id="chat-clear" title="Clear chat" onclick="clearChat()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+          <button id="chat-send" onclick="sendChat()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+        <div class="chat-model-badge" id="chat-model-badge">Powered by <span id="chat-model-display">Gemini</span> · Session only — history clears on reload</div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1775,6 +2001,12 @@
     // Footer
     document.getElementById('footer-tagline').textContent = data.footer.tagline;
 
+    // AI settings — load from Firestore data so all users get them
+    if (data.aiSettings) {
+      window._aiSettings = data.aiSettings;
+    }
+    initChat();
+
     // Attach scroll reveal observer to all .reveal elements (including newly created ones)
     document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
     document.querySelectorAll('.stats-grid').forEach(el => observer.observe(el));
@@ -1816,6 +2048,7 @@
       <button class="admin-tab" onclick="switchAdminTab('banned')">🚫 Banned</button>
       <button class="admin-tab" onclick="switchAdminTab('command')">Command</button>
       <button class="admin-tab" onclick="switchAdminTab('notice')">Notice</button>
+      <button class="admin-tab" onclick="switchAdminTab('ai')">🤖 AI Settings</button>
     </div>
     <div class="admin-body">
 
@@ -1875,6 +2108,32 @@
         <div id="ae-command-links-list"></div>
         <button class="admin-add-btn" onclick="adminAddCommandLink()">+ Add Link</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('command')">Save Command</button><span class="admin-status" id="status-command"></span></div>
+      </div>
+
+      <!-- AI SETTINGS -->
+      <div class="admin-section" id="admin-ai">
+        <p class="admin-hint" style="margin-bottom:1rem;">
+          Add one or more Gemini API keys. If a key fails (quota exceeded, invalid, etc.) the chat will automatically cycle to the next key.
+        </p>
+        <div class="admin-sublabel" style="margin-top:0;">API Keys</div>
+        <div id="ae-api-keys-list" class="admin-row-list"></div>
+        <button class="admin-add-btn" onclick="adminAddApiKey()">+ Add API Key</button>
+        <hr class="admin-divider">
+        <div class="admin-sublabel">Model</div>
+        <div class="admin-field" style="flex-direction:row;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+          <select class="admin-input" id="ae-gemini-model" style="flex:1;min-width:220px;cursor:pointer;">
+            <option value="">— fetch models first —</option>
+          </select>
+          <button class="admin-save-btn" style="margin:0;padding:0.7rem 1.25rem;white-space:nowrap;" onclick="fetchGeminiModels()">↺ Fetch Models</button>
+        </div>
+        <p class="admin-hint" id="ae-model-hint">Click "Fetch Models" to load available Gemini models from Google's API (requires at least one API key above).</p>
+        <hr class="admin-divider">
+        <div class="admin-sublabel">System Prompt (optional)</div>
+        <textarea class="admin-textarea" id="ae-system-prompt" style="min-height:80px;" placeholder="e.g. You are a helpful gaming assistant for KnowWhere Gaming Hub. Keep answers concise and gaming-focused."></textarea>
+        <div class="admin-save-row">
+          <button class="admin-save-btn" onclick="adminSaveAI()">Save AI Settings</button>
+          <span class="admin-status" id="status-ai"></span>
+        </div>
       </div>
 
     </div>
@@ -2070,6 +2329,382 @@ window.adminAddCommandLink = function() {
     <input class="cl-desc admin-card-input" placeholder="Description" />
     <input class="cl-url admin-card-input" placeholder="URL (leave blank = 'coming soon')" />`;
   document.getElementById('ae-command-links-list').appendChild(div);
+};
+
+// ═══════════════════════════════════════════
+//  AI CHAT — Gemini
+// ═══════════════════════════════════════════
+
+// In-memory AI settings (populated from Firestore after login)
+window._aiSettings = { apiKeys: [], model: 'gemini-2.0-flash', systemPrompt: '' };
+
+// In-session chat history (cleared on reload)
+let chatHistory = [];
+let chatIsTyping = false;
+let currentKeyIndex = 0;
+
+// ── Init chat UI — called after Firestore data loads ──
+function initChat() {
+  const settings = window._aiSettings || {};
+  const keys = settings.apiKeys || [];
+  const model = settings.model || 'gemini-2.0-flash';
+  const dot = document.getElementById('chat-dot');
+  const modelLabel = document.getElementById('chat-model-label');
+  const modelDisplay = document.getElementById('chat-model-display');
+  const noKey = document.getElementById('chat-no-key');
+  const input = document.getElementById('chat-input');
+  const send = document.getElementById('chat-send');
+  const msgs = document.getElementById('chat-messages');
+
+  if (!keys.length) {
+    dot.className = 'chat-status-dot offline';
+    modelLabel.textContent = 'No API key — offline';
+    modelDisplay.textContent = 'Gemini';
+    noKey.style.display = 'block';
+    input.disabled = true;
+    send.disabled = true;
+    return;
+  }
+
+  dot.className = 'chat-status-dot';
+  modelLabel.textContent = model;
+  modelDisplay.textContent = model;
+  noKey.style.display = 'none';
+  input.disabled = false;
+  send.disabled = false;
+
+  // Welcome message (only once per session)
+  if (!msgs.querySelector('.chat-msg')) {
+    appendAIMessage("Hey! I'm your KnowWhere gaming assistant powered by Gemini.");
+  }
+}
+
+function appendAIMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ai';
+  div.innerHTML = `<div class="chat-avatar">AI</div><div class="chat-bubble">${escapeHtml(text)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendUserMessage(text) {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg user';
+  div.innerHTML = `<div class="chat-avatar">YOU</div><div class="chat-bubble">${escapeHtml(text)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg ai';
+  div.id = 'chat-typing';
+  div.innerHTML = `<div class="chat-avatar">AI</div><div class="chat-bubble typing"><span></span><span></span><span></span></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('chat-typing');
+  if (el) el.remove();
+}
+
+function escapeHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+
+window.clearChat = function() {
+  chatHistory = [];
+  const msgs = document.getElementById('chat-messages');
+  msgs.innerHTML = '';
+  appendAIMessage("Chat cleared! Ask me anything about gaming. 🎮");
+};
+
+// Parse "retry in Xs" from Google error messages
+function parseRetryDelay(errMsg) {
+  const m = (errMsg || '').match(/retry in ([\d.]+)s/i);
+  return m ? Math.ceil(parseFloat(m[1])) : 0;
+}
+
+// Show live countdown in the typing bubble
+function showRetryCountdown(secs, keyNum, total) {
+  let remaining = secs;
+  const msgs = document.getElementById('chat-messages');
+  // Remove old typing bubble if present
+  const old = document.getElementById('chat-typing');
+  if (old) old.remove();
+  const div = document.createElement('div');
+  div.className = 'chat-msg ai';
+  div.id = 'chat-typing';
+  const label = total > 1 ? ` (key ${keyNum}/${total} rate-limited)` : '';
+  div.innerHTML = `<div class="chat-avatar">AI</div><div class="chat-bubble" id="chat-countdown-bubble" style="color:var(--muted);font-size:0.82rem;">⏳ Rate limited${label} — retrying in <strong id="chat-countdown-num">${remaining}s</strong></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return new Promise(resolve => {
+    const iv = setInterval(() => {
+      remaining--;
+      const el = document.getElementById('chat-countdown-num');
+      if (el) el.textContent = remaining + 's';
+      if (remaining <= 0) { clearInterval(iv); resolve(); }
+    }, 1000);
+  });
+}
+
+window.sendChat = async function() {
+  if (chatIsTyping) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const settings = window._aiSettings || {};
+  const keys = settings.apiKeys || [];
+  if (!keys.length) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  appendUserMessage(text);
+  chatHistory.push({ role: 'user', parts: [{ text }] });
+
+  chatIsTyping = true;
+  document.getElementById('chat-send').disabled = true;
+  showTyping();
+
+  const model = settings.model || 'gemini-2.0-flash';
+  const systemPrompt = settings.systemPrompt || 'You are a helpful assistant for KnowWhere Gaming Hub. Be concise and friendly.';
+  const body = { system_instruction: { parts: [{ text: systemPrompt }] }, contents: chatHistory };
+
+  let response = null;
+  let lastErrShort = '';
+  // Track which keys have been tried this request to avoid infinite loops
+  const tried = new Set();
+  let keyIdx = currentKeyIndex;
+
+  while (tried.size < keys.length) {
+    if (tried.has(keyIdx)) { keyIdx = (keyIdx + 1) % keys.length; continue; }
+    tried.add(keyIdx);
+    const key = keys[keyIdx];
+
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '(no response)';
+        currentKeyIndex = keyIdx; // remember the working key
+        response = aiText;
+        chatHistory.push({ role: 'model', parts: [{ text: aiText }] });
+        break;
+      }
+
+      const errData = await res.json().catch(() => ({}));
+      const errMsg = errData?.error?.message || `HTTP ${res.status}`;
+
+      if (res.status === 429) {
+        const delaySecs = parseRetryDelay(errMsg);
+        const remainingKeys = keys.length - tried.size;
+
+        if (remainingKeys > 0) {
+          // More keys to try — cycle immediately
+          const nextIdx = (keyIdx + 1) % keys.length;
+          lastErrShort = `Key ${keyIdx + 1} rate-limited — trying key ${nextIdx + 1}`;
+          hideTyping();
+          showTyping();
+          keyIdx = nextIdx;
+          continue;
+        } else if (delaySecs > 0) {
+          // All keys exhausted — wait on the last one then retry it once
+          await showRetryCountdown(delaySecs, keyIdx + 1, keys.length);
+          showTyping();
+          const res2 = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`,
+            { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
+          );
+          if (res2.ok) {
+            const data2 = await res2.json();
+            response = data2?.candidates?.[0]?.content?.parts?.[0]?.text || '(no response)';
+            currentKeyIndex = keyIdx;
+            chatHistory.push({ role: 'model', parts: [{ text: response }] });
+          } else {
+            lastErrShort = 'All keys rate-limited. Wait a minute and try again.';
+          }
+          break;
+        } else {
+          lastErrShort = 'All keys rate-limited. Add more API keys or wait a bit.';
+          break;
+        }
+      } else {
+        // Non-429 — try next key
+        lastErrShort = `Key ${keyIdx + 1} error: HTTP ${res.status}`;
+        keyIdx = (keyIdx + 1) % keys.length;
+      }
+    } catch (e) {
+      lastErrShort = `Key ${keyIdx + 1} error: ${e.message}`;
+      keyIdx = (keyIdx + 1) % keys.length;
+    }
+  }
+
+  hideTyping();
+  chatIsTyping = false;
+  document.getElementById('chat-send').disabled = false;
+
+  if (response) {
+    appendAIMessage(response);
+  } else {
+    appendAIMessage(`⚠️ ${lastErrShort || 'All keys failed. Try again shortly.'}`);
+  }
+};
+
+// Auto-resize textarea & enter to send
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('chat-input');
+  if (input) {
+    input.addEventListener('input', () => {
+      input.style.height = 'auto';
+      input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendChat();
+      }
+    });
+  }
+});
+
+// ═══════════════════════════════════════════
+//  ADMIN — AI Settings (stored in Firestore)
+// ═══════════════════════════════════════════
+
+function renderApiKeysEditor() {
+  const keys = (window._aiSettings && window._aiSettings.apiKeys) || [];
+  const list = document.getElementById('ae-api-keys-list');
+  list.innerHTML = keys.map((k, i) => `
+    <div class="admin-row-item">
+      <input class="admin-row-input api-key-input" placeholder="AIza..." value="${escAttr(k)}" type="password"
+        onfocus="this.type='text'" onblur="this.type='password'" style="flex:1;font-family:monospace;" />
+      <span style="font-size:0.7rem;color:var(--muted);padding:0 0.25rem;flex-shrink:0;">Key ${i+1}</span>
+      <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
+    </div>`).join('');
+}
+
+window.adminAddApiKey = function() {
+  const list = document.getElementById('ae-api-keys-list');
+  const div = document.createElement('div');
+  div.className = 'admin-row-item';
+  const idx = list.children.length + 1;
+  div.innerHTML = `
+    <input class="admin-row-input api-key-input" placeholder="AIza..." type="text" style="flex:1;font-family:monospace;" />
+    <span style="font-size:0.7rem;color:var(--muted);padding:0 0.25rem;flex-shrink:0;">Key ${idx}</span>
+    <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
+  list.appendChild(div);
+  div.querySelector('input').focus();
+};
+
+window.fetchGeminiModels = async function() {
+  const keys = [...document.querySelectorAll('.api-key-input')].map(i => i.value.trim()).filter(Boolean);
+  const hint = document.getElementById('ae-model-hint');
+  const select = document.getElementById('ae-gemini-model');
+
+  if (!keys.length) {
+    hint.textContent = '⚠️ Add at least one API key first.';
+    hint.style.color = 'var(--danger)';
+    return;
+  }
+
+  hint.textContent = 'Fetching models...';
+  hint.style.color = 'var(--muted)';
+  select.innerHTML = '<option value="">Loading...</option>';
+
+  let models = [];
+  let lastErr = '';
+
+  for (const key of keys) {
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+      if (!res.ok) { lastErr = `HTTP ${res.status}`; continue; }
+      const data = await res.json();
+      models = (data.models || [])
+        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+        .map(m => m.name.replace('models/', ''))
+        .filter(m => m.startsWith('gemini'));
+      if (models.length) break;
+    } catch(e) { lastErr = e.message; }
+  }
+
+  if (!models.length) {
+    select.innerHTML = '<option value="">— failed to load —</option>';
+    hint.textContent = `Failed: ${lastErr}`;
+    hint.style.color = 'var(--danger)';
+    return;
+  }
+
+  const current = (window._aiSettings && window._aiSettings.model) || '';
+  select.innerHTML = models.map(m =>
+    `<option value="${m}" ${m === current ? 'selected' : ''}>${m}</option>`
+  ).join('');
+  hint.textContent = `✓ ${models.length} model${models.length !== 1 ? 's' : ''} loaded.`;
+  hint.style.color = '#22c55e';
+};
+
+window.adminSaveAI = async function() {
+  if (!window._isAdmin) return;
+  const statusEl = document.getElementById('status-ai');
+  statusEl.textContent = 'Saving...';
+  statusEl.className = 'admin-status';
+
+  const keys = [...document.querySelectorAll('.api-key-input')].map(i => i.value.trim()).filter(Boolean);
+  const model = document.getElementById('ae-gemini-model').value || 'gemini-2.0-flash';
+  const systemPrompt = document.getElementById('ae-system-prompt').value.trim();
+
+  try {
+    // Save to Firestore so all users get the settings
+    await window._firestoreUpdate({ aiSettings: { apiKeys: keys, model, systemPrompt } });
+
+    // Update in-memory cache
+    window._aiSettings = { apiKeys: keys, model, systemPrompt };
+    if (window._siteData) window._siteData.aiSettings = window._aiSettings;
+
+    // Re-init chat with new settings
+    currentKeyIndex = 0;
+    initChat();
+
+    statusEl.textContent = '✓ Saved to Firestore';
+    statusEl.className = 'admin-status ok';
+    setTimeout(() => { statusEl.textContent = ''; statusEl.className = 'admin-status'; }, 3000);
+  } catch(e) {
+    statusEl.textContent = '✗ ' + (e.message || 'Save failed');
+    statusEl.className = 'admin-status err';
+  }
+};
+
+// Patch openAdminPanel to also populate AI settings tab
+const _origOpenAdmin = window.openAdminPanel;
+window.openAdminPanel = function() {
+  _origOpenAdmin && _origOpenAdmin();
+  renderApiKeysEditor();
+  const settings = window._aiSettings || {};
+  const sel = document.getElementById('ae-gemini-model');
+  if (settings.model) {
+    const existing = [...sel.options].find(o => o.value === settings.model);
+    if (!existing) {
+      const opt = document.createElement('option');
+      opt.value = settings.model;
+      opt.textContent = settings.model;
+      opt.selected = true;
+      sel.prepend(opt);
+    } else {
+      sel.value = settings.model;
+    }
+  }
+  document.getElementById('ae-system-prompt').value = settings.systemPrompt || '';
+  document.getElementById('ae-model-hint').textContent = 'Click "Fetch Models" to load available Gemini models from Google\'s API (requires at least one API key above).';
+  document.getElementById('ae-model-hint').style.color = '';
 };
 
 // ── Save ──
