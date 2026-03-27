@@ -1813,22 +1813,11 @@
       <button class="admin-tab active" onclick="switchAdminTab('games')">🎮 Games</button>
       <button class="admin-tab" onclick="switchAdminTab('toptier')">⭐ Top Tier</button>
       <button class="admin-tab" onclick="switchAdminTab('banned')">🚫 Banned</button>
-      <button class="admin-tab" onclick="switchAdminTab('hero')">Hero</button>
       <button class="admin-tab" onclick="switchAdminTab('notice')">Notice</button>
       <button class="admin-tab" onclick="switchAdminTab('sites')">Sites</button>
       <button class="admin-tab" onclick="switchAdminTab('command')">Command</button>
     </div>
     <div class="admin-body">
-
-      <!-- HERO -->
-      <div class="admin-section active" id="admin-hero">
-        <div class="admin-field"><label>Subtitle</label><input class="admin-input" id="ae-hero-subtitle" /></div>
-        <div class="admin-field"><label>Primary Button Label</label><input class="admin-input" id="ae-hero-btn1-label" /></div>
-        <div class="admin-field"><label>Primary Button Link</label><input class="admin-input" id="ae-hero-btn1-href" /></div>
-        <div class="admin-field"><label>Secondary Button Label</label><input class="admin-input" id="ae-hero-btn2-label" /></div>
-        <div class="admin-field"><label>Secondary Button Link</label><input class="admin-input" id="ae-hero-btn2-href" /></div>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('hero')">Save Hero</button><span class="admin-status" id="status-hero"></span></div>
-      </div>
 
       <!-- NOTICE -->
       <div class="admin-section" id="admin-notice">
@@ -1907,13 +1896,6 @@ window.openAdminPanel = function() {
   if (!window._isAdmin) return;
   const data = window._siteData;
   if (!data) { alert('Site data not loaded yet. Try again in a moment.'); return; }
-
-  // Hero
-  document.getElementById('ae-hero-subtitle').value = data.hero?.subtitle || '';
-  document.getElementById('ae-hero-btn1-label').value = data.hero?.buttons?.primary?.label || '';
-  document.getElementById('ae-hero-btn1-href').value = data.hero?.buttons?.primary?.href || '';
-  document.getElementById('ae-hero-btn2-label').value = data.hero?.buttons?.secondary?.label || '';
-  document.getElementById('ae-hero-btn2-href').value = data.hero?.buttons?.secondary?.href || '';
 
   // Notice
   document.getElementById('ae-notice-title').value = data.notice?.title || '';
@@ -2102,15 +2084,7 @@ window.adminSave = async function(section) {
   try {
     let patch = {};
 
-    if (section === 'hero') {
-      patch.hero = {
-        subtitle: document.getElementById('ae-hero-subtitle').value.trim(),
-        buttons: {
-          primary:   { label: document.getElementById('ae-hero-btn1-label').value.trim(), href: document.getElementById('ae-hero-btn1-href').value.trim() },
-          secondary: { label: document.getElementById('ae-hero-btn2-label').value.trim(), href: document.getElementById('ae-hero-btn2-href').value.trim() }
-        }
-      };
-    } else if (section === 'notice') {
+    if (section === 'notice') {
       patch.notice = {
         title: document.getElementById('ae-notice-title').value.trim(),
         text:  document.getElementById('ae-notice-text').value.trim()
