@@ -2004,6 +2004,9 @@
     // AI settings — load from Firestore data so all users get them
     if (data.aiSettings) {
       window._aiSettings = data.aiSettings;
+      // Apply AI enable/disable for all users
+      const aiEnabled = data.aiSettings.aiEnabled !== false;
+      applyAiEnabledState(aiEnabled);
     }
     initChat();
 
@@ -2113,9 +2116,24 @@
       <!-- AI SETTINGS -->
       <div class="admin-section" id="admin-ai">
         <p class="admin-hint" style="margin-bottom:1rem;">
-          Add one or more Gemini API keys. If a key fails (quota exceeded, invalid, etc.) the chat will automatically cycle to the next key.
+          Add one or more Gemini API keys. If a key fails (quota exceeded, invalid, etc.) the chat will automatically cycle to the next key. Keys are stored in Firestore and shared with all users.
         </p>
-        <div class="admin-sublabel" style="margin-top:0;">API Keys</div>
+
+        <div class="admin-sublabel" style="margin-top:0;">AI Access</div>
+        <div class="admin-field" style="display:flex;align-items:center;gap:1rem;background:#111118;border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;">
+          <div style="flex:1;">
+            <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;">Enable AI for All Users</div>
+            <div style="font-size:0.72rem;color:var(--muted);">When disabled, the chat UI is hidden from all users site-wide.</div>
+          </div>
+          <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;">
+            <input type="checkbox" id="ae-ai-enabled" style="opacity:0;width:0;height:0;position:absolute;" onchange="updateAiToggleStyle(this)" />
+            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;cursor:pointer;" onclick="document.getElementById('ae-ai-enabled').click()">
+              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);"></span>
+            </span>
+          </label>
+        </div>
+
+        <div class="admin-sublabel">API Keys</div>
         <div id="ae-api-keys-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddApiKey()">+ Add API Key</button>
         <hr class="admin-divider">
@@ -2420,7 +2438,7 @@ window.clearChat = function() {
   chatHistory = [];
   const msgs = document.getElementById('chat-messages');
   msgs.innerHTML = '';
-  appendAIMessage("Chat cleared! Ask me anything!");
+  appendAIMessage("Chat cleared! Ask me anything about gaming. 🎮");
 };
 
 // Parse "retry in Xs" from Google error messages
@@ -2583,22 +2601,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function renderApiKeysEditor() {
   const keys = (window._aiSettings && window._aiSettings.apiKeys) || [];
+  const tiers = (window._aiSettings && window._aiSettings.keyTiers) || [];
   const list = document.getElementById('ae-api-keys-list');
-  list.innerHTML = keys.map((k, i) => `
-    <div class="admin-row-item">
-      <input class="admin-row-input api-key-input" placeholder="AIza..." value="${escAttr(k)}" type="password"
-        onfocus="this.type='text'" onblur="this.type='password'" style="flex:1;font-family:monospace;" />
+  list.innerHTML = keys.map((k, i) => {
+    const tier = tiers[i] || 'free';
+    return `
+    <div class="admin-row-item" style="align-items:center;">
+      <select class="api-tier-select" style="flex-shrink:0;background:#111118;border:1px solid var(--border);border-radius:6px;padding:0.48rem 0.5rem;color:var(--text);font-size:0.75rem;font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;cursor:pointer;outline:none;width:76px;" onchange="updateTierBadge(this)">
+        <option value="free" ${tier==='free'?'selected':''}>FREE</option>
+        <option value="paid" ${tier==='paid'?'selected':''}>PAID</option>
+      </select>
+      <input class="admin-row-input api-key-input" placeholder="AIza..." value="${escAttr(k)}" type="text" style="flex:1;font-family:monospace;" />
       <span style="font-size:0.7rem;color:var(--muted);padding:0 0.25rem;flex-shrink:0;">Key ${i+1}</span>
       <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+  // Color tier selects after render
+  list.querySelectorAll('.api-tier-select').forEach(s => updateTierBadge(s));
 }
+
+window.updateTierBadge = function(sel) {
+  if (sel.value === 'paid') {
+    sel.style.color = '#22c55e';
+    sel.style.borderColor = 'rgba(34,197,94,0.45)';
+    sel.style.background = 'rgba(34,197,94,0.07)';
+  } else {
+    sel.style.color = 'var(--muted)';
+    sel.style.borderColor = 'var(--border)';
+    sel.style.background = '#111118';
+  }
+};
 
 window.adminAddApiKey = function() {
   const list = document.getElementById('ae-api-keys-list');
   const div = document.createElement('div');
   div.className = 'admin-row-item';
+  div.style.alignItems = 'center';
   const idx = list.children.length + 1;
   div.innerHTML = `
+    <select class="api-tier-select" style="flex-shrink:0;background:#111118;border:1px solid var(--border);border-radius:6px;padding:0.48rem 0.5rem;color:var(--muted);font-size:0.75rem;font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;cursor:pointer;outline:none;width:76px;" onchange="updateTierBadge(this)">
+      <option value="free">FREE</option>
+      <option value="paid">PAID</option>
+    </select>
     <input class="admin-row-input api-key-input" placeholder="AIza..." type="text" style="flex:1;font-family:monospace;" />
     <span style="font-size:0.7rem;color:var(--muted);padding:0 0.25rem;flex-shrink:0;">Key ${idx}</span>
     <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
@@ -2658,17 +2702,23 @@ window.adminSaveAI = async function() {
   statusEl.textContent = 'Saving...';
   statusEl.className = 'admin-status';
 
-  const keys = [...document.querySelectorAll('.api-key-input')].map(i => i.value.trim()).filter(Boolean);
+  const keyRows = [...document.querySelectorAll('#ae-api-keys-list .admin-row-item')];
+  const keys = keyRows.map(row => row.querySelector('.api-key-input').value.trim()).filter(Boolean);
+  const keyTiers = keyRows.map(row => row.querySelector('.api-tier-select')?.value || 'free');
   const model = document.getElementById('ae-gemini-model').value || 'gemini-2.0-flash';
   const systemPrompt = document.getElementById('ae-system-prompt').value.trim();
+  const aiEnabled = document.getElementById('ae-ai-enabled').checked;
 
   try {
     // Save to Firestore so all users get the settings
-    await window._firestoreUpdate({ aiSettings: { apiKeys: keys, model, systemPrompt } });
+    await window._firestoreUpdate({ aiSettings: { apiKeys: keys, keyTiers, model, systemPrompt, aiEnabled } });
 
     // Update in-memory cache
-    window._aiSettings = { apiKeys: keys, model, systemPrompt };
+    window._aiSettings = { apiKeys: keys, keyTiers, model, systemPrompt, aiEnabled };
     if (window._siteData) window._siteData.aiSettings = window._aiSettings;
+
+    // Apply AI enable/disable to the live chat section
+    applyAiEnabledState(aiEnabled);
 
     // Re-init chat with new settings
     currentKeyIndex = 0;
@@ -2682,6 +2732,14 @@ window.adminSaveAI = async function() {
     statusEl.className = 'admin-status err';
   }
 };
+
+function applyAiEnabledState(enabled) {
+  const aiSection = document.getElementById('ai-chat');
+  if (aiSection) aiSection.style.display = enabled ? '' : 'none';
+  // Also hide/show the nav AI link
+  const navLinks = document.querySelectorAll('.nav-links a');
+  navLinks.forEach(a => { if (a.getAttribute('href') === '#ai-chat') a.style.display = enabled ? '' : 'none'; });
+}
 
 // Patch openAdminPanel to also populate AI settings tab
 const _origOpenAdmin = window.openAdminPanel;
@@ -2705,6 +2763,24 @@ window.openAdminPanel = function() {
   document.getElementById('ae-system-prompt').value = settings.systemPrompt || '';
   document.getElementById('ae-model-hint').textContent = 'Click "Fetch Models" to load available Gemini models from Google\'s API (requires at least one API key above).';
   document.getElementById('ae-model-hint').style.color = '';
+  // Populate AI enabled toggle
+  const enabledChk = document.getElementById('ae-ai-enabled');
+  const isEnabled = settings.aiEnabled !== false; // default true
+  enabledChk.checked = isEnabled;
+  updateAiToggleStyle(enabledChk);
+};
+
+window.updateAiToggleStyle = function(chk) {
+  const track = document.getElementById('ae-ai-toggle-track');
+  const thumb = document.getElementById('ae-ai-toggle-thumb');
+  if (!track || !thumb) return;
+  if (chk.checked) {
+    track.style.background = 'var(--primary)';
+    thumb.style.transform = 'translateX(22px)';
+  } else {
+    track.style.background = 'var(--border)';
+    thumb.style.transform = 'translateX(0)';
+  }
 };
 
 // ── Save ──
