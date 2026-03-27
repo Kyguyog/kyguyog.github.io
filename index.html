@@ -1847,7 +1847,7 @@
 
       <!-- GAMES -->
       <div class="admin-section" id="admin-games">
-        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name; URL is optional.</p>
+        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name; URL is NOT optional.</p>
         <div id="ae-games-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
@@ -2010,7 +2010,7 @@ function renderGamesEditor(gamesObj) {
   document.getElementById('ae-games-list').innerHTML = flat.map(g => `
     <div class="admin-row-item">
       <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name)}" style="flex:1;" />
-      <input class="admin-row-input game-url-input" placeholder="https://... (optional)" value="${escAttr(g.url||'')}" style="flex:2;" />
+      <input class="admin-row-input game-url-input" placeholder="https://..." value="${escAttr(g.url||'')}" style="flex:2;" />
       <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
     </div>`).join('');
 }
@@ -2020,7 +2020,7 @@ window.adminAddGame = function() {
   div.className = 'admin-row-item';
   div.innerHTML = `
     <input class="admin-row-input game-name-input" placeholder="Game name" style="flex:1;" />
-    <input class="admin-row-input game-url-input" placeholder="https://... (optional)" style="flex:2;" />
+    <input class="admin-row-input game-url-input" placeholder="https://..." style="flex:2;" />
     <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
   document.getElementById('ae-games-list').appendChild(div);
   div.querySelector('input').focus();
