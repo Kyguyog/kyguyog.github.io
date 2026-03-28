@@ -1365,6 +1365,7 @@
     <a href="#games">Games</a>
     <a href="#sites">Sites</a>
     <a href="#ai-chat">AI</a>
+    <a href="#stats">Stats</a>
     <a href="#staff">Outcasts</a>
   </div>
   <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
@@ -1498,7 +1499,7 @@
 </section>
 
 <!-- STATS -->
-<section>
+<section id="stats">
   <div class="container">
     <div class="stats-grid reveal" id="stats-grid"></div>
   </div>
@@ -1552,6 +1553,10 @@
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
       Edit Site Content
     </button>
+    <button class="popup-btn" id="ai-usage-popup-btn" onclick="openAiUsageDash();toggleUserPopup();" style="color:var(--secondary);display:none;">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><polyline points="7 10 11 14 14 11 17 14"/></svg>
+      AI Usage
+    </button>
   </div>
   <div class="popup-section">
     <button class="popup-btn" onclick="togglePopupForm('username-form')">
@@ -1589,12 +1594,15 @@
 </div>
 </div><!-- end #main-content -->
 
+<!-- Admin panels injected here by JS only for admins -->
+<div id="admin-panels-mount"></div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword }
     from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ",
@@ -1614,6 +1622,20 @@
   // Expose update bridge for admin panel (non-module script)
   window._firestoreUpdate = async function(patch) {
     await updateDoc(doc(db, 'siteContent', 'main'), patch);
+  };
+
+  // Record one AI request timestamp for the current user
+  window._recordAiUsage = async function() {
+    const user = auth.currentUser;
+    if (!user) return;
+    const now = new Date().toISOString();
+    await setDoc(doc(db, 'users', user.email), { aiUsage: arrayUnion(now) }, { merge: true });
+  };
+
+  // Fetch all user docs for the AI usage dashboard
+  window._fetchAllUsers = async function() {
+    const snap = await getDocs(collection(db, 'users'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   };
 
   // ── Tab switching ──
@@ -1813,8 +1835,11 @@
           window._isAdmin = true;
           const adminBtn = document.getElementById('admin-popup-btn');
           const adminSection = document.getElementById('admin-popup-section');
+          const aiUsageBtn = document.getElementById('ai-usage-popup-btn');
           if (adminBtn) adminBtn.style.display = 'flex';
           if (adminSection) adminSection.style.display = 'block';
+          if (aiUsageBtn) aiUsageBtn.style.display = 'flex';
+          injectAdminPanels();
         }
       } catch(e) {
         console.warn('Could not check admin status:', e);
@@ -1890,7 +1915,13 @@
     let html = '';
 
     for (const [letter, games] of Object.entries(GAMES).sort(([a],[b]) => a.localeCompare(b))) {
-      const matched = q ? games.filter(g => g.name.toLowerCase().includes(q)) : games;
+      const matched = q ? games.filter(g => {
+          if (g.name.toLowerCase().includes(q)) return true;
+          try {
+            const host = new URL(g.url).hostname.replace(/^www\./, '').toLowerCase();
+            return host.includes(q) || host.replace(/\.[^.]+$/, '').includes(q);
+          } catch { return false; }
+        }) : games;
       if (matched.length === 0) continue;
       totalMatches += matched.length;
       const cards = matched.map(g => {
@@ -1974,7 +2005,7 @@
     const statsGrid = document.getElementById('stats-grid');
     statsGrid.innerHTML = [
       { value: totalGames,  label: 'Total Games' },
-      { value: totalSites,  label: 'Total Sites' },
+      { value: totalSites,  label: 'Approved Sites' },
       { value: totalBanned, label: 'Banned Users' }
     ].map(s =>
       `<div class="stat-item">
@@ -2055,6 +2086,17 @@
 </script>
 
 <!-- ADMIN PANEL -->
+<script>
+// ═══════════════════════════════════════════
+//  ADMIN PANEL
+// ═══════════════════════════════════════════
+window._isAdmin = false;
+window._siteData = null;
+
+window.injectAdminPanels = function() {
+  if (document.getElementById('admin-panel')) return; // already injected
+  const mount = document.getElementById('admin-panels-mount');
+  mount.innerHTML = `
 <div id="admin-panel">
   <div class="admin-modal">
     <div class="admin-header">
@@ -2074,45 +2116,33 @@
       <button class="admin-tab" onclick="switchAdminTab('ai')">🤖 AI Settings</button>
     </div>
     <div class="admin-body">
-
-      <!-- NOTICE -->
       <div class="admin-section" id="admin-notice">
         <div class="admin-field"><label>Notice Title</label><input class="admin-input" id="ae-notice-title" /></div>
         <div class="admin-field"><label>Notice Text (HTML allowed)</label><textarea class="admin-textarea" id="ae-notice-text" style="min-height:100px;"></textarea></div>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('notice')">Save Notice</button><span class="admin-status" id="status-notice"></span></div>
       </div>
-
-      <!-- TOP TIER -->
       <div class="admin-section" id="admin-toptier">
         <p class="admin-hint" style="margin-bottom:1rem;">Fill in name, badge, game URL, and background image URL for each card.</p>
         <div id="ae-toptier-list"></div>
         <button class="admin-add-btn" onclick="adminAddTopTier()">+ Add Card</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('toptier')">Save Top Tier</button><span class="admin-status" id="status-toptier"></span></div>
       </div>
-
-      <!-- GAMES -->
       <div class="admin-section" id="admin-games">
         <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name; URL is NOT optional.</p>
         <div id="ae-games-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
       </div>
-
-      <!-- SITES -->
       <div class="admin-section" id="admin-sites">
         <div id="ae-sites-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddSite()">+ Add Site</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('sites')">Save Sites</button><span class="admin-status" id="status-sites"></span></div>
       </div>
-
-      <!-- BANNED -->
       <div class="admin-section" id="admin-banned">
         <div id="ae-banned-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddBanned()">+ Add Person</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('banned')">Save Banned</button><span class="admin-status" id="status-banned"></span></div>
       </div>
-
-      <!-- COMMAND -->
       <div class="admin-section" id="admin-command">
         <div class="admin-sublabel" style="margin-top:0;">Hiring Banner</div>
         <div class="admin-field">
@@ -2132,27 +2162,21 @@
         <button class="admin-add-btn" onclick="adminAddCommandLink()">+ Add Link</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('command')">Save Command</button><span class="admin-status" id="status-command"></span></div>
       </div>
-
-      <!-- AI SETTINGS -->
       <div class="admin-section" id="admin-ai">
-        <p class="admin-hint" style="margin-bottom:1rem;">
-          Add one or more Gemini API keys. If a key fails (quota exceeded, invalid, etc.) the chat will automatically cycle to the next key. Keys are stored in Firestore and shared with all users.
-        </p>
-
+        <p class="admin-hint" style="margin-bottom:1rem;">Add one or more Gemini API keys. If a key fails (quota exceeded, invalid, etc.) the chat will automatically cycle to the next key. Keys are stored in Firestore and shared with all users.</p>
         <div class="admin-sublabel" style="margin-top:0;">AI Access</div>
         <div class="admin-field" style="display:flex;align-items:center;gap:1rem;background:#111118;border:1px solid var(--border);border-radius:8px;padding:0.85rem 1rem;margin-bottom:1rem;">
           <div style="flex:1;">
             <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;">Enable AI for All Users</div>
             <div style="font-size:0.72rem;color:var(--muted);">When disabled, the chat UI is hidden from all users site-wide.</div>
           </div>
-          <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;">
-            <input type="checkbox" id="ae-ai-enabled" style="opacity:0;width:0;height:0;position:absolute;" onchange="updateAiToggleStyle(this)" />
-            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;cursor:pointer;" onclick="var chk=document.getElementById('ae-ai-enabled');chk.checked=!chk.checked;updateAiToggleStyle(chk)">
-              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);"></span>
+          <div style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;" onclick="var chk=document.getElementById('ae-ai-enabled');chk.checked=!chk.checked;updateAiToggleStyle(chk);">
+            <input type="checkbox" id="ae-ai-enabled" name="ae-ai-enabled" style="position:absolute;opacity:0;pointer-events:none;width:48px;height:26px;" />
+            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;pointer-events:none;">
+              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);pointer-events:none;"></span>
             </span>
-          </label>
+          </div>
         </div>
-
         <div class="admin-sublabel">API Keys</div>
         <div id="ae-api-keys-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddApiKey()">+ Add API Key</button>
@@ -2164,7 +2188,7 @@
           </select>
           <button class="admin-save-btn" style="margin:0;padding:0.7rem 1.25rem;white-space:nowrap;" onclick="fetchGeminiModels()">↺ Fetch Models</button>
         </div>
-        <p class="admin-hint" id="ae-model-hint">Click "Fetch Models" to load available Gemini models from Google's API (requires at least one API key above).</p>
+        <p class="admin-hint" id="ae-model-hint">Click "Fetch Models" to load available Gemini models from Google\'s API (requires at least one API key above).</p>
         <hr class="admin-divider">
         <div class="admin-sublabel">System Prompt (optional)</div>
         <textarea class="admin-textarea" id="ae-system-prompt" style="min-height:80px;" placeholder="e.g. You are a helpful gaming assistant for KnowWhere Gaming Hub. Keep answers concise and gaming-focused."></textarea>
@@ -2173,17 +2197,35 @@
           <span class="admin-status" id="status-ai"></span>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
-<script>
-// ═══════════════════════════════════════════
-//  ADMIN PANEL
-// ═══════════════════════════════════════════
-window._isAdmin = false;
-window._siteData = null;
+<div id="ai-usage-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(34,211,238,0.12);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:0.6rem;font-family:var(--font-display);font-size:0.85rem;font-weight:700;letter-spacing:0.1em;color:var(--secondary);">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><polyline points="7 10 11 14 14 11 17 14"/></svg>
+        AI USAGE — LAST 48 HRS
+      </div>
+      <button onclick="closeAiUsageDash()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Close</button>
+    </div>
+    <div style="padding:0.75rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <span id="ai-usage-summary" style="font-size:0.75rem;color:var(--muted);"></span>
+      <button onclick="loadAiUsage()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--secondary)';this.style.color='var(--secondary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+    </div>
+    <div id="ai-usage-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.4rem;">
+      <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
+    </div>
+  </div>
+</div>`;
+
+  // Bind backdrop click to close admin panel
+  document.getElementById('admin-panel').addEventListener('click', function(e) {
+    if (e.target === this) closeAdminPanel();
+  });
+};
+
 
 function escAttr(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -2229,10 +2271,6 @@ window.openAdminPanel = function() {
 window.closeAdminPanel = function() {
   document.getElementById('admin-panel').classList.remove('open');
 };
-
-document.getElementById('admin-panel').addEventListener('click', function(e) {
-  if (e.target === this) closeAdminPanel();
-});
 
 window.switchAdminTab = function(tab) {
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -2462,7 +2500,6 @@ window.downloadChat = function() {
     messages: chatHistory.map(entry => ({
       role: entry.role === 'model' ? 'ai' : 'user',
       text: entry.parts[0].text,
-      // keep original Gemini format too so re-import works cleanly
       _gemini: entry
     }))
   };
@@ -2482,33 +2519,25 @@ window.uploadChat = function(event) {
   reader.onload = function(e) {
     try {
       const data = JSON.parse(e.target.result);
-      // Accept both our export format and raw Gemini history arrays
       let entries = [];
       if (Array.isArray(data)) {
-        // Raw chatHistory dump
         entries = data;
       } else if (data.messages && Array.isArray(data.messages)) {
-        // Our export format — reconstruct Gemini entries from _gemini field or re-build
         entries = data.messages.map(m => m._gemini || { role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.text }] });
       } else {
         throw new Error('Unrecognised format');
       }
-      // Validate basic shape
       if (!entries.every(e => e.role && Array.isArray(e.parts))) throw new Error('Invalid message structure');
-
       chatHistory = entries;
-      // Re-render messages
       const msgs = document.getElementById('chat-messages');
       msgs.innerHTML = '';
       entries.forEach(entry => {
         if (entry.role === 'user') appendUserMessage(entry.parts[0].text);
         else appendAIMessage(entry.parts[0].text);
       });
-
     } catch(err) {
       alert('Failed to load chat: ' + err.message);
     }
-    // Reset file input so the same file can be re-uploaded if needed
     event.target.value = '';
   };
   reader.readAsText(file);
@@ -2653,6 +2682,7 @@ window.sendChat = async function() {
 
   if (response) {
     appendAIMessage(response);
+    if (window._recordAiUsage) window._recordAiUsage();
   } else {
     appendAIMessage(`⚠️ ${lastErrShort || 'All keys failed. Try again shortly.'}`);
   }
@@ -2943,6 +2973,65 @@ window.adminSave = async function(section) {
   }
 
   if (btn) btn.disabled = false;
+};
+
+// ── AI Usage Dashboard ──
+window.openAiUsageDash = function() {
+  if (!window._isAdmin) return;
+  const panel = document.getElementById('ai-usage-panel');
+  panel.style.display = 'flex';
+  loadAiUsage();
+};
+
+window.closeAiUsageDash = function() {
+  document.getElementById('ai-usage-panel').style.display = 'none';
+};
+
+window.loadAiUsage = async function() {
+  const list = document.getElementById('ai-usage-list');
+  const summary = document.getElementById('ai-usage-summary');
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';
+  summary.textContent = '';
+
+  try {
+    const users = await window._fetchAllUsers();
+    const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+
+    const rows = users.map(u => {
+      const usage = Array.isArray(u.aiUsage) ? u.aiUsage : [];
+      const recent = usage.filter(ts => new Date(ts).getTime() >= cutoff);
+      return { name: u.username || u.email || u.id, email: u.email || u.id, count: recent.length };
+    }).filter(r => r.count > 0).sort((a, b) => b.count - a.count);
+
+    const totalReqs = rows.reduce((s, r) => s + r.count, 0);
+    summary.textContent = `${rows.length} active user${rows.length !== 1 ? 's' : ''} · ${totalReqs} total request${totalReqs !== 1 ? 's' : ''}`;
+
+    if (!rows.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No AI requests in the last 48 hours.</div>';
+      return;
+    }
+
+    const max = rows[0].count;
+    list.innerHTML = rows.map((r, i) => {
+      const pct = max > 0 ? (r.count / max) * 100 : 0;
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="display:inline-block;width:18px;text-align:center;font-size:0.7rem;color:var(--muted);">${i+1}</span>`;
+      return `<div style="display:flex;flex-direction:column;gap:0.3rem;padding:0.6rem 0.75rem;background:#0d0d14;border:1px solid var(--border);border-radius:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:0.5rem;min-width:0;">
+            <span style="flex-shrink:0;">${medal}</span>
+            <span style="font-size:0.82rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.name}</span>
+            ${r.name !== r.email ? `<span style="font-size:0.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.email}</span>` : ''}
+          </div>
+          <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;color:var(--secondary);flex-shrink:0;margin-left:0.75rem;">${r.count} req${r.count !== 1 ? 's' : ''}</span>
+        </div>
+        <div style="height:4px;background:var(--border);border-radius:999px;overflow:hidden;">
+          <div style="height:100%;width:${pct}%;background:var(--secondary);border-radius:999px;transition:width 0.4s ease;"></div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
+  }
 };
 </script>
 
