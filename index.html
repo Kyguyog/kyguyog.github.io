@@ -2125,12 +2125,12 @@
             <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;">Enable AI for All Users</div>
             <div style="font-size:0.72rem;color:var(--muted);">When disabled, the chat UI is hidden from all users site-wide.</div>
           </div>
-          <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;">
-            <input type="checkbox" id="ae-ai-enabled" style="opacity:0;width:0;height:0;position:absolute;" onchange="updateAiToggleStyle(this)" />
-            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;cursor:pointer;" onclick="document.getElementById('ae-ai-enabled').click()">
-              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);"></span>
+          <div style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;" onclick="var chk=document.getElementById('ae-ai-enabled');chk.checked=!chk.checked;updateAiToggleStyle(chk);">
+            <input type="checkbox" id="ae-ai-enabled" name="ae-ai-enabled" style="position:absolute;opacity:0;pointer-events:none;width:48px;height:26px;" />
+            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;pointer-events:none;">
+              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);pointer-events:none;"></span>
             </span>
-          </label>
+          </div>
         </div>
 
         <div class="admin-sublabel">API Keys</div>
