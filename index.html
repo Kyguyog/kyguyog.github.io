@@ -1293,6 +1293,19 @@
       transition: border-color 0.2s, color 0.2s;
     }
     #chat-clear:hover { border-color: var(--danger); color: var(--danger); }
+    #chat-download, #chat-upload-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    #chat-download:hover { border-color: var(--secondary); color: var(--secondary); }
+    #chat-upload-btn:hover { border-color: var(--primary); color: var(--primary); }
     .chat-model-badge {
       font-size: 0.65rem;
       color: var(--muted);
@@ -1464,6 +1477,13 @@
         </div>
         <div class="chat-footer">
           <textarea id="chat-input" placeholder="Ask anything about games..." rows="1"></textarea>
+          <button id="chat-download" title="Download chat as JSON" onclick="downloadChat()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          </button>
+          <button id="chat-upload-btn" title="Upload chat from JSON" onclick="document.getElementById('chat-upload-input').click()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </button>
+          <input type="file" id="chat-upload-input" accept=".json" style="display:none;" onchange="uploadChat(event)" />
           <button id="chat-clear" title="Clear chat" onclick="clearChat()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
           </button>
@@ -1954,7 +1974,7 @@
     const statsGrid = document.getElementById('stats-grid');
     statsGrid.innerHTML = [
       { value: totalGames,  label: 'Total Games' },
-      { value: totalSites,  label: 'Total Sites' },
+      { value: totalSites,  label: 'Approved Sites' },
       { value: totalBanned, label: 'Banned Users' }
     ].map(s =>
       `<div class="stat-item">
@@ -2125,12 +2145,12 @@
             <div style="font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:0.15rem;">Enable AI for All Users</div>
             <div style="font-size:0.72rem;color:var(--muted);">When disabled, the chat UI is hidden from all users site-wide.</div>
           </div>
-          <div style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;" onclick="var chk=document.getElementById('ae-ai-enabled');chk.checked=!chk.checked;updateAiToggleStyle(chk);">
-            <input type="checkbox" id="ae-ai-enabled" name="ae-ai-enabled" style="position:absolute;opacity:0;pointer-events:none;width:48px;height:26px;" />
-            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;pointer-events:none;">
-              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);pointer-events:none;"></span>
+          <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;">
+            <input type="checkbox" id="ae-ai-enabled" style="opacity:0;width:0;height:0;position:absolute;" onchange="updateAiToggleStyle(this)" />
+            <span id="ae-ai-toggle-track" style="display:flex;align-items:center;width:48px;height:26px;background:var(--border);border-radius:999px;transition:background 0.2s;padding:3px;cursor:pointer;" onclick="var chk=document.getElementById('ae-ai-enabled');chk.checked=!chk.checked;updateAiToggleStyle(chk)">
+              <span id="ae-ai-toggle-thumb" style="width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s;display:block;transform:translateX(0);box-shadow:0 1px 4px rgba(0,0,0,0.4);"></span>
             </span>
-          </div>
+          </label>
         </div>
 
         <div class="admin-sublabel">API Keys</div>
@@ -2433,6 +2453,66 @@ function hideTyping() {
 function escapeHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g,'<br>');
 }
+
+window.downloadChat = function() {
+  if (!chatHistory.length) return;
+  const exportData = {
+    exported: new Date().toISOString(),
+    model: (window._aiSettings && window._aiSettings.model) || 'gemini-2.0-flash',
+    messages: chatHistory.map(entry => ({
+      role: entry.role === 'model' ? 'ai' : 'user',
+      text: entry.parts[0].text,
+      // keep original Gemini format too so re-import works cleanly
+      _gemini: entry
+    }))
+  };
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `chat-${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+window.uploadChat = function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Accept both our export format and raw Gemini history arrays
+      let entries = [];
+      if (Array.isArray(data)) {
+        // Raw chatHistory dump
+        entries = data;
+      } else if (data.messages && Array.isArray(data.messages)) {
+        // Our export format — reconstruct Gemini entries from _gemini field or re-build
+        entries = data.messages.map(m => m._gemini || { role: m.role === 'ai' ? 'model' : 'user', parts: [{ text: m.text }] });
+      } else {
+        throw new Error('Unrecognised format');
+      }
+      // Validate basic shape
+      if (!entries.every(e => e.role && Array.isArray(e.parts))) throw new Error('Invalid message structure');
+
+      chatHistory = entries;
+      // Re-render messages
+      const msgs = document.getElementById('chat-messages');
+      msgs.innerHTML = '';
+      entries.forEach(entry => {
+        if (entry.role === 'user') appendUserMessage(entry.parts[0].text);
+        else appendAIMessage(entry.parts[0].text);
+      });
+
+    } catch(err) {
+      alert('Failed to load chat: ' + err.message);
+    }
+    // Reset file input so the same file can be re-uploaded if needed
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+};
 
 window.clearChat = function() {
   chatHistory = [];
