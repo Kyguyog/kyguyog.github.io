@@ -1495,7 +1495,7 @@
           </div>
         </div>
         <div class="chat-footer">
-          <textarea id="chat-input" placeholder="Ask anything about games..." rows="1"></textarea>
+          <textarea id="chat-input" placeholder="Ask anything, However keep it SFW..." rows="1"></textarea>
           <button id="chat-download" title="Download chat as JSON" onclick="downloadChat()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
@@ -1573,7 +1573,7 @@
     </button>
     <button class="popup-btn" id="ai-usage-popup-btn" onclick="openAiUsageDash();toggleUserPopup();" style="color:var(--secondary);display:none;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><polyline points="7 10 11 14 14 11 17 14"/></svg>
-      User Dashboard
+      Admin Dashboard
     </button>
   </div>
   <div class="popup-section">
@@ -2403,7 +2403,7 @@ window.injectAdminPanels = function() {
     <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:0.6rem;font-family:var(--font-display);font-size:0.85rem;font-weight:700;letter-spacing:0.1em;color:var(--secondary);">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><polyline points="7 10 11 14 14 11 17 14"/></svg>
-        USER DASHBOARD
+        Admin DASHBOARD
       </div>
       <button onclick="closeAiUsageDash()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Close</button>
     </div>
@@ -2672,7 +2672,7 @@ function initChat() {
 
   // Welcome message (only once per session)
   if (!msgs.querySelector('.chat-msg')) {
-    appendAIMessage("Hey! I'm your KnowWhere assistant powered by Gemini, FYI I forget everything when you refresh");
+    appendAIMessage("Hey! I'm your KnowWhere assistant powered by Gemini, I forget everything when you refresh. You can save the chat and re-upload it later though!");
   }
 }
 
@@ -3196,7 +3196,7 @@ window.adminSave = async function(section) {
   if (btn) btn.disabled = false;
 };
 
-// ── AI Usage / User Dashboard ──
+// ── AI Usage / Admin Dashboard ──
 window.openAiUsageDash = function() {
   if (!window._isAdmin) return;
   const panel = document.getElementById('ai-usage-panel');
