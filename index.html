@@ -1327,15 +1327,13 @@
       <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" alt="KnowWhere">
       <div class="auth-logo-name">KNOW<span>WHERE</span></div>
     </div>
-    <div class="auth-tabs" style="display:none;">
+    <div class="auth-tabs">
       <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
       <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
     </div>
-    <div class="auth-form">
-      <div class="auth-field" id="field-username" style="display:none;">
-        <label>Username</label>
-        <input type="text" id="auth-username" placeholder="Choose a username" />
-      </div>
+
+    <!-- LOGIN FORM -->
+    <div class="auth-form" id="login-form-wrap">
       <div class="auth-field">
         <label>Email</label>
         <input type="email" id="auth-email" placeholder="you@example.com" />
@@ -1346,6 +1344,26 @@
       </div>
       <div class="auth-error" id="auth-error"></div>
       <button class="auth-submit" id="auth-submit" onclick="handleAuth()">Login</button>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div class="auth-form" id="signup-form-wrap" style="display:none;">
+      <div class="auth-field">
+        <label>Email</label>
+        <input type="email" id="signup-email" placeholder="you@example.com" />
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="signup-password" placeholder="Min 6 characters" />
+      </div>
+      <div class="auth-field">
+        <label>Confirm Password</label>
+        <input type="password" id="signup-confirm" placeholder="••••••••" />
+      </div>
+      <div class="auth-error" id="signup-error"></div>
+      <!-- Success state shown after request submitted -->
+      <div id="signup-success" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:0.9rem 1rem;color:#22c55e;font-size:0.85rem;line-height:1.5;text-align:center;"></div>
+      <button class="auth-submit" id="signup-submit" onclick="handleSignupRequest()" style="display:block;">Request Access</button>
     </div>
   </div>
 </div>
@@ -1555,7 +1573,7 @@
     </button>
     <button class="popup-btn" id="ai-usage-popup-btn" onclick="openAiUsageDash();toggleUserPopup();" style="color:var(--secondary);display:none;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><polyline points="7 10 11 14 14 11 17 14"/></svg>
-      AI Usage
+      User Dashboard
     </button>
   </div>
   <div class="popup-section">
@@ -1598,14 +1616,16 @@
 <div id="admin-panels-mount"></div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+  import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword }
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword, createUserWithEmailAndPassword }
     from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, arrayUnion } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+  const FIREBASE_API_KEY = "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ",
+    apiKey: FIREBASE_API_KEY,
     authDomain: "knowwhere1.firebaseapp.com",
     projectId: "knowwhere1",
     storageBucket: "knowwhere1.firebasestorage.app",
@@ -1638,14 +1658,71 @@
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   };
 
+  // ── S3 credential storage (admin-only Firestore doc) ──
+  window._fetchS3Creds = async function() {
+    const snap = await getDoc(doc(db, 'adminConfig', 's3'));
+    return snap.exists() ? snap.data() : null;
+  };
+
+  window._saveS3Creds = async function(creds) {
+    await setDoc(doc(db, 'adminConfig', 's3'), creds);
+  };
+
+  // Fetch pending signup requests
+  window._fetchSignupRequests = async function() {
+    const snap = await getDocs(collection(db, 'signupRequests'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  };
+
+  // Approve a signup request: create the Firebase Auth user via a secondary app instance
+  // (avoids ADMIN_ONLY_OPERATION and keeps the current admin session untouched)
+  window._approveSignup = async function(requestId, email, password) {
+    // 1. Create a secondary Firebase app instance just for account creation
+    //    This keeps the primary auth session (admin) completely intact
+    const secondaryAppName = 'secondary-signup-' + Date.now();
+    const secondaryApp = initializeApp(firebaseConfig, secondaryAppName);
+    const secondaryAuth = getAuth(secondaryApp);
+
+    try {
+      // 2. Create the account in the secondary auth context
+      await createUserWithEmailAndPassword(secondaryAuth, email, password);
+
+      // 3. Immediately sign out of the secondary app so it doesn't linger
+      await signOut(secondaryAuth);
+    } finally {
+      // 4. Clean up the secondary app instance
+      await deleteApp(secondaryApp).catch(() => {});
+    }
+
+    // 5. Create Firestore user doc
+    await setDoc(doc(db, 'users', email), {
+      email,
+      username: '',
+      createdAt: new Date().toISOString(),
+      admin: false
+    }, { merge: true });
+
+    // 6. Mark request as approved
+    await updateDoc(doc(db, 'signupRequests', requestId), {
+      status: 'approved',
+      approvedAt: new Date().toISOString()
+    });
+  };
+
+  // Deny a signup request
+  window._denySignup = async function(requestId) {
+    await updateDoc(doc(db, 'signupRequests', requestId), {
+      status: 'denied',
+      deniedAt: new Date().toISOString()
+    });
+  };
+
   // ── Tab switching ──
-  let currentTab = 'login';
   window.switchTab = function(tab) {
-    currentTab = tab;
     document.getElementById('tab-login').classList.toggle('active', tab === 'login');
     document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-    document.getElementById('field-username').style.display = tab === 'signup' ? 'flex' : 'none';
-    document.getElementById('auth-submit').textContent = tab === 'login' ? 'Login' : 'Create Account';
+    document.getElementById('login-form-wrap').style.display = tab === 'login' ? 'flex' : 'none';
+    document.getElementById('signup-form-wrap').style.display = tab === 'signup' ? 'flex' : 'none';
     document.getElementById('auth-error').classList.remove('show');
   };
 
@@ -1663,7 +1740,7 @@
     return map[code] || 'Something went wrong. Please try again.';
   }
 
-  // ── Handle login / signup ──
+  // ── Handle login ──
   window.handleAuth = async function() {
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
@@ -1678,7 +1755,6 @@
 
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      // Sync user record to Firestore on every login
       const user = cred.user;
       await setDoc(doc(db, 'users', user.email), {
         email: user.email,
@@ -1690,6 +1766,83 @@
       errEl.classList.add('show');
       btn.disabled = false;
       btn.textContent = 'Login';
+    }
+  };
+
+  // ── Handle sign-up request (pending admin approval) ──
+  window.handleSignupRequest = async function() {
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const confirm = document.getElementById('signup-confirm').value;
+    const errEl = document.getElementById('signup-error');
+    const successEl = document.getElementById('signup-success');
+    const btn = document.getElementById('signup-submit');
+
+    errEl.classList.remove('show');
+    successEl.style.display = 'none';
+
+    if (!email || !password || !confirm) {
+      errEl.textContent = 'Please fill in all fields.';
+      errEl.classList.add('show');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = 'Please enter a valid email address.';
+      errEl.classList.add('show');
+      return;
+    }
+    if (password.length < 6) {
+      errEl.textContent = 'Password must be at least 6 characters.';
+      errEl.classList.add('show');
+      return;
+    }
+    if (password !== confirm) {
+      errEl.textContent = 'Passwords do not match.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending request...';
+
+    try {
+      // Check for existing pending or approved request for this email
+      const existing = await getDocs(collection(db, 'signupRequests'));
+      const alreadyRequested = existing.docs.some(d => {
+        const data = d.data();
+        return data.email === email && (data.status === 'pending' || data.status === 'approved');
+      });
+
+      if (alreadyRequested) {
+        errEl.textContent = 'A request for this email has already been submitted.';
+        errEl.classList.add('show');
+        btn.disabled = false;
+        btn.textContent = 'Request Access';
+        return;
+      }
+
+      // Store the request in Firestore (password stored to create the account on approval)
+      const requestId = email.replace(/[^a-zA-Z0-9]/g, '_') + '_' + Date.now();
+      await setDoc(doc(db, 'signupRequests', requestId), {
+        email,
+        password,
+        status: 'pending',
+        requestedAt: new Date().toISOString()
+      });
+
+      // Show success, hide button
+      successEl.textContent = '✓ Request submitted! An admin will review your application. You\'ll be able to log in once approved.';
+      successEl.style.display = 'block';
+      btn.style.display = 'none';
+      document.getElementById('signup-email').value = '';
+      document.getElementById('signup-password').value = '';
+      document.getElementById('signup-confirm').value = '';
+
+    } catch(e) {
+      errEl.textContent = e.message || 'Failed to submit request. Try again.';
+      errEl.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = 'Request Access';
     }
   };
 
@@ -1849,11 +2002,19 @@
       wall.classList.remove('hidden');
       main.classList.remove('visible');
       if (badge) badge.innerHTML = '';
-      // Reset form
+      // Reset login form
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
-      document.getElementById('auth-username').value = '';
       document.getElementById('auth-error').classList.remove('show');
+      // Reset signup form
+      document.getElementById('signup-email').value = '';
+      document.getElementById('signup-password').value = '';
+      document.getElementById('signup-confirm').value = '';
+      document.getElementById('signup-error').classList.remove('show');
+      document.getElementById('signup-success').style.display = 'none';
+      document.getElementById('signup-submit').style.display = 'block';
+      document.getElementById('signup-submit').disabled = false;
+      document.getElementById('signup-submit').textContent = 'Request Access';
       switchTab('login');
     }
   });
@@ -1861,7 +2022,8 @@
   // ── Allow Enter key to submit ──
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !document.getElementById('auth-wall').classList.contains('hidden')) {
-      handleAuth();
+      const loginVisible = document.getElementById('login-form-wrap').style.display !== 'none';
+      if (loginVisible) handleAuth();
     }
   });
 </script>
@@ -2114,6 +2276,7 @@ window.injectAdminPanels = function() {
       <button class="admin-tab" onclick="switchAdminTab('command')">Command</button>
       <button class="admin-tab" onclick="switchAdminTab('notice')">Notice</button>
       <button class="admin-tab" onclick="switchAdminTab('ai')">🤖 AI Settings</button>
+      <button class="admin-tab" onclick="switchAdminTab('s3')">🖼️ Images</button>
     </div>
     <div class="admin-body">
       <div class="admin-section" id="admin-notice">
@@ -2197,25 +2360,81 @@ window.injectAdminPanels = function() {
           <span class="admin-status" id="status-ai"></span>
         </div>
       </div>
+      <div class="admin-section" id="admin-s3">
+        <p class="admin-hint" style="margin-bottom:1rem;">Manage images stored in your AWS S3 bucket. Credentials are stored encrypted in Firestore (admin-only). Make sure your bucket has CORS enabled for browser uploads.</p>
+        <div class="admin-sublabel" style="margin-top:0;">S3 Credentials</div>
+        <div class="admin-field"><label>AWS Region</label><input class="admin-input" id="ae-s3-region" placeholder="e.g. us-east-1" /></div>
+        <div class="admin-field"><label>Bucket Name</label><input class="admin-input" id="ae-s3-bucket" placeholder="my-bucket-name" /></div>
+        <div class="admin-field"><label>Access Key ID</label><input class="admin-input" id="ae-s3-key-id" placeholder="AKIA..." autocomplete="off" /></div>
+        <div class="admin-field"><label>Secret Access Key</label><input class="admin-input" id="ae-s3-secret" type="password" placeholder="••••••••••••••••••••" autocomplete="off" /></div>
+        <div class="admin-field"><label>Folder / Prefix <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional — e.g. <code style="background:#1a1a26;padding:0.1rem 0.3rem;border-radius:3px;color:var(--secondary);font-size:0.7rem;">images/</code>)</span></label><input class="admin-input" id="ae-s3-prefix" placeholder="images/" /></div>
+        <div class="admin-save-row" style="margin-bottom:1.25rem;">
+          <button class="admin-save-btn" onclick="s3SaveCreds()">Save Credentials</button>
+          <button class="admin-save-btn" style="background:transparent;border:1px solid var(--border);color:var(--muted);box-shadow:none;" onclick="s3Connect()">↺ Connect &amp; Load Images</button>
+          <span class="admin-status" id="status-s3-creds"></span>
+        </div>
+        <hr class="admin-divider">
+        <div class="admin-sublabel">Upload New Image</div>
+        <div id="s3-upload-zone" style="border:2px dashed var(--border);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:0.75rem;position:relative;" onclick="document.getElementById('s3-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)';this.style.background='var(--primary-dim)';" ondragleave="this.style.borderColor='var(--border)';this.style.background='';" ondrop="event.preventDefault();this.style.borderColor='var(--border)';this.style.background='';s3HandleDrop(event);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);margin:0 auto 0.5rem;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div style="font-size:0.8rem;color:var(--muted);">Click or drag &amp; drop images here</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem;opacity:0.6;">JPG, PNG, GIF, WebP, SVG</div>
+          <input type="file" id="s3-file-input" accept="image/*" multiple style="display:none;" onchange="s3HandleFiles(this.files)" />
+        </div>
+        <div id="s3-upload-progress" style="display:none;margin-bottom:0.75rem;"></div>
+        <hr class="admin-divider">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+          <div class="admin-sublabel" style="margin:0;">Bucket Images</div>
+          <div style="display:flex;align-items:center;gap:0.5rem;">
+            <input class="admin-input" id="s3-search" placeholder="Search…" style="width:160px;padding:0.4rem 0.75rem;font-size:0.8rem;" oninput="s3FilterGrid(this.value)" />
+            <button onclick="s3Connect()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.38rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+          </div>
+        </div>
+        <div id="s3-status" style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;min-height:1.2em;"></div>
+        <div id="s3-image-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.6rem;max-height:360px;overflow-y:auto;padding-right:2px;"></div>
+      </div>
     </div>
   </div>
 </div>
 
 <div id="ai-usage-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(34,211,238,0.12);">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:580px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(34,211,238,0.12);">
+    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:0.6rem;font-family:var(--font-display);font-size:0.85rem;font-weight:700;letter-spacing:0.1em;color:var(--secondary);">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/><polyline points="7 10 11 14 14 11 17 14"/></svg>
-        AI USAGE — LAST 48 HRS
+        USER DASHBOARD
       </div>
       <button onclick="closeAiUsageDash()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Close</button>
     </div>
-    <div style="padding:0.75rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-      <span id="ai-usage-summary" style="font-size:0.75rem;color:var(--muted);"></span>
-      <button onclick="loadAiUsage()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--secondary)';this.style.color='var(--secondary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid var(--border);background:#0a0a0f;">
+      <button id="dash-tab-approvals" onclick="switchDashTab('approvals')" style="flex:1;padding:0.75rem 1rem;background:transparent;border:none;border-bottom:2px solid var(--primary);color:var(--primary);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">
+        👤 Sign-Up Approvals
+      </button>
+      <button id="dash-tab-aistats" onclick="switchDashTab('aistats')" style="flex:1;padding:0.75rem 1rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">
+        🤖 AI Stats
+      </button>
     </div>
-    <div id="ai-usage-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.4rem;">
-      <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
+    <!-- Tab: Approvals -->
+    <div id="dash-panel-approvals" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+      <div style="padding:0.75rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <span id="approvals-summary" style="font-size:0.75rem;color:var(--muted);"></span>
+        <button onclick="loadSignupRequests()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+      </div>
+      <div id="approvals-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
+        <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
+      </div>
+    </div>
+    <!-- Tab: AI Stats -->
+    <div id="dash-panel-aistats" style="flex:1;display:none;flex-direction:column;overflow:hidden;">
+      <div style="padding:0.75rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+        <span id="ai-usage-summary" style="font-size:0.75rem;color:var(--muted);"></span>
+        <button onclick="loadAiUsage()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--secondary)';this.style.color='var(--secondary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+      </div>
+      <div id="ai-usage-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.4rem;">
+        <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
+      </div>
     </div>
   </div>
 </div>`;
@@ -2266,6 +2485,8 @@ window.openAdminPanel = function() {
   switchAdminTab('games');
   document.getElementById('admin-panel').classList.add('open');
   document.getElementById('user-popup').classList.remove('open');
+  // Load S3 creds async (non-blocking)
+  s3LoadCreds().catch(() => {});
 };
 
 window.closeAdminPanel = function() {
@@ -2975,16 +3196,114 @@ window.adminSave = async function(section) {
   if (btn) btn.disabled = false;
 };
 
-// ── AI Usage Dashboard ──
+// ── AI Usage / User Dashboard ──
 window.openAiUsageDash = function() {
   if (!window._isAdmin) return;
   const panel = document.getElementById('ai-usage-panel');
   panel.style.display = 'flex';
-  loadAiUsage();
+  switchDashTab('approvals');
 };
 
 window.closeAiUsageDash = function() {
   document.getElementById('ai-usage-panel').style.display = 'none';
+};
+
+window.switchDashTab = function(tab) {
+  const tabApprovals = document.getElementById('dash-tab-approvals');
+  const tabAistats   = document.getElementById('dash-tab-aistats');
+  const panelApprovals = document.getElementById('dash-panel-approvals');
+  const panelAistats   = document.getElementById('dash-panel-aistats');
+
+  if (tab === 'approvals') {
+    tabApprovals.style.borderBottomColor = 'var(--primary)';
+    tabApprovals.style.color = 'var(--primary)';
+    tabAistats.style.borderBottomColor = 'transparent';
+    tabAistats.style.color = 'var(--muted)';
+    panelApprovals.style.display = 'flex';
+    panelAistats.style.display = 'none';
+    loadSignupRequests();
+  } else {
+    tabAistats.style.borderBottomColor = 'var(--secondary)';
+    tabAistats.style.color = 'var(--secondary)';
+    tabApprovals.style.borderBottomColor = 'transparent';
+    tabApprovals.style.color = 'var(--muted)';
+    panelAistats.style.display = 'flex';
+    panelApprovals.style.display = 'none';
+    loadAiUsage();
+  }
+};
+
+window.loadSignupRequests = async function() {
+  const list = document.getElementById('approvals-list');
+  const summary = document.getElementById('approvals-summary');
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';
+  summary.textContent = '';
+
+  try {
+    const requests = await window._fetchSignupRequests();
+    const pending = requests.filter(r => r.status === 'pending');
+    const others  = requests.filter(r => r.status !== 'pending').sort((a,b) => (b.approvedAt||b.deniedAt||'').localeCompare(a.approvedAt||a.deniedAt||''));
+
+    summary.textContent = `${pending.length} pending · ${requests.length} total`;
+
+    if (!requests.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No signup requests yet.</div>';
+      return;
+    }
+
+    const renderRow = (r) => {
+      const isPending = r.status === 'pending';
+      const date = new Date(r.requestedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      const statusColor = r.status === 'approved' ? '#22c55e' : r.status === 'denied' ? 'var(--danger)' : 'var(--secondary)';
+      const statusLabel = r.status === 'approved' ? '✓ Approved' : r.status === 'denied' ? '✗ Denied' : '⏳ Pending';
+
+      return `<div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:#0d0d14;border:1px solid ${isPending ? 'rgba(168,85,247,0.3)' : 'var(--border)'};border-radius:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">
+            <span style="font-size:0.85rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.email}</span>
+            <span style="font-size:0.7rem;color:var(--muted);">Requested ${date}</span>
+          </div>
+          <span style="font-size:0.7rem;font-weight:700;color:${statusColor};flex-shrink:0;">${statusLabel}</span>
+        </div>
+        ${isPending ? `
+        <div style="display:flex;gap:0.5rem;">
+          <button onclick="approveRequest('${r.id}','${r.email}','${r.password}')" style="flex:1;padding:0.5rem;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:6px;color:#22c55e;font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.22)'" onmouseout="this.style.background='rgba(34,197,94,0.12)'">✓ Approve</button>
+          <button onclick="denyRequest('${r.id}')" style="flex:1;padding:0.5rem;background:var(--danger-dim);border:1px solid rgba(239,68,68,0.3);border-radius:6px;color:var(--danger);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='var(--danger-dim)'">✗ Deny</button>
+        </div>` : ''}
+      </div>`;
+    };
+
+    list.innerHTML = [
+      ...pending.map(renderRow),
+      ...(others.length && pending.length ? ['<div style="border-top:1px solid var(--border);margin:0.25rem 0;"></div>'] : []),
+      ...others.map(renderRow)
+    ].join('');
+
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
+  }
+};
+
+window.approveRequest = async function(requestId, email, password) {
+  const btn = event && event.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; }
+  try {
+    await window._approveSignup(requestId, email, password);
+    loadSignupRequests();
+  } catch(e) {
+    alert('Failed to approve: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Approve'; }
+  }
+};
+
+window.denyRequest = async function(requestId) {
+  if (!confirm('Deny this signup request?')) return;
+  try {
+    await window._denySignup(requestId);
+    loadSignupRequests();
+  } catch(e) {
+    alert('Failed to deny: ' + e.message);
+  }
 };
 
 window.loadAiUsage = async function() {
@@ -3033,6 +3352,264 @@ window.loadAiUsage = async function() {
     list.innerHTML = `<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
   }
 };
+
+// ═══════════════════════════════════════════
+//  S3 IMAGE MANAGER
+// ═══════════════════════════════════════════
+
+let _s3Creds = null;
+let _s3AllImages = [];
+
+// ── AWS Signature V4 helpers (pure JS, no SDK needed) ──
+async function _sha256(message) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(message));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+async function _sha256Bytes(ab) {
+  const buf = await crypto.subtle.digest('SHA-256', ab);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+async function _hmacSha256(key, data) {
+  const k = typeof key === 'string' ? new TextEncoder().encode(key) : key;
+  const ck = await crypto.subtle.importKey('raw', k, { name:'HMAC', hash:'SHA-256' }, false, ['sign']);
+  return new Uint8Array(await crypto.subtle.sign('HMAC', ck, new TextEncoder().encode(data)));
+}
+async function _signingKey(secret, date, region, service) {
+  const kDate    = await _hmacSha256('AWS4' + secret, date);
+  const kRegion  = await _hmacSha256(kDate, region);
+  const kService = await _hmacSha256(kRegion, service);
+  return _hmacSha256(kService, 'aws4_request');
+}
+function _hex(buf) { return Array.from(buf).map(b => b.toString(16).padStart(2,'0')).join(''); }
+function _amzNow() { return new Date().toISOString().replace(/[:\-]|\.\d{3}/g,'').slice(0,15)+'Z'; }
+const EMPTY_HASH = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+
+// Generic signed S3 fetch — method, path key, query string, body ArrayBuffer, content-type
+async function _s3Fetch(method, key, query, body, contentType) {
+  const { region, bucket, keyId, secret } = _s3Creds;
+  const host = `${bucket}.s3.${region}.amazonaws.com`;
+  const amzDate = _amzNow();
+  const dateStamp = amzDate.slice(0,8);
+  const encodedKey = key ? '/' + key.split('/').map(encodeURIComponent).join('/') : '/';
+  const payloadHash = body ? await _sha256Bytes(body) : EMPTY_HASH;
+  const qs = query || '';
+
+  const rawHeaders = {
+    'host': host,
+    'x-amz-content-sha256': payloadHash,
+    'x-amz-date': amzDate,
+    ...(contentType ? { 'content-type': contentType } : {})
+  };
+  const sortedNames = Object.keys(rawHeaders).sort();
+  const canonicalHeaders = sortedNames.map(k => `${k}:${rawHeaders[k]}`).join('\n') + '\n';
+  const signedHeadersStr = sortedNames.join(';');
+
+  const canonicalRequest = [method, encodedKey, qs, canonicalHeaders, signedHeadersStr, payloadHash].join('\n');
+  const credScope = `${dateStamp}/${region}/s3/aws4_request`;
+  const stringToSign = ['AWS4-HMAC-SHA256', amzDate, credScope, await _sha256(canonicalRequest)].join('\n');
+  const sk = await _signingKey(secret, dateStamp, region, 's3');
+  const sig = _hex(await _hmacSha256(sk, stringToSign));
+  const auth = `AWS4-HMAC-SHA256 Credential=${keyId}/${credScope}, SignedHeaders=${signedHeadersStr}, Signature=${sig}`;
+
+  const fetchHeaders = {
+    'Authorization': auth,
+    'x-amz-date': amzDate,
+    'x-amz-content-sha256': payloadHash,
+    ...(contentType ? { 'Content-Type': contentType } : {})
+  };
+  const url = `https://${host}${encodedKey}${qs ? '?' + qs : ''}`;
+  return fetch(url, { method, headers: fetchHeaders, body: body || undefined });
+}
+
+// ── Load creds from Firestore ──
+window.s3LoadCreds = async function() {
+  if (!window._fetchS3Creds) return;
+  const saved = await window._fetchS3Creds();
+  if (!saved) return;
+  _s3Creds = saved;
+  document.getElementById('ae-s3-region').value = saved.region || '';
+  document.getElementById('ae-s3-bucket').value = saved.bucket || '';
+  document.getElementById('ae-s3-key-id').value  = saved.keyId  || '';
+  document.getElementById('ae-s3-secret').value  = saved.secret || '';
+  document.getElementById('ae-s3-prefix').value  = saved.prefix || '';
+};
+
+// ── Save creds to Firestore ──
+window.s3SaveCreds = async function() {
+  const st = document.getElementById('status-s3-creds');
+  st.textContent = 'Saving…'; st.className = 'admin-status';
+  const creds = {
+    region: document.getElementById('ae-s3-region').value.trim(),
+    bucket: document.getElementById('ae-s3-bucket').value.trim(),
+    keyId:  document.getElementById('ae-s3-key-id').value.trim(),
+    secret: document.getElementById('ae-s3-secret').value.trim(),
+    prefix: document.getElementById('ae-s3-prefix').value.trim()
+  };
+  if (!creds.region || !creds.bucket || !creds.keyId || !creds.secret) {
+    st.textContent = '✗ Fill in all required fields.'; st.className = 'admin-status err'; return;
+  }
+  try {
+    await window._saveS3Creds(creds);
+    _s3Creds = creds;
+    st.textContent = '✓ Saved'; st.className = 'admin-status ok';
+    setTimeout(() => { st.textContent = ''; st.className = 'admin-status'; }, 3000);
+  } catch(e) {
+    st.textContent = '✗ ' + e.message; st.className = 'admin-status err';
+  }
+};
+
+// ── Connect: list objects ──
+window.s3Connect = async function() {
+  const statusEl = document.getElementById('s3-status');
+  const grid = document.getElementById('s3-image-grid');
+  if (!_s3Creds || !_s3Creds.keyId) {
+    statusEl.textContent = '⚠ Enter and save credentials first.'; return;
+  }
+  statusEl.textContent = 'Connecting…';
+  grid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:0.8rem;text-align:center;padding:1.5rem 0;">Loading…</div>';
+  _s3AllImages = [];
+
+  try {
+    let token = null;
+    const prefix = _s3Creds.prefix || '';
+    const IMAGE_RE = /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)$/i;
+
+    do {
+      let qs = 'list-type=2';
+      if (prefix) qs += '&prefix=' + encodeURIComponent(prefix);
+      if (token)  qs += '&continuation-token=' + encodeURIComponent(token);
+
+      const res = await _s3Fetch('GET', '', qs, null, null);
+      if (!res.ok) {
+        const txt = await res.text();
+        const msg = txt.match(/<Message>(.*?)<\/Message>/)?.[1] || `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      const xml = new DOMParser().parseFromString(await res.text(), 'text/xml');
+      xml.querySelectorAll('Contents Key').forEach(el => {
+        const k = el.textContent;
+        if (IMAGE_RE.test(k)) _s3AllImages.push(k);
+      });
+      const truncated = xml.querySelector('IsTruncated')?.textContent === 'true';
+      token = truncated ? xml.querySelector('NextContinuationToken')?.textContent : null;
+    } while (token);
+
+    statusEl.textContent = `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
+    s3RenderGrid(_s3AllImages);
+  } catch(e) {
+    statusEl.textContent = '✗ ' + e.message;
+    grid.innerHTML = `<div style="grid-column:1/-1;color:var(--danger);font-size:0.8rem;text-align:center;padding:1.5rem 0;">${escapeHtml(e.message)}</div>`;
+  }
+};
+
+// ── Render image grid ──
+function s3RenderGrid(keys) {
+  const grid = document.getElementById('s3-image-grid');
+  const { region, bucket } = _s3Creds;
+  if (!keys.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;color:var(--muted);font-size:0.8rem;text-align:center;padding:1.5rem 0;">No images found.</div>';
+    return;
+  }
+  grid.innerHTML = keys.map(key => {
+    const url = `https://${bucket}.s3.${region}.amazonaws.com/${key.split('/').map(encodeURIComponent).join('/')}`;
+    const name = key.split('/').pop();
+    const safeKey = key.replace(/'/g, "\\'");
+    const safeUrl = url.replace(/'/g, "\\'");
+    return `<div style="position:relative;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#0d0d14;aspect-ratio:1;"
+      onmouseover="this.querySelector('.s3ia').style.opacity='1'"
+      onmouseout="this.querySelector('.s3ia').style.opacity='0'">
+      <img src="${url}" alt="${name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" />
+      <div style="display:none;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:0.62rem;padding:0.35rem;text-align:center;word-break:break-all;">${name}</div>
+      <div class="s3ia" style="position:absolute;inset:0;background:rgba(0,0,0,0.72);opacity:0;transition:opacity 0.18s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.35rem;padding:0.5rem;">
+        <div style="font-size:0.58rem;color:rgba(255,255,255,0.65);text-align:center;word-break:break-all;max-height:2.4em;overflow:hidden;line-height:1.2;">${name}</div>
+        <div style="display:flex;gap:0.3rem;margin-top:0.15rem;">
+          <button onclick="s3CopyUrl('${safeUrl}')" style="padding:0.28rem 0.5rem;background:var(--primary-dim);border:1px solid rgba(168,85,247,0.4);border-radius:5px;color:var(--primary);font-size:0.62rem;cursor:pointer;font-family:var(--font-display);font-weight:700;letter-spacing:0.05em;transition:background 0.15s;" onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='var(--primary-dim)'">COPY URL</button>
+          <button onclick="s3DeleteImage('${safeKey}',this)" style="padding:0.28rem 0.5rem;background:var(--danger-dim);border:1px solid rgba(239,68,68,0.3);border-radius:5px;color:var(--danger);font-size:0.62rem;cursor:pointer;font-family:var(--font-display);font-weight:700;letter-spacing:0.05em;transition:background 0.15s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='var(--danger-dim)'">DELETE</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.s3FilterGrid = function(q) {
+  const filtered = q ? _s3AllImages.filter(k => k.toLowerCase().includes(q.toLowerCase())) : _s3AllImages;
+  document.getElementById('s3-status').textContent = q
+    ? `${filtered.length} of ${_s3AllImages.length} images`
+    : `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
+  s3RenderGrid(filtered);
+};
+
+window.s3CopyUrl = function(url) {
+  navigator.clipboard.writeText(url)
+    .then(() => { /* flash handled by the button hover */ })
+    .catch(() => prompt('Copy this URL:', url));
+};
+
+window.s3DeleteImage = async function(key, btn) {
+  if (!confirm(`Delete "${key.split('/').pop()}"?\nThis cannot be undone.`)) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res = await _s3Fetch('DELETE', key, null, null, null);
+    if (!res.ok && res.status !== 204) throw new Error(`HTTP ${res.status}`);
+    _s3AllImages = _s3AllImages.filter(k => k !== key);
+    document.getElementById('s3-status').textContent = `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
+    s3FilterGrid(document.getElementById('s3-search').value);
+  } catch(e) {
+    btn.disabled = false; btn.textContent = 'DELETE';
+    alert('Delete failed: ' + e.message);
+  }
+};
+
+window.s3HandleFiles = function(files) {
+  if (!files || !files.length) return;
+  if (!_s3Creds || !_s3Creds.keyId) { alert('Save S3 credentials first.'); return; }
+  s3UploadFiles(Array.from(files));
+};
+
+window.s3HandleDrop = function(e) {
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+  if (!_s3Creds || !_s3Creds.keyId) { alert('Save S3 credentials first.'); return; }
+  s3UploadFiles(files);
+};
+
+async function s3UploadFiles(files) {
+  const progressEl = document.getElementById('s3-upload-progress');
+  progressEl.style.display = 'block';
+  progressEl.innerHTML = '';
+
+  for (const file of files) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.78rem;';
+    row.innerHTML = `<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${file.name}</span><span class="upl-st" style="color:var(--muted);flex-shrink:0;">Uploading…</span>`;
+    progressEl.appendChild(row);
+    const stEl = row.querySelector('.upl-st');
+
+    try {
+      const prefix = (_s3Creds.prefix || '');
+      const key = prefix + file.name;
+      const ab = await file.arrayBuffer();
+      const ct = file.type || 'application/octet-stream';
+
+      const res = await _s3Fetch('PUT', key, null, ab, ct);
+      if (!res.ok) {
+        const txt = await res.text();
+        const msg = txt.match(/<Message>(.*?)<\/Message>/)?.[1] || `HTTP ${res.status}`;
+        throw new Error(msg);
+      }
+      stEl.textContent = '✓ Done'; stEl.style.color = '#22c55e';
+      if (!_s3AllImages.includes(key)) _s3AllImages.push(key);
+    } catch(e) {
+      stEl.textContent = '✗ ' + e.message; stEl.style.color = 'var(--danger)';
+    }
+  }
+
+  document.getElementById('s3-file-input').value = '';
+  document.getElementById('s3-status').textContent = `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
+  s3FilterGrid(document.getElementById('s3-search').value);
+  setTimeout(() => { progressEl.style.display = 'none'; progressEl.innerHTML = ''; }, 5000);
+}
 </script>
 
 </body>
