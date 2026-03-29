@@ -1426,9 +1426,9 @@
       bottom: 0;
       left: -2rem; right: -2rem;
       height: 20px;
-      background: linear-gradient(180deg, #1e140a 0%, #130e06 60%, #0d0906 100%);
-      border-top: 2px solid #3a2a14;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(180,120,40,0.12);
+      background: linear-gradient(180deg, #1a0f2e 0%, #110a1f 60%, #0a0612 100%);
+      border-top: 2px solid rgba(168,85,247,0.45);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(168,85,247,0.18);
     }
 
     /* Product card */
@@ -1952,6 +1952,12 @@
       Admin Dashboard
     </button>
   </div>
+  <div class="popup-section" id="orders-popup-section" style="display:none;">
+    <button class="popup-btn" id="orders-popup-btn" onclick="openOrdersPanel();toggleUserPopup();" style="color:var(--secondary);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Orders
+    </button>
+  </div>
   <div class="popup-section">
     <button class="popup-btn" onclick="togglePopupForm('username-form')">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -2018,6 +2024,32 @@
   // Expose update bridge for admin panel (non-module script)
   window._firestoreUpdate = async function(patch) {
     await updateDoc(doc(db, 'siteContent', 'main'), patch);
+  };
+
+  // Save a shop order to Firestore under the user's email doc
+  window._saveOrder = async function(orderData) {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Not logged in');
+    const snap = await getDoc(doc(db, 'users', user.email));
+    const username = (snap.exists() && snap.data().username) || user.email;
+    const orderDoc = {
+      email: user.email,
+      username,
+      items: orderData.items,
+      total: orderData.total,
+      placedAt: new Date().toISOString()
+    };
+    // Store under users/{email}/orders/{timestamp}
+    const orderId = 'order_' + Date.now();
+    await setDoc(doc(db, 'users', user.email, 'orders', orderId), orderDoc);
+    // Also store a flat copy in top-level 'orders' collection for the orders panel
+    await setDoc(doc(db, 'orders', orderId), orderDoc);
+  };
+
+  // Fetch all orders (orders: true users only)
+  window._fetchAllOrders = async function() {
+    const snap = await getDocs(collection(db, 'orders'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.placedAt.localeCompare(a.placedAt));
   };
 
   // Record one AI request timestamp for the current user
@@ -2369,6 +2401,11 @@
           if (adminSection) adminSection.style.display = 'block';
           if (aiUsageBtn) aiUsageBtn.style.display = 'flex';
           injectAdminPanels();
+        }
+        // Check orders flag — show Orders button if orders: true
+        if (userSnap.exists() && userSnap.data().orders === true) {
+          const ordersSection = document.getElementById('orders-popup-section');
+          if (ordersSection) ordersSection.style.display = 'block';
         }
       } catch(e) {
         console.warn('Could not check admin status:', e);
@@ -4145,15 +4182,30 @@ window.toggleCart = function() {
   document.getElementById('cart-overlay').classList.toggle('open');
 };
 
-window.shopCheckout = function() {
+window.shopCheckout = async function() {
   const items = Object.values(shopCart);
   if (!items.length) { alert('Your cart is empty!'); return; }
+
   const total = items.reduce((s, i) => s + i.qty * i.price, 0);
-  const list  = items.map(i => `  • ${i.name} x${i.qty} — $${(i.qty * i.price).toFixed(2)}`).join('\n');
-  alert(`Order received! 🎮\n\n${list}\n\nTotal: $${total.toFixed(2)}\n\n(Demo shop — no real purchase made.)`);
-  shopCart = {};
-  renderCart();
-  toggleCart();
+  const btn = document.querySelector('.cart-checkout-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Placing order...'; }
+
+  try {
+    await window._saveOrder({
+      items: items.map(i => ({ name: i.name, qty: i.qty, price: i.price, img: i.img })),
+      total: parseFloat(total.toFixed(2))
+    });
+
+    const list = items.map(i => `  • ${i.name} x${i.qty} — $${(i.qty * i.price).toFixed(2)}`).join('\n');
+    alert(`✓ Order placed!\n\n${list}\n\nTotal: $${total.toFixed(2)}\n\nYour order has been saved.`);
+    shopCart = {};
+    renderCart();
+    toggleCart();
+  } catch(e) {
+    alert('Failed to place order: ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Checkout →'; }
+  }
 };
 
 // ── Admin: render shop editor ──
@@ -4191,6 +4243,91 @@ window.adminAddShopItem = function() {
 
 // init empty cart on load
 renderCart();
+</script>
+
+<!-- ORDERS PANEL -->
+<div id="orders-panel" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1.5rem;">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(34,211,238,0.08);">
+    <!-- header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--secondary);">ALL ORDERS</span>
+      </div>
+      <button onclick="closeOrdersPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <!-- summary -->
+    <div id="orders-summary" style="padding:0.6rem 1.5rem;font-size:0.72rem;color:var(--muted);border-bottom:1px solid var(--border);"></div>
+    <!-- list -->
+    <div id="orders-list" style="flex:1;overflow-y:auto;padding:1rem 1.5rem;display:flex;flex-direction:column;gap:0.65rem;scrollbar-width:thin;scrollbar-color:rgba(34,211,238,0.2) transparent;">
+      <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading orders...</div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.openOrdersPanel = function() {
+  const panel = document.getElementById('orders-panel');
+  panel.style.display = 'flex';
+  loadOrders();
+};
+
+window.closeOrdersPanel = function() {
+  document.getElementById('orders-panel').style.display = 'none';
+};
+
+// Close on backdrop click
+document.getElementById('orders-panel').addEventListener('click', function(e) {
+  if (e.target === this) closeOrdersPanel();
+});
+
+async function loadOrders() {
+  const list    = document.getElementById('orders-list');
+  const summary = document.getElementById('orders-summary');
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading...</div>';
+  summary.textContent = '';
+
+  try {
+    const orders = await window._fetchAllOrders();
+    summary.textContent = `${orders.length} order${orders.length !== 1 ? 's' : ''} total`;
+
+    if (!orders.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;opacity:0.5;">No orders yet.</div>';
+      return;
+    }
+
+    list.innerHTML = orders.map(o => {
+      const date = new Date(o.placedAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const itemLines = (o.items || []).map(i =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);padding:0.2rem 0;">
+          <span style="display:flex;align-items:center;gap:0.4rem;">
+            ${i.img ? `<img src="${i.img}" style="width:22px;height:22px;object-fit:contain;opacity:0.8;" onerror="this.style.display='none'" />` : ''}
+            ${i.name} <span style="color:var(--border)">×${i.qty}</span>
+          </span>
+          <span style="color:var(--text);font-weight:600;">$${(i.qty * i.price).toFixed(2)}</span>
+        </div>`
+      ).join('');
+
+      return `<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.5rem;">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;">
+          <div style="display:flex;flex-direction:column;gap:0.05rem;">
+            <span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${o.username || o.email}</span>
+            <span style="font-size:0.68rem;color:var(--muted);">${o.email} · ${date}</span>
+          </div>
+          <span style="font-family:var(--font-display);font-size:0.9rem;font-weight:900;color:var(--secondary);text-shadow:0 0 12px rgba(34,211,238,0.4);">$${parseFloat(o.total).toFixed(2)}</span>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:0.4rem;display:flex;flex-direction:column;gap:0.1rem;">
+          ${itemLines}
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--danger);font-size:0.82rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
+  }
+}
 </script>
 
 </body>
