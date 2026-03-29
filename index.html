@@ -4286,8 +4286,6 @@ window.shopCheckout = async function() {
       total: parseFloat(total.toFixed(2))
     });
 
-    const list = items.map(i => `  • ${i.name} x${i.qty} — $${(i.qty * i.price).toFixed(2)}`).join('\n');
-    alert(`✓ Order placed!\n\n${list}\n\nTotal: $${total.toFixed(2)}\n\nYour order has been saved.`);
     shopCart = {};
     renderCart();
     toggleCart();
