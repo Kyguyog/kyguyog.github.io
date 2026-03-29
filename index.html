@@ -2405,26 +2405,34 @@
         console.error('Failed to load site content:', e);
       }
 
-      // Check admin flag — show Edit Site button if admin: true
+      // Check admin/editor flag
       try {
         const userSnap = await getDoc(doc(db, 'users', user.email));
-        if (userSnap.exists() && userSnap.data().admin === true) {
-          window._isAdmin = true;
-          const adminBtn = document.getElementById('admin-popup-btn');
+        const userData = userSnap.exists() ? userSnap.data() : {};
+        const isAdmin  = userData.admin  === true;
+        const isEditor = userData.editor === true;
+
+        if (isAdmin || isEditor) {
+          window._isAdmin  = isAdmin;
+          window._isEditor = isEditor && !isAdmin;
+          const adminBtn     = document.getElementById('admin-popup-btn');
           const adminSection = document.getElementById('admin-popup-section');
-          const aiUsageBtn = document.getElementById('ai-usage-popup-btn');
-          if (adminBtn) adminBtn.style.display = 'flex';
+          if (adminBtn)     adminBtn.style.display = 'flex';
           if (adminSection) adminSection.style.display = 'block';
-          if (aiUsageBtn) aiUsageBtn.style.display = 'flex';
+          // Admin Dashboard only for full admins
+          if (isAdmin) {
+            const aiUsageBtn = document.getElementById('ai-usage-popup-btn');
+            if (aiUsageBtn) aiUsageBtn.style.display = 'flex';
+          }
           injectAdminPanels();
         }
-        // Check orders flag — show Orders button if orders: true
-        if (userSnap.exists() && userSnap.data().orders === true) {
+        // Check orders flag -- show Orders button if orders: true
+        if (userData.orders === true) {
           const ordersSection = document.getElementById('orders-popup-section');
           if (ordersSection) ordersSection.style.display = 'block';
         }
       } catch(e) {
-        console.warn('Could not check admin status:', e);
+        console.warn('Could not check admin/editor status:', e);
       }
 
     } else {
@@ -2697,6 +2705,7 @@ window.injectAdminPanels = function() {
       <div class="admin-header-title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         Site Editor
+        <span id="admin-role-badge" style="display:none;align-items:center;font-size:0.55rem;font-weight:700;letter-spacing:0.12em;padding:0.15rem 0.5rem;border-radius:4px;border:1px solid;margin-left:0.35rem;"></span>
       </div>
       <button class="admin-close" onclick="closeAdminPanel()">✕ Close</button>
     </div>
@@ -2801,16 +2810,25 @@ window.injectAdminPanels = function() {
       </div>
       <div class="admin-section" id="admin-s3">
         <p class="admin-hint" style="margin-bottom:1rem;">Manage images stored in your AWS S3 bucket. Credentials are stored encrypted in Firestore (admin-only). Make sure your bucket has CORS enabled for browser uploads.</p>
-        <div class="admin-sublabel" style="margin-top:0;">S3 Credentials</div>
-        <div class="admin-field"><label>AWS Region</label><input class="admin-input" id="ae-s3-region" placeholder="e.g. us-east-1" /></div>
-        <div class="admin-field"><label>Bucket Name</label><input class="admin-input" id="ae-s3-bucket" placeholder="my-bucket-name" /></div>
-        <div class="admin-field"><label>Access Key ID</label><input class="admin-input" id="ae-s3-key-id" placeholder="AKIA..." autocomplete="off" /></div>
-        <div class="admin-field"><label>Secret Access Key</label><input class="admin-input" id="ae-s3-secret" type="password" placeholder="••••••••••••••••••••" autocomplete="off" /></div>
-        <div class="admin-field"><label>Folder / Prefix <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional — e.g. <code style="background:#1a1a26;padding:0.1rem 0.3rem;border-radius:3px;color:var(--secondary);font-size:0.7rem;">images/</code>)</span></label><input class="admin-input" id="ae-s3-prefix" placeholder="images/" /></div>
-        <div class="admin-save-row" style="margin-bottom:1.25rem;">
-          <button class="admin-save-btn" onclick="s3SaveCreds()">Save Credentials</button>
-          <button class="admin-save-btn" style="background:transparent;border:1px solid var(--border);color:var(--muted);box-shadow:none;" onclick="s3Connect()">↺ Connect &amp; Load Images</button>
-          <span class="admin-status" id="status-s3-creds"></span>
+        <!-- S3 Credentials collapsible -->
+        <button onclick="toggleS3Creds(this)" style="display:flex;align-items:center;justify-content:space-between;width:100%;background:rgba(168,85,247,0.06);border:1px solid rgba(168,85,247,0.2);border-radius:8px;padding:0.7rem 1rem;cursor:pointer;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.12)'" onmouseout="this.style.background='rgba(168,85,247,0.06)'">
+          <span style="display:flex;align-items:center;gap:0.5rem;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            S3 Credentials
+          </span>
+          <svg id="s3-creds-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div id="s3-creds-body" style="display:none;flex-direction:column;gap:0;margin-bottom:0.75rem;border:1px solid rgba(168,85,247,0.15);border-radius:0 0 8px 8px;border-top:none;padding:0.75rem 0.75rem 0.25rem;background:rgba(168,85,247,0.03);">
+          <div class="admin-field"><label>AWS Region</label><input class="admin-input" id="ae-s3-region" placeholder="e.g. us-east-1" /></div>
+          <div class="admin-field"><label>Bucket Name</label><input class="admin-input" id="ae-s3-bucket" placeholder="my-bucket-name" /></div>
+          <div class="admin-field"><label>Access Key ID</label><input class="admin-input" id="ae-s3-key-id" placeholder="AKIA..." autocomplete="off" /></div>
+          <div class="admin-field"><label>Secret Access Key</label><input class="admin-input" id="ae-s3-secret" type="password" placeholder="••••••••••••••••••••" autocomplete="off" /></div>
+          <div class="admin-field"><label>Folder / Prefix <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional — e.g. <code style="background:#1a1a26;padding:0.1rem 0.3rem;border-radius:3px;color:var(--secondary);font-size:0.7rem;">images/</code>)</span></label><input class="admin-input" id="ae-s3-prefix" placeholder="images/" /></div>
+          <div class="admin-save-row" style="margin-bottom:0.5rem;">
+            <button class="admin-save-btn" onclick="s3SaveCreds()">Save Credentials</button>
+            <button class="admin-save-btn" style="background:transparent;border:1px solid var(--border);color:var(--muted);box-shadow:none;" onclick="s3Connect()">↺ Connect &amp; Load Images</button>
+            <span class="admin-status" id="status-s3-creds"></span>
+          </div>
         </div>
         <hr class="admin-divider">
         <div class="admin-sublabel">Upload New Image</div>
@@ -2882,6 +2900,17 @@ window.injectAdminPanels = function() {
   document.getElementById('admin-panel').addEventListener('click', function(e) {
     if (e.target === this) closeAdminPanel();
   });
+
+  // Hide restricted tabs for editors
+  if (window._isEditor) {
+    ['command','notice','ai','s3'].forEach(tab => {
+      document.querySelectorAll('.admin-tab').forEach(t => {
+        if (t.getAttribute('onclick') === "switchAdminTab('" + tab + "')") {
+          t.style.display = 'none';
+        }
+      });
+    });
+  }
 };
 
 
@@ -2890,7 +2919,7 @@ function escAttr(s) {
 }
 
 window.openAdminPanel = function() {
-  if (!window._isAdmin) return;
+  if (!window._isAdmin && !window._isEditor) return;
   const data = window._siteData;
   if (!data) { alert('Site data not loaded yet. Try again in a moment.'); return; }
 
@@ -2921,11 +2950,30 @@ window.openAdminPanel = function() {
 
   // Clear statuses & open
   document.querySelectorAll('.admin-status').forEach(el => { el.textContent=''; el.className='admin-status'; });
+
+  // Show role badge in header
+  const roleTag = document.getElementById('admin-role-badge');
+  if (roleTag) {
+    if (window._isEditor) {
+      roleTag.textContent = 'EDITOR';
+      roleTag.style.background = 'rgba(34,211,238,0.12)';
+      roleTag.style.color = 'var(--secondary)';
+      roleTag.style.borderColor = 'rgba(34,211,238,0.3)';
+      roleTag.style.display = 'inline-flex';
+    } else {
+      roleTag.textContent = 'ADMIN';
+      roleTag.style.background = 'rgba(168,85,247,0.12)';
+      roleTag.style.color = 'var(--primary)';
+      roleTag.style.borderColor = 'rgba(168,85,247,0.3)';
+      roleTag.style.display = 'inline-flex';
+    }
+  }
+
   switchAdminTab('games');
   document.getElementById('admin-panel').classList.add('open');
   document.getElementById('user-popup').classList.remove('open');
-  // Load S3 creds async (non-blocking)
-  s3LoadCreds().catch(() => {});
+  // Load S3 creds async (non-blocking) — admin only
+  if (window._isAdmin) s3LoadCreds().catch(() => {});
 };
 
 window.closeAdminPanel = function() {
@@ -2933,6 +2981,9 @@ window.closeAdminPanel = function() {
 };
 
 window.switchAdminTab = function(tab) {
+  // Editor-restricted tabs
+  const editorRestricted = ['command', 'notice', 'ai', 's3'];
+  if (window._isEditor && editorRestricted.includes(tab)) return;
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
   document.getElementById('admin-' + tab).classList.add('active');
@@ -3870,6 +3921,19 @@ async function _s3Fetch(method, key, query, body, contentType) {
   return fetch(url, { method, headers: fetchHeaders, body: body || undefined });
 }
 
+// ── Toggle S3 Credentials collapsible ──
+window.toggleS3Creds = function(btn) {
+  const body = document.getElementById('s3-creds-body');
+  const chevron = document.getElementById('s3-creds-chevron');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'flex';
+  body.style.flexDirection = 'column';
+  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+  // Round the button bottom corners when open
+  btn.style.borderRadius = isOpen ? '8px' : '8px 8px 0 0';
+  btn.style.marginBottom = isOpen ? '0.5rem' : '0';
+};
+
 // ── Load creds from Firestore ──
 window.s3LoadCreds = async function() {
   if (!window._fetchS3Creds) return;
@@ -3881,6 +3945,16 @@ window.s3LoadCreds = async function() {
   document.getElementById('ae-s3-key-id').value  = saved.keyId  || '';
   document.getElementById('ae-s3-secret').value  = saved.secret || '';
   document.getElementById('ae-s3-prefix').value  = saved.prefix || '';
+  // Auto-open credentials panel when saved creds are loaded
+  const body = document.getElementById('s3-creds-body');
+  const chevron = document.getElementById('s3-creds-chevron');
+  const btn = body && body.previousElementSibling;
+  if (body && body.style.display === 'none') {
+    body.style.display = 'flex';
+    body.style.flexDirection = 'column';
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
+    if (btn) { btn.style.borderRadius = '8px 8px 0 0'; btn.style.marginBottom = '0'; }
+  }
 };
 
 // ── Save creds to Firestore ──
