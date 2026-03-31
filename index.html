@@ -1875,7 +1875,7 @@
           </div>
         </div>
         <div class="chat-footer">
-          <textarea id="chat-input" placeholder="Ask anything, However keep it SFW..." rows="1"></textarea>
+          <textarea id="chat-input" placeholder="Ask anything, However keep it SFW... aka NO GOONERS!" rows="1"></textarea>
           <button id="chat-download" title="Download chat as JSON" onclick="downloadChat()">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
           </button>
@@ -2553,19 +2553,25 @@
     document.getElementById('home-subtitle').textContent = data.home.subtitle;
 
     // home buttons
-    const homeBtns = document.querySelector('.home-btns');
-    if (homeBtns) {
-      const btnPrimary = homeBtns.querySelector('a.btn-primary');
-      if (btnPrimary) {
-        btnPrimary.href = data.home.buttons.primary.href;
-        btnPrimary.childNodes[btnPrimary.childNodes.length - 1].textContent = data.home.buttons.primary.label;
-      }
-      const btnSecondary = homeBtns.querySelector('a.btn-secondary');
-      if (btnSecondary) {
-        btnSecondary.href = data.home.buttons.secondary.href;
-        btnSecondary.textContent = data.home.buttons.secondary.label;
-      }
+    // Inside populatePage(data)
+const homeBtns = document.querySelector('.home-btns');
+if (homeBtns && data.home) {
+    const btnPrimary = homeBtns.querySelector('a.btn-primary');
+    const btnSecondary = homeBtns.querySelector('a.btn-secondary');
+
+    // Match your specific Firebase field names
+    if (btnPrimary) {
+        btnPrimary.href = data.home.primary_btn_href || '#games';
+        // This targets the text node after the icon
+        btnPrimary.childNodes[btnPrimary.childNodes.length - 1].textContent = 
+            data.home.primary_btn_label || 'Play Now';
     }
+
+    if (btnSecondary) {
+        btnSecondary.href = data.home.secondary_btn_href || '/msg';
+        btnSecondary.textContent = data.home.secondary_btn_label || 'Messages';
+    }
+}
 
     // Notice
     document.getElementById('notice-title').textContent = data.notice.title;
