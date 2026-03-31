@@ -1,1 +1,1 @@
-still in a very beta stage, but should be safe to expose to the Internet 
+Still in a very beta stage! ONLY FOR USE IN VMS (Viewpoint Middle School)!!!
