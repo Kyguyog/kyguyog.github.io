@@ -599,9 +599,10 @@
       display: flex;
       flex-direction: column;
       gap: 0.4rem;
-      max-height: 200px;
+      max-height: 320px;
       overflow-y: auto;
       scrollbar-width: thin;
+      scrollbar-color: rgba(168,85,247,0.2) transparent;
     }
     .user-result-item {
       display: flex;
@@ -1117,8 +1118,8 @@
   window.openNewConvModal = function() {
     document.getElementById('new-conv-modal').classList.add('open');
     document.getElementById('user-search-input').value = '';
-    document.getElementById('user-results').innerHTML = `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">Start typing to find users...</div>`;
     document.getElementById('modal-error').classList.remove('show');
+    _renderUserList(allUsers);
     setTimeout(() => document.getElementById('user-search-input').focus(), 50);
   };
 
@@ -1135,25 +1136,13 @@
     searchTimeout = setTimeout(() => _searchUsers(q), 200);
   };
 
-  function _searchUsers(q) {
+  function _renderUserList(users) {
     const resultsEl = document.getElementById('user-results');
-    if (!q.trim()) {
-      resultsEl.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">Start typing to find users...</div>`;
-      return;
-    }
-
-    const lower = q.toLowerCase();
-    const matches = allUsers.filter(u =>
-      (u.username || '').toLowerCase().includes(lower) ||
-      (u.email || '').toLowerCase().includes(lower)
-    ).slice(0, 8);
-
-    if (matches.length === 0) {
+    if (users.length === 0) {
       resultsEl.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">No users found.</div>`;
       return;
     }
-
-    resultsEl.innerHTML = matches.map(u => {
+    resultsEl.innerHTML = users.map(u => {
       const name = u.username || u.email;
       const initial = name[0].toUpperCase();
       return `<div class="user-result-item" onclick="startConversation('${u.email}')">
@@ -1164,6 +1153,21 @@
         </div>
       </div>`;
     }).join('');
+  }
+
+  function _searchUsers(q) {
+    if (!q.trim()) {
+      _renderUserList(allUsers);
+      return;
+    }
+
+    const lower = q.toLowerCase();
+    const matches = allUsers.filter(u =>
+      (u.username || '').toLowerCase().includes(lower) ||
+      (u.email || '').toLowerCase().includes(lower)
+    );
+
+    _renderUserList(matches);
   }
 
   window.startConversation = async function(otherEmail) {
