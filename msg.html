@@ -816,6 +816,7 @@
   let messagesUnsubscribe = null;
   let convsUnsubscribe = null;
   let allUsers = [];
+  const userNameCache = {};   // email → display name cache
 
   // ── AUTH ──
   window.handleAuth = async function() {
@@ -916,26 +917,31 @@
     );
 
     convsUnsubscribe = onSnapshot(q, async (snapshot) => {
-      allConversations = [];
-      for (const docSnap of snapshot.docs) {
+      // Fetch all user names in parallel before touching allConversations
+      const convPromises = snapshot.docs.map(async (docSnap) => {
         const data = docSnap.data();
         const otherEmail = data.participants.find(p => p !== currentUser.email);
-        // Fetch the other user's username
         let otherName = otherEmail;
-        try {
-          const uSnap = await getDoc(doc(db, 'users', otherEmail));
-          if (uSnap.exists() && uSnap.data().username) otherName = uSnap.data().username;
-        } catch {}
-        allConversations.push({ id: docSnap.id, ...data, otherEmail, otherName });
-      }
+        if (userNameCache[otherEmail]) {
+          otherName = userNameCache[otherEmail];
+        } else {
+          try {
+            const uSnap = await getDoc(doc(db, 'users', otherEmail));
+            if (uSnap.exists() && uSnap.data().username) otherName = uSnap.data().username;
+            userNameCache[otherEmail] = otherName;
+          } catch {}
+        }
+        return { id: docSnap.id, ...data, otherEmail, otherName };
+      });
 
-      // Sort by lastMessageAt desc
-      allConversations.sort((a, b) => {
+      // Only update state once everything is ready — prevents flicker/duplication
+      const resolved = await Promise.all(convPromises);
+      resolved.sort((a, b) => {
         const ta = a.lastMessageAt?.toMillis?.() || 0;
         const tb = b.lastMessageAt?.toMillis?.() || 0;
         return tb - ta;
       });
-
+      allConversations = resolved;
       renderConvList(allConversations);
     });
   }
