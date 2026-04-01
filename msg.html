@@ -669,11 +669,183 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
-    /* ── RESPONSIVE ── */
-    @media (max-width: 640px) {
-      .sidebar { width: 100%; display: none; }
-      .sidebar.mobile-open { display: flex; position: absolute; inset: 0; z-index: 50; }
-      .chat-pane { width: 100%; }
+    .back-btn { display: none; }
+
+    /* ── RESPONSIVE / MOBILE ── */
+
+    /* Safe-area support for notched iPhones & Android punch-holes */
+    @supports (padding: env(safe-area-inset-bottom)) {
+      nav          { padding-top: env(safe-area-inset-top); }
+      .msg-input-area {
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+      }
+      .mobile-bottom-bar {
+        padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+      }
+    }
+
+    @media (max-width: 700px) {
+      /* ── Body / layout ── */
+      body { overflow: hidden; }
+
+      #app {
+        flex-direction: column;
+        position: relative;
+      }
+
+      /* ── Nav ── */
+      nav {
+        padding: 0 1rem;
+        height: 52px;
+      }
+      .nav-title { display: none; }
+      .nav-user-chip {
+        max-width: 90px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* ── Sidebar becomes a full-screen panel ── */
+      .sidebar {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        z-index: 200;
+        background: var(--card);
+        transition: transform 0.25s ease;
+        transform: translateX(0);
+        display: flex;
+      }
+
+      /* When chat is open, slide sidebar out to the left */
+      .sidebar.slide-out {
+        transform: translateX(-100%);
+        pointer-events: none;
+      }
+
+      /* ── Chat pane takes full width ── */
+      .chat-pane {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        z-index: 100;
+        transform: translateX(100%);
+        transition: transform 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        background: var(--bg);
+      }
+
+      .chat-pane.slide-in {
+        transform: translateX(0);
+      }
+
+      .back-btn { display: flex; }
+
+      /* ── Chat header: add back button ── */
+      .chat-header {
+        padding: 0.75rem 1rem;
+        gap: 0.6rem;
+        min-height: 56px;
+      }
+
+      .back-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--primary);
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.15s;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .back-btn:active { background: var(--primary-dim); }
+
+      /* ── Bigger tap targets in conv list ── */
+      .conv-item {
+        padding: 1rem 1.25rem;
+        min-height: 64px;
+      }
+      .conv-avatar { width: 44px; height: 44px; font-size: 0.8rem; }
+
+      /* ── Sidebar head ── */
+      .sidebar-head { padding: 1rem 1.25rem; }
+      .new-msg-btn { padding: 0.55rem 1rem; font-size: 0.65rem; }
+
+      /* ── Messages area: full height minus header + input ── */
+      .messages-area {
+        padding: 1rem;
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* ── Message bubbles slightly wider on mobile ── */
+      .msg-row { max-width: 85%; }
+
+      /* ── Input area ── */
+      .msg-input-area {
+        padding: 0.75rem 1rem;
+        gap: 0.6rem;
+      }
+      .msg-input-area textarea {
+        font-size: 1rem;       /* prevents iOS zoom-on-focus */
+        padding: 0.65rem 0.85rem;
+        border-radius: 22px;
+      }
+      .send-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 22px;
+      }
+
+      /* ── Modal ── */
+      .modal-box {
+        padding: 1.5rem 1.25rem;
+        border-radius: 18px 18px 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-width: 100%;
+        margin: 0;
+        padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+      }
+      .modal-overlay.open {
+        align-items: flex-end;
+      }
+      .modal-input { font-size: 1rem; }
+      .user-results { max-height: 45vh; }
+      .user-result-item { padding: 0.85rem 0.75rem; min-height: 52px; }
+
+      /* ── Auth wall ── */
+      .auth-box {
+        padding: 2rem 1.5rem;
+        border-radius: 18px;
+      }
+      .auth-field input { font-size: 1rem; padding: 0.85rem 1rem; }
+      .auth-submit { padding: 1rem; font-size: 0.75rem; }
+
+      /* ── Active chat full height ── */
+      #active-chat {
+        display: flex !important;
+        flex: 1;
+        flex-direction: column;
+        overflow: hidden;
+      }
+    }
+
+    /* Very small screens (iPhone SE, Galaxy A series small) */
+    @media (max-width: 375px) {
+      .nav-user-chip { max-width: 64px; }
+      .conv-avatar { width: 38px; height: 38px; }
+      .msg-bubble { font-size: 0.85rem; }
     }
   </style>
 </head>
@@ -747,6 +919,9 @@
 
     <div id="active-chat" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none;">
       <div class="chat-header" id="chat-header">
+        <button class="back-btn" id="back-btn" onclick="closeChatMobile()" aria-label="Back to conversations">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
         <div class="chat-header-avatar" id="chat-header-avatar"></div>
         <div>
           <div class="chat-header-name" id="chat-header-name"></div>
@@ -983,6 +1158,31 @@
     renderConvList(filtered);
   };
 
+  // ── MOBILE NAVIGATION ──
+  function isMobile() { return window.innerWidth <= 700; }
+
+  function openChatMobile() {
+    if (!isMobile()) return;
+    document.getElementById('sidebar').classList.add('slide-out');
+    document.getElementById('chat-pane').classList.add('slide-in');
+  }
+
+  function closeChatMobile() {
+    if (!isMobile()) return;
+    document.getElementById('sidebar').classList.remove('slide-out');
+    document.getElementById('chat-pane').classList.remove('slide-in');
+  }
+
+  window.closeChatMobile = closeChatMobile;
+
+  // Handle resize: reset mobile state if user goes to desktop
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      document.getElementById('sidebar').classList.remove('slide-out');
+      document.getElementById('chat-pane').classList.remove('slide-in');
+    }
+  });
+
   // ── OPEN CONVERSATION ──
   window.openConversation = async function(convId) {
     if (messagesUnsubscribe) messagesUnsubscribe();
@@ -1016,6 +1216,9 @@
     activeChat.style.flexDirection = 'column';
     activeChat.style.flex = '1';
     activeChat.style.overflow = 'hidden';
+
+    // On mobile, slide to chat view
+    openChatMobile();
 
     // Subscribe to messages
     const msgsRef = collection(db, 'conversations', convId, 'messages');
