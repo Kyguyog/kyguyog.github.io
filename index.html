@@ -1652,6 +1652,169 @@
       #cart-drawer { width: 100%; right: -100%; }
       .shelf-products { grid-template-columns: repeat(2, 1fr); }
     }
+
+    /* ══ MOBILE RESPONSIVE ══ */
+
+    /* Hamburger button */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.45rem 0.55rem;
+      cursor: pointer;
+      z-index: 201;
+      flex-shrink: 0;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile nav drawer */
+    .nav-mobile-drawer {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 0; right: 0;
+      background: rgba(10,10,15,0.97);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      z-index: 199;
+      flex-direction: column;
+      padding: 1rem 1.5rem 1.5rem;
+      gap: 0.25rem;
+      transform: translateY(-8px);
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-mobile-drawer.open {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .nav-mobile-drawer a {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      transition: color 0.2s;
+    }
+    .nav-mobile-drawer a:hover { color: var(--text); }
+    .nav-mobile-drawer a:last-child { border-bottom: none; }
+
+    @media (max-width: 768px) {
+      /* Nav */
+      nav { padding: 0 1rem; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+      #nav-user-badge { margin-left: auto; }
+
+      /* User popup */
+      #user-popup { right: 0.75rem; width: calc(100vw - 1.5rem); max-width: 320px; }
+
+      /* Home section */
+      .home-content { padding: 1.25rem; }
+      .skull-wrap img { width: 90px; height: 90px; }
+      .home-btns { flex-direction: column; align-items: center; gap: 0.75rem; }
+      .btn-primary, .btn-secondary { width: 100%; max-width: 280px; justify-content: center; }
+
+      /* Notice */
+      .notice-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+      }
+
+      /* Sections */
+      section { padding: 3rem 1.25rem; }
+
+      /* Top tier grid */
+      .top-tier-grid { grid-template-columns: 1fr; }
+
+      /* Archive / games grid */
+      .letter-group { padding-left: 1.5rem; }
+      .letter-bg { font-size: 3.5rem; }
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.5rem; }
+
+      /* Sites */
+      .sites-flex { gap: 0.5rem; }
+      .site-pill { font-size: 0.8rem; padding: 0.45rem 0.9rem; }
+
+      /* Shop header */
+      .shop-header-row { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+
+      /* Shelf */
+      .shelf-unit { padding: 1.5rem 1rem 0; }
+      .shelf-plank::after { left: -1rem; right: -1rem; }
+      .shelf-products { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+      .product-img-wrap { width: 90px; height: 110px; }
+
+      /* Cart drawer */
+      #cart-drawer { width: 100%; right: -100%; }
+
+      /* AI Chat */
+      .chat-messages { height: 300px; }
+      .chat-footer { flex-wrap: wrap; gap: 0.4rem; }
+      #chat-input { min-width: 0; width: calc(100% - 50px); }
+
+      /* Stats */
+      .stats-grid { grid-template-columns: 1fr; }
+      .stat-item { border-right: none; border-bottom: 1px solid var(--border); padding: 1.75rem 1rem; }
+      .stat-item:last-child { border-bottom: none; }
+
+      /* Command / staff */
+      .command-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .command-link { padding: 1rem 1.1rem; }
+
+      /* Banned grid */
+      .banned-grid { grid-template-columns: 1fr; }
+
+      /* Admin modal */
+      .admin-modal { margin: 0; border-radius: 12px; }
+      .admin-body { padding: 1.25rem; }
+      #admin-panel { padding: 0.75rem; align-items: flex-start; }
+
+      /* Orders panel */
+      #orders-panel > div {
+        max-width: 100% !important;
+        max-height: 90vh !important;
+        border-radius: 12px !important;
+      }
+
+      /* Hire card */
+      .hire-card { padding: 1.5rem; }
+
+      /* Search */
+      .search-wrap { margin-bottom: 2rem; }
+      #search-input { font-size: 0.9rem; }
+
+      /* Footer */
+      footer { padding: 2rem 1.25rem; }
+    }
+
+    @media (max-width: 400px) {
+      .games-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+      .shelf-products { grid-template-columns: repeat(2, 1fr); }
+      .product-img-wrap { width: 75px; height: 90px; }
+      h1.home-title { font-size: clamp(2.8rem, 14vw, 5rem); }
+    }
   </style>
 </head>
 <body>
@@ -1724,7 +1887,43 @@
     <a href="#staff">Outcasts</a>
   </div>
   <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
+  <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- MOBILE NAV DRAWER -->
+<div class="nav-mobile-drawer" id="nav-mobile-drawer">
+  <a href="/msg" onclick="closeMobileNav()">Message</a>
+  <a href="#top-tier" onclick="closeMobileNav()">Tier</a>
+  <a href="#games" onclick="closeMobileNav()">Games</a>
+  <a href="#sites" onclick="closeMobileNav()">Sites</a>
+  <a href="#shop" onclick="closeMobileNav()">Shop</a>
+  <a href="#ai-chat" onclick="closeMobileNav()">AI</a>
+  <a href="#stats" onclick="closeMobileNav()">Stats</a>
+  <a href="#staff" onclick="closeMobileNav()">Outcasts</a>
+</div>
+
+<script>
+function toggleMobileNav() {
+  var btn = document.getElementById('nav-hamburger');
+  var drawer = document.getElementById('nav-mobile-drawer');
+  btn.classList.toggle('open');
+  drawer.classList.toggle('open');
+}
+function closeMobileNav() {
+  document.getElementById('nav-hamburger').classList.remove('open');
+  document.getElementById('nav-mobile-drawer').classList.remove('open');
+}
+document.addEventListener('click', function(e) {
+  var btn = document.getElementById('nav-hamburger');
+  var drawer = document.getElementById('nav-mobile-drawer');
+  if (btn && drawer && !btn.contains(e.target) && !drawer.contains(e.target)) {
+    btn.classList.remove('open');
+    drawer.classList.remove('open');
+  }
+});
+</script>
 
 <!-- home -->
 <section id="home">
