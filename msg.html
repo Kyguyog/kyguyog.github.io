@@ -669,6 +669,60 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
 
+    /* ── AI AGENT ── */
+    .conv-item.ai-agent .conv-avatar {
+      background: linear-gradient(135deg, rgba(168,85,247,0.5), rgba(34,211,238,0.5));
+      border-color: rgba(34,211,238,0.5);
+      color: var(--secondary);
+      box-shadow: 0 0 10px rgba(34,211,238,0.2);
+    }
+    .conv-item.ai-agent { border-bottom: 1px solid rgba(34,211,238,0.15); }
+    .conv-item.ai-agent .conv-name { color: var(--secondary); }
+    .ai-divider {
+      padding: 0.4rem 1.25rem;
+      font-family: var(--font-display);
+      font-size: 0.55rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      background: rgba(34,211,238,0.03);
+    }
+    .msg-row.ai-msg .msg-avatar-sm {
+      background: linear-gradient(135deg, rgba(168,85,247,0.4), rgba(34,211,238,0.4));
+      border-color: rgba(34,211,238,0.4);
+      color: var(--secondary);
+    }
+    .msg-row.ai-msg .msg-bubble {
+      background: rgba(34,211,238,0.07);
+      border: 1px solid rgba(34,211,238,0.2);
+      color: var(--text);
+    }
+    .msg-row.ai-msg .msg-time { color: rgba(34,211,238,0.4); }
+    .ai-typing {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 0.4rem 0.2rem;
+    }
+    .ai-typing span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--secondary);
+      opacity: 0.6;
+      animation: aiDot 1.2s ease-in-out infinite;
+    }
+    .ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes aiDot { 0%,80%,100%{transform:translateY(0);opacity:0.4} 40%{transform:translateY(-5px);opacity:1} }
+    .ai-disabled-notice {
+      text-align: center;
+      padding: 2rem 1.5rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+
     .back-btn { display: none; }
 
     /* ── RESPONSIVE / MOBILE ── */
@@ -904,6 +958,15 @@
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <input type="text" id="conv-search" placeholder="Search conversations..." oninput="filterConvs(this.value)" />
     </div>
+    <div class="ai-divider">✦ AI Assistant</div>
+    <div id="ai-conv-item" class="conv-item ai-agent" onclick="openAiConversation()" style="display:none;">
+      <div class="conv-avatar">✦</div>
+      <div class="conv-info">
+        <div class="conv-name" id="ai-conv-name">KnowWhere AI</div>
+        <div class="conv-preview" id="ai-conv-preview">Ask me anything...</div>
+      </div>
+    </div>
+    <div class="ai-divider" style="margin-top:0.25rem;">Conversations</div>
     <div class="conv-list" id="conv-list">
       <div class="loading-spinner"><div class="spinner"></div> Loading...</div>
     </div>
@@ -993,6 +1056,11 @@
   let allUsers = [];
   const userNameCache = {};   // email → display name cache
 
+  // ── AI AGENT STATE ──
+  let aiConfig = null;        // { aiEnabled, apiKey, model, systemPrompt }
+  let aiMessages = [];        // local message history for AI conv
+  let aiConvActive = false;   // is AI conv currently open
+
   // ── AUTH ──
   window.handleAuth = async function() {
     const email = document.getElementById('auth-email').value.trim();
@@ -1053,6 +1121,9 @@
       // Load all users for search
       loadAllUsers();
 
+      // Load AI config from Firestore
+      loadAiConfig();
+
       // Subscribe to conversations
       subscribeToConversations();
 
@@ -1066,6 +1137,157 @@
       document.getElementById('auth-error').classList.remove('show');
     }
   });
+
+  // ── AI CONFIG ──
+  async function loadAiConfig() {
+    try {
+      const snap = await getDoc(doc(db, 'siteContent', 'main'));
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const ai = data.aiSettings || {};
+      if (!ai.aiEnabled) return;
+
+      // Pick a random API key from the array
+      const keys = ai.apiKeys || [];
+      if (keys.length === 0) return;
+      const apiKey = keys[Math.floor(Math.random() * keys.length)];
+
+      aiConfig = {
+        aiEnabled: true,
+        apiKey,
+        model: ai.model || 'gemini-2.5-flash-lite',
+        systemPrompt: ai.systemPrompt || 'You are a helpful assistant.'
+      };
+
+      // Show the AI conv item in sidebar
+      const item = document.getElementById('ai-conv-item');
+      if (item) item.style.display = 'flex';
+    } catch(e) {
+      console.warn('Could not load AI config:', e);
+    }
+  }
+
+  // ── OPEN AI CONVERSATION ──
+  window.openAiConversation = function() {
+    if (messagesUnsubscribe) { messagesUnsubscribe(); messagesUnsubscribe = null; }
+    activeConvId = null;
+    aiConvActive = true;
+
+    // Update sidebar active state
+    document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+    document.getElementById('ai-conv-item').classList.add('active');
+
+    // Populate header
+    const modelLabel = aiConfig?.model || 'AI';
+    document.getElementById('chat-header-avatar').textContent = '✦';
+    document.getElementById('chat-header-avatar').style.color = 'var(--secondary)';
+    document.getElementById('chat-header-name').textContent = 'KnowWhere AI';
+    document.getElementById('chat-header-sub').textContent = modelLabel;
+
+    // Show chat pane
+    document.getElementById('chat-empty').style.display = 'none';
+    const activeChat = document.getElementById('active-chat');
+    activeChat.style.display = 'flex';
+    activeChat.style.flexDirection = 'column';
+    activeChat.style.flex = '1';
+    activeChat.style.overflow = 'hidden';
+
+    openChatMobile();
+    renderAiMessages();
+
+    // Focus input
+    setTimeout(() => document.getElementById('msg-input').focus(), 100);
+  };
+
+  function renderAiMessages() {
+    const area = document.getElementById('messages-area');
+    if (aiMessages.length === 0) {
+      const greeting = aiConfig?.systemPrompt?.includes('KnowWhere')
+        ? 'Hi! I\'m the KnowWhere AI assistant. How can I help you today?'
+        : 'Hi! How can I help you today?';
+      area.innerHTML = `<div class="msg-row ai-msg theirs" style="max-width:75%;align-self:flex-start;">
+        <div class="msg-avatar-sm">✦</div>
+        <div><div class="msg-bubble">${escapeHtml(greeting)}<span class="msg-time">now</span></div></div>
+      </div>`;
+      return;
+    }
+
+    let html = '';
+    for (const msg of aiMessages) {
+      const isMine = msg.role === 'user';
+      const timeStr = msg.time || '';
+      if (isMine) {
+        const initial = (currentUserData?.username || currentUser?.email || '?')[0].toUpperCase();
+        html += `<div class="msg-row mine">
+          <div><div class="msg-bubble">${escapeHtml(msg.content)}<span class="msg-time">${timeStr}</span></div></div>
+          <div class="msg-avatar-sm">${initial}</div>
+        </div>`;
+      } else {
+        html += `<div class="msg-row ai-msg theirs">
+          <div class="msg-avatar-sm">✦</div>
+          <div><div class="msg-bubble">${escapeHtml(msg.content)}<span class="msg-time">${timeStr}</span></div></div>
+        </div>`;
+      }
+    }
+    area.innerHTML = html;
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function showAiTyping() {
+    const area = document.getElementById('messages-area');
+    const div = document.createElement('div');
+    div.id = 'ai-typing-indicator';
+    div.className = 'msg-row ai-msg theirs';
+    div.style.maxWidth = '75%';
+    div.style.alignSelf = 'flex-start';
+    div.innerHTML = `<div class="msg-avatar-sm">✦</div>
+      <div><div class="msg-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div></div>`;
+    area.appendChild(div);
+    area.scrollTop = area.scrollHeight;
+  }
+
+  function hideAiTyping() {
+    const el = document.getElementById('ai-typing-indicator');
+    if (el) el.remove();
+  }
+
+  async function sendAiMessage(text) {
+    if (!aiConfig?.aiEnabled) return;
+
+    const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    aiMessages.push({ role: 'user', content: text, time: now });
+    renderAiMessages();
+    showAiTyping();
+
+    // Build Gemini API request
+    const contents = aiMessages
+      .filter(m => m.role === 'user' || m.role === 'model')
+      .map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.content }] }));
+
+    const payload = {
+      system_instruction: { parts: [{ text: aiConfig.systemPrompt }] },
+      contents
+    };
+
+    try {
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${aiConfig.model}:generateContent?key=${aiConfig.apiKey}`,
+        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
+      );
+      const data = await res.json();
+      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I couldn\'t generate a response.';
+      const replyTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      aiMessages.push({ role: 'model', content: reply, time: replyTime });
+
+      // Update sidebar preview
+      document.getElementById('ai-conv-preview').textContent = reply.slice(0, 40) + (reply.length > 40 ? '…' : '');
+    } catch(e) {
+      aiMessages.push({ role: 'model', content: 'Sorry, something went wrong connecting to the AI.', time: now });
+    }
+
+    hideAiTyping();
+    renderAiMessages();
+  }
 
   // ── LOAD ALL USERS ──
   async function loadAllUsers() {
@@ -1187,6 +1409,15 @@
   window.openConversation = async function(convId) {
     if (messagesUnsubscribe) messagesUnsubscribe();
     activeConvId = convId;
+    aiConvActive = false;
+
+    // Reset AI avatar styling if switching from AI
+    const avatar = document.getElementById('chat-header-avatar');
+    avatar.style.color = '';
+
+    // Remove active from AI conv item
+    const aiItem = document.getElementById('ai-conv-item');
+    if (aiItem) aiItem.classList.remove('active');
 
     const conv = allConversations.find(c => c.id === convId);
     if (!conv) return;
@@ -1275,7 +1506,17 @@
   window.sendMessage = async function() {
     const input = document.getElementById('msg-input');
     const text = input.value.trim();
-    if (!text || !activeConvId) return;
+    if (!text) return;
+
+    // Route to AI if AI conversation is active
+    if (aiConvActive) {
+      input.value = '';
+      input.style.height = 'auto';
+      await sendAiMessage(text);
+      return;
+    }
+
+    if (!activeConvId) return;
 
     const btn = document.getElementById('send-btn');
     btn.disabled = true;
