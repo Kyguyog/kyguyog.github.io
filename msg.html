@@ -1016,9 +1016,6 @@
   </div>
   <div class="nav-right">
     <span class="nav-user-chip" id="nav-username"></span>
-    <button class="nav-settings-btn" id="nav-settings-btn" onclick="openSettingsModal()" title="Admin Settings" style="display:none;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-    </button>
     <button class="nav-signout" onclick="handleSignOut()">Sign Out</button>
   </div>
 </nav>
@@ -1066,10 +1063,13 @@
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         </button>
         <div class="chat-header-avatar" id="chat-header-avatar"></div>
-        <div>
+        <div style="flex:1;">
           <div class="chat-header-name" id="chat-header-name"></div>
           <div class="chat-header-sub" id="chat-header-sub"></div>
         </div>
+        <button class="nav-settings-btn" id="chat-settings-btn" onclick="openSettingsModal()" title="AI Settings" style="display:none;margin-left:auto;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
       </div>
       <div class="messages-area" id="messages-area"></div>
       <div class="msg-input-area">
@@ -1252,13 +1252,6 @@
       const displayName = currentUserData.username || user.email;
       document.getElementById('nav-username').textContent = displayName;
 
-      // Show settings gear for admins
-      if (currentUserData.admin === true) {
-        document.getElementById('nav-settings-btn').style.display = 'flex';
-      } else {
-        document.getElementById('nav-settings-btn').style.display = 'none';
-      }
-
       // Load all users for search
       loadAllUsers();
 
@@ -1273,7 +1266,6 @@
       currentUserData = null;
       wall.classList.remove('hidden');
       appEl.classList.remove('visible');
-      document.getElementById('nav-settings-btn').style.display = 'none';
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-error').classList.remove('show');
@@ -1336,6 +1328,10 @@
 
     openChatMobile();
     renderAiMessages();
+
+    // Show settings gear for admins in AI conv header
+    const settingsBtn = document.getElementById('chat-settings-btn');
+    if (settingsBtn && currentUserData?.admin === true) settingsBtn.style.display = 'flex';
 
     // Focus input
     setTimeout(() => document.getElementById('msg-input').focus(), 100);
@@ -1634,6 +1630,10 @@
     document.getElementById('chat-header-avatar').textContent = initial;
     document.getElementById('chat-header-name').textContent = conv.otherName || conv.otherEmail;
     document.getElementById('chat-header-sub').textContent = conv.otherEmail;
+
+    // Hide AI settings gear for regular convos
+    const settingsBtn = document.getElementById('chat-settings-btn');
+    if (settingsBtn) settingsBtn.style.display = 'none';
 
     // Show chat pane
     document.getElementById('chat-empty').style.display = 'none';
