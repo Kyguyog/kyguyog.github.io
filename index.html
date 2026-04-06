@@ -3753,7 +3753,7 @@ document.getElementById('orders-panel').addEventListener('click', function(e) {
 function _buildOrderCard(o, isCompleted, showUser) {
   const date = new Date(o.placedAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
   const completedDate = o.completedAt ? new Date(o.completedAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
-  const orderNumDisplay = o.orderNumber ? `<span style="font-size:0.65rem;color:var(--secondary);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;opacity:0.85;">ORD-${o.orderNumber}</span>` : '';
+  const orderNumDisplay = o.orderNumber ? `<span style="font-size:0.65rem;color:var(--secondary);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;opacity:0.85;">ORDER-${o.orderNumber}</span>` : '';
   const itemLines = (o.items || []).map(i =>
     `<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);padding:0.2rem 0;">
       <span style="display:flex;align-items:center;gap:0.4rem;">
