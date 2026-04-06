@@ -2004,11 +2004,25 @@ document.addEventListener('click', function(e) {
     return orderNumber;
   };
 
-  // Fetch all orders (orders: true users only)
+  // Fetch all orders (orders: true / admin users only)
   window._fetchAllOrders = async function() {
     const snap = await getDocs(collection(db, 'orders'));
     return snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.placedAt.localeCompare(a.placedAt));
   };
+
+  // Fetch only the current user's orders
+  window._fetchMyOrders = async function() {
+    const user = auth.currentUser;
+    if (!user) return [];
+    const snap = await getDocs(collection(db, 'users', user.email, 'orders'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.placedAt.localeCompare(a.placedAt));
+  };
+
+  // Expose current user email for panel scoping
+  Object.defineProperty(window, '_currentUserEmail', {
+    get: () => auth.currentUser ? auth.currentUser.email : null,
+    configurable: true
+  });
 
   // Mark an order as completed (writes to top-level 'orders' doc)
   window._markOrderCompleted = async function(orderId) {
@@ -2376,11 +2390,12 @@ document.addEventListener('click', function(e) {
           }
           injectAdminPanels();
         }
-        // Check orders flag -- show Orders button if orders: true
-        if (userData.orders === true) {
-          const ordersSection = document.getElementById('orders-popup-section');
-          if (ordersSection) ordersSection.style.display = 'block';
-        }
+        // Store privilege flags for orders panel scoping
+        window._canSeeAllOrders = (userData.orders === true || userData.admin === true);
+
+        // Show Orders button for ALL logged-in users
+        const ordersSection = document.getElementById('orders-popup-section');
+        if (ordersSection) ordersSection.style.display = 'block';
       } catch(e) {
         console.warn('Could not check admin/editor status:', e);
       }
@@ -3699,7 +3714,7 @@ renderCart();
     <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:0.6rem;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--secondary);">ALL ORDERS</span>
+        <span id="orders-panel-title" style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--secondary);">ORDERS</span>
       </div>
       <button onclick="closeOrdersPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -3730,9 +3745,10 @@ document.getElementById('orders-panel').addEventListener('click', function(e) {
   if (e.target === this) closeOrdersPanel();
 });
 
-function _buildOrderCard(o, isCompleted) {
+function _buildOrderCard(o, isCompleted, showUser) {
   const date = new Date(o.placedAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
   const completedDate = o.completedAt ? new Date(o.completedAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
+  const orderNumDisplay = o.orderNumber ? `<span style="font-size:0.65rem;color:var(--secondary);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;opacity:0.85;">ORD-${o.orderNumber}</span>` : '';
   const itemLines = (o.items || []).map(i =>
     `<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);padding:0.2rem 0;">
       <span style="display:flex;align-items:center;gap:0.4rem;">
@@ -3745,18 +3761,28 @@ function _buildOrderCard(o, isCompleted) {
 
   const safeId = (o.id || '').replace(/'/g, "\\'");
 
-  const actionBtn = isCompleted
-    ? `<button onclick="undoOrderComplete('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(100,116,139,0.12);border:1px solid rgba(100,116,139,0.35);border-radius:6px;color:var(--muted);font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(100,116,139,0.22)'" onmouseout="this.style.background='rgba(100,116,139,0.12)'">↩ Undo</button>`
-    : `<button onclick="completeOrder('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:6px;color:#ef4444;font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.22)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">✓ Complete</button>`;
+  // Normal users don't get complete/undo buttons
+  let actionBtn = '';
+  if (window._canSeeAllOrders) {
+    actionBtn = isCompleted
+      ? `<button onclick="undoOrderComplete('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(100,116,139,0.12);border:1px solid rgba(100,116,139,0.35);border-radius:6px;color:var(--muted);font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(100,116,139,0.22)'" onmouseout="this.style.background='rgba(100,116,139,0.12)'">↩ Undo</button>`
+      : `<button onclick="completeOrder('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:6px;color:#ef4444;font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.22)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">✓ Complete</button>`;
+  }
 
   const borderColor = isCompleted ? 'rgba(100,116,139,0.25)' : 'var(--border)';
   const opacity = isCompleted ? '0.7' : '1';
 
+  const userLine = showUser
+    ? `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${o.username || o.email}</span>
+       <span style="font-size:0.68rem;color:var(--muted);">${o.email} · ${date}</span>`
+    : `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">Your Order</span>
+       <span style="font-size:0.68rem;color:var(--muted);">${date}</span>`;
+
   return `<div data-order-id="${o.id}" style="background:var(--bg);border:1px solid ${borderColor};border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.5rem;opacity:${opacity};">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;">
       <div style="display:flex;flex-direction:column;gap:0.05rem;flex:1;min-width:0;">
-        <span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${o.username || o.email}</span>
-        <span style="font-size:0.68rem;color:var(--muted);">${o.email} · ${date}</span>
+        ${userLine}
+        ${orderNumDisplay}
         ${isCompleted && completedDate ? `<span style="font-size:0.62rem;color:#22c55e;margin-top:0.1rem;">✓ Completed ${completedDate}</span>` : ''}
       </div>
       <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
@@ -3773,11 +3799,17 @@ function _buildOrderCard(o, isCompleted) {
 async function loadOrders() {
   const list    = document.getElementById('orders-list');
   const summary = document.getElementById('orders-summary');
+  const titleEl = document.getElementById('orders-panel-title');
   list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading...</div>';
   summary.textContent = '';
 
+  const canSeeAll = !!window._canSeeAllOrders;
+  if (titleEl) titleEl.textContent = canSeeAll ? 'ALL ORDERS' : 'MY ORDERS';
+
   try {
-    const orders = await window._fetchAllOrders();
+    const orders = canSeeAll
+      ? await window._fetchAllOrders()
+      : await window._fetchMyOrders();
     const active    = orders.filter(o => !o.completed);
     const completed = orders.filter(o => o.completed);
 
@@ -3789,12 +3821,12 @@ async function loadOrders() {
     }
 
     const activeHtml = active.length
-      ? active.map(o => _buildOrderCard(o, false)).join('')
+      ? active.map(o => _buildOrderCard(o, false, canSeeAll)).join('')
       : '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:1rem 0;opacity:0.5;">No active orders.</div>';
 
     // Completed Orders collapsible dropdown
     const completedHtml = completed.length
-      ? completed.map(o => _buildOrderCard(o, true)).join('')
+      ? completed.map(o => _buildOrderCard(o, true, canSeeAll)).join('')
       : '<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:0.75rem 0;opacity:0.5;">No completed orders yet.</div>';
 
     const completedSection = `
