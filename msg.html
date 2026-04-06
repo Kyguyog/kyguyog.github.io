@@ -1204,7 +1204,7 @@
     if (aiMessages.length === 0) {
       const greeting = aiConfig?.systemPrompt?.includes('KnowWhere')
         ? 'Hi! I\'m the KnowWhere AI assistant. How can I help you today?'
-        : 'Hi! How can I help you today?';
+        : 'Hi! How can I help you today? I forget everything upon refresh.';
       area.innerHTML = `<div class="msg-row ai-msg theirs" style="max-width:75%;align-self:flex-start;">
         <div class="msg-avatar-sm">✦</div>
         <div><div class="msg-bubble">${escapeHtml(greeting)}<span class="msg-time">now</span></div></div>
@@ -1569,7 +1569,9 @@
     document.getElementById('new-conv-modal').classList.add('open');
     document.getElementById('user-search-input').value = '';
     document.getElementById('modal-error').classList.remove('show');
-    _renderUserList(allUsers);
+    const existingEmails = new Set(allConversations.map(c => c.otherEmail));
+    const newUsers = allUsers.filter(u => !existingEmails.has(u.email));
+    _renderUserList(newUsers);
     setTimeout(() => document.getElementById('user-search-input').focus(), 50);
   };
 
@@ -1606,15 +1608,18 @@
   }
 
   function _searchUsers(q) {
+    const existingEmails = new Set(allConversations.map(c => c.otherEmail));
     if (!q.trim()) {
-      _renderUserList(allUsers);
+      _renderUserList(allUsers.filter(u => !existingEmails.has(u.email)));
       return;
     }
 
     const lower = q.toLowerCase();
     const matches = allUsers.filter(u =>
-      (u.username || '').toLowerCase().includes(lower) ||
-      (u.email || '').toLowerCase().includes(lower)
+      !existingEmails.has(u.email) && (
+        (u.username || '').toLowerCase().includes(lower) ||
+        (u.email || '').toLowerCase().includes(lower)
+      )
     );
 
     _renderUserList(matches);
