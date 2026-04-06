@@ -1300,7 +1300,22 @@
       if (!snap.exists()) return;
       const data = snap.data();
       const ai = data.aiSettings || {};
-      if (!ai.aiEnabled) return;
+
+      // Always show AI section for admins so they can re-enable it
+      const admin = currentUserData?.admin === true;
+      const item = document.getElementById('ai-conv-item');
+
+      if (!ai.aiEnabled) {
+        if (admin && item) {
+          item.style.display = 'flex';
+          item.style.opacity = '0.45';
+          item.title = 'AI is disabled — open settings to re-enable';
+        }
+        return;
+      }
+
+      // Restore full opacity if previously dimmed
+      if (item) { item.style.display = 'flex'; item.style.opacity = ''; item.title = ''; }
 
       // Pick a random API key from the array
       const keys = ai.apiKeys || [];
@@ -1313,10 +1328,6 @@
         model: ai.model || 'gemini-2.5-flash-lite',
         systemPrompt: ai.systemPrompt || 'You are a helpful assistant.'
       };
-
-      // Show the AI conv item in sidebar
-      const item = document.getElementById('ai-conv-item');
-      if (item) item.style.display = 'flex';
     } catch(e) {
       console.warn('Could not load AI config:', e);
     }
@@ -1324,6 +1335,13 @@
 
   // ── OPEN AI CONVERSATION ──
   window.openAiConversation = function() {
+    // If AI is disabled and user is admin, just open settings directly
+    if (!aiConfig?.aiEnabled && currentUserData?.admin === true) {
+      openSettingsModal();
+      return;
+    }
+    if (!aiConfig?.aiEnabled) return;
+
     if (messagesUnsubscribe) { messagesUnsubscribe(); messagesUnsubscribe = null; }
     activeConvId = null;
     aiConvActive = true;
