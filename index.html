@@ -2235,11 +2235,14 @@ document.addEventListener('click', function(e) {
     if (!user) throw new Error('Not logged in');
     const snap = await getDoc(doc(db, 'users', user.email));
     const username = (snap.exists() && snap.data().username) || user.email;
+    // Generate a random 6-digit order number (100000–999999)
+    const orderNumber = Math.floor(100000 + Math.random() * 900000);
     const orderDoc = {
       email: user.email,
       username,
       items: orderData.items,
       total: orderData.total,
+      orderNumber,
       placedAt: new Date().toISOString()
     };
     // Store under users/{email}/orders/{timestamp}
@@ -2247,6 +2250,7 @@ document.addEventListener('click', function(e) {
     await setDoc(doc(db, 'users', user.email, 'orders', orderId), orderDoc);
     // Also store a flat copy in top-level 'orders' collection for the orders panel
     await setDoc(doc(db, 'orders', orderId), orderDoc);
+    return orderNumber;
   };
 
   // Fetch all orders (orders: true users only)
@@ -4490,7 +4494,7 @@ window.shopCheckout = async function() {
   if (btn) { btn.disabled = true; btn.textContent = 'Placing order...'; }
 
   try {
-    await window._saveOrder({
+    const orderNumber = await window._saveOrder({
       items: items.map(i => ({ name: i.name, qty: i.qty, price: i.price, img: i.img })),
       total: parseFloat(total.toFixed(2))
     });
@@ -4498,11 +4502,21 @@ window.shopCheckout = async function() {
     shopCart = {};
     renderCart();
     toggleCart();
+    showOrderConfirmation(orderNumber);
   } catch(e) {
     alert('Failed to place order: ' + e.message);
   } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Checkout →'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Checkout \u2192'; }
   }
+};
+
+window.showOrderConfirmation = function(orderNumber) {
+  document.getElementById('order-confirm-number').textContent = '#' + orderNumber;
+  document.getElementById('order-confirm-modal').style.display = 'flex';
+};
+
+window.closeOrderConfirmation = function() {
+  document.getElementById('order-confirm-modal').style.display = 'none';
 };
 
 // ── Admin: render shop editor ──
@@ -4541,6 +4555,39 @@ window.adminAddShopItem = function() {
 // init empty cart on load
 renderCart();
 </script>
+
+<!-- ORDER CONFIRMATION MODAL -->
+<div id="order-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;" onclick="if(event.target===this)closeOrderConfirmation()">
+  <div style="background:var(--card);border:1px solid rgba(168,85,247,0.45);border-radius:16px;width:100%;max-width:460px;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;gap:1.25rem;box-shadow:0 0 60px rgba(168,85,247,0.18);text-align:center;animation:popIn 0.2s ease;">
+    <div style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div>
+      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;letter-spacing:0.05em;color:#22c55e;margin-bottom:0.3rem;">ORDER PLACED!</div>
+      <div style="font-size:0.85rem;color:var(--muted);">Your order has been received. Here is your order number:</div>
+    </div>
+    <div style="background:var(--bg);border:2px solid var(--primary);border-radius:10px;padding:0.9rem 2rem;width:100%;">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">Your Order Number</div>
+      <div id="order-confirm-number" style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--primary);text-shadow:0 0 20px rgba(168,85,247,0.6);letter-spacing:0.05em;">#------</div>
+    </div>
+    <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1.1rem 1.25rem;width:100%;text-align:left;display:flex;flex-direction:column;gap:0.75rem;">
+      <div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--secondary);">Next Step &mdash; Contact Us</div>
+      <p style="font-size:0.87rem;color:var(--text);line-height:1.6;">Please text or email us with your <strong style="color:var(--primary);">order number</strong> and <strong style="color:var(--primary);">first name</strong> so we can fulfill your order:</p>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;">
+        <a href="sms:3855129648" style="display:flex;align-items:center;gap:0.6rem;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.35);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.2)'" onmouseout="this.style.background='rgba(168,85,247,0.1)'">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 10 19.79 19.79 0 0 1 1.69 1.4 2 2 0 0 1 3.68 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--primary);">TEXT: 385-512-9648</span>
+        </a>
+        <a href="mailto:knowwhereindustries@gmail.com" style="display:flex;align-items:center;gap:0.6rem;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.3);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,211,238,0.16)'" onmouseout="this.style.background='rgba(34,211,238,0.08)'">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.05em;color:var(--secondary);">knowwhereindustries@gmail.com</span>
+        </a>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);line-height:1.5;">Send us: <em style="color:var(--text);">"Order #[your number], First Name: [your name]"</em></p>
+    </div>
+    <button onclick="closeOrderConfirmation()" style="width:100%;padding:0.85rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 20px rgba(168,85,247,0.35);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 0 32px rgba(168,85,247,0.6)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 20px rgba(168,85,247,0.35)'">Got It!</button>
+  </div>
+</div>
 
 <!-- ORDERS PANEL -->
 <div id="orders-panel" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1.5rem;">
