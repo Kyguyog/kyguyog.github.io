@@ -146,14 +146,15 @@
       font-family: var(--font-display);
       font-weight: 900;
       font-size: 1rem;
-      letter-spacing: 0.05em;
+      letter-spacing: 0;
       display: flex;
       align-items: center;
       gap: 0.5rem;
       text-decoration: none;
       color: var(--text);
     }
-    .nav-logo span { color: var(--primary); }
+    .nav-logo .know-text { color: var(--text); text-decoration: none; letter-spacing: 0.05em; }
+    .nav-logo span { color: var(--primary); letter-spacing: 0.05em; text-decoration: none; }
     .nav-logo img { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 6px rgba(168,85,247,0.7)); }
     .nav-title {
       font-family: var(--font-display);
@@ -951,7 +952,7 @@
 <nav>
   <a href="/" class="nav-logo">
     <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" alt="Logo">
-    KNOW<span>WHERE</span>
+    <span class="logo-text"><span class="know-text">KNOW</span><span>WHERE</span></span>
   </a>
   <div class="nav-title">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
