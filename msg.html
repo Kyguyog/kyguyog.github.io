@@ -197,6 +197,62 @@
       transition: color 0.2s, border-color 0.2s;
     }
     .nav-signout:hover { color: var(--danger); border-color: var(--danger); }
+    .nav-settings-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--primary-dim);
+      border: 1px solid rgba(168,85,247,0.35);
+      color: var(--primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .nav-settings-btn:hover { background: rgba(168,85,247,0.25); box-shadow: 0 0 12px rgba(168,85,247,0.4); }
+    .settings-section { display:flex;flex-direction:column;gap:0.4rem; }
+    .settings-section-title {
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+    }
+    .settings-row { display:flex;align-items:center;justify-content:space-between; }
+    .settings-label { font-size:0.85rem;color:var(--text); }
+    .settings-toggle { position:relative;display:inline-flex;align-items:center;cursor:pointer; }
+    .settings-toggle input { opacity:0;width:0;height:0;position:absolute; }
+    .settings-toggle-track {
+      width: 40px; height: 22px; border-radius: 11px;
+      background: var(--border);
+      transition: background 0.2s;
+      display: block;
+    }
+    .settings-toggle-track::after {
+      content:'';position:absolute;top:3px;left:3px;
+      width:16px;height:16px;border-radius:50%;
+      background:#fff;transition:transform 0.2s;
+    }
+    .settings-toggle input:checked + .settings-toggle-track { background: var(--primary); }
+    .settings-toggle input:checked + .settings-toggle-track::after { transform: translateX(18px); }
+    .settings-add-btn {
+      font-family:var(--font-display);font-size:0.55rem;font-weight:700;letter-spacing:0.1em;
+      color:var(--secondary);border:1px solid rgba(34,211,238,0.35);background:rgba(34,211,238,0.08);
+      border-radius:5px;padding:0.25rem 0.6rem;cursor:pointer;transition:background 0.2s;
+    }
+    .settings-add-btn:hover { background:rgba(34,211,238,0.18); }
+    .api-key-row { display:flex;gap:0.4rem;align-items:center; }
+    .api-key-row input { flex:1; }
+    .api-key-del {
+      width:28px;height:28px;border-radius:6px;border:1px solid rgba(239,68,68,0.3);
+      background:var(--danger-dim);color:var(--danger);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1rem;line-height:1;
+      transition:background 0.15s;
+    }
+    .api-key-del:hover { background:rgba(239,68,68,0.25); }
 
     /* ── MAIN LAYOUT ── */
     #app {
@@ -960,6 +1016,9 @@
   </div>
   <div class="nav-right">
     <span class="nav-user-chip" id="nav-username"></span>
+    <button class="nav-settings-btn" id="nav-settings-btn" onclick="openSettingsModal()" title="Admin Settings" style="display:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
     <button class="nav-signout" onclick="handleSignOut()">Sign Out</button>
   </div>
 </nav>
@@ -1034,6 +1093,60 @@
     </div>
     <div class="modal-actions">
       <button class="modal-cancel-btn" onclick="closeNewConvModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN SETTINGS MODAL -->
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal-box" style="max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div class="modal-title" style="display:flex;align-items:center;gap:0.5rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Admin Settings
+      </div>
+      <button onclick="closeSettingsModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:0.25rem;line-height:1;font-size:1.2rem;" title="Close">&times;</button>
+    </div>
+
+    <!-- AI Enabled toggle -->
+    <div class="settings-section">
+      <div class="settings-section-title">AI Assistant</div>
+      <div class="settings-row">
+        <label class="settings-label">Enable AI Assistant</label>
+        <label class="settings-toggle">
+          <input type="checkbox" id="s-ai-enabled" />
+          <span class="settings-toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Model -->
+    <div class="settings-section">
+      <div class="settings-section-title">Model</div>
+      <input class="modal-input" type="text" id="s-model" placeholder="e.g. gemini-2.5-flash-lite" />
+    </div>
+
+    <!-- System Prompt -->
+    <div class="settings-section">
+      <div class="settings-section-title">System Prompt</div>
+      <textarea class="modal-input" id="s-system-prompt" rows="4" placeholder="Enter system prompt..." style="resize:vertical;line-height:1.5;"></textarea>
+    </div>
+
+    <!-- API Keys -->
+    <div class="settings-section">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+        <div class="settings-section-title" style="margin-bottom:0;">API Keys</div>
+        <button class="settings-add-btn" onclick="addApiKeyField()">+ Add Key</button>
+      </div>
+      <div id="s-api-keys-list" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+    </div>
+
+    <div id="settings-error" style="font-size:0.78rem;color:var(--danger);display:none;"></div>
+    <div id="settings-success" style="font-size:0.78rem;color:#22c55e;display:none;"></div>
+
+    <div class="modal-actions" style="margin-top:0.5rem;">
+      <button class="modal-cancel-btn" onclick="closeSettingsModal()">Cancel</button>
+      <button class="auth-submit" style="flex:1;padding:0.65rem;font-size:0.6rem;" onclick="saveSettings()">Save Changes</button>
     </div>
   </div>
 </div>
@@ -1139,6 +1252,13 @@
       const displayName = currentUserData.username || user.email;
       document.getElementById('nav-username').textContent = displayName;
 
+      // Show settings gear for admins
+      if (currentUserData.admin === true) {
+        document.getElementById('nav-settings-btn').style.display = 'flex';
+      } else {
+        document.getElementById('nav-settings-btn').style.display = 'none';
+      }
+
       // Load all users for search
       loadAllUsers();
 
@@ -1153,6 +1273,7 @@
       currentUserData = null;
       wall.classList.remove('hidden');
       appEl.classList.remove('visible');
+      document.getElementById('nav-settings-btn').style.display = 'none';
       document.getElementById('auth-email').value = '';
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-error').classList.remove('show');
@@ -1752,6 +1873,92 @@
     closeNewConvModal();
     // Wait a tick for subscription to catch up
     setTimeout(() => openConversation(convId), 300);
+  };
+
+  // ── ADMIN SETTINGS ──
+  function isAdmin() {
+    return currentUserData && currentUserData.admin === true;
+  }
+
+  window.openSettingsModal = async function() {
+    if (!isAdmin()) return;
+    const modal = document.getElementById('settings-modal');
+    modal.classList.add('open');
+    document.getElementById('settings-error').style.display = 'none';
+    document.getElementById('settings-success').style.display = 'none';
+
+    // Load current values from Firestore
+    try {
+      const snap = await getDoc(doc(db, 'siteContent', 'main'));
+      if (!snap.exists()) return;
+      const data = snap.data();
+      const ai = data.aiSettings || {};
+      document.getElementById('s-ai-enabled').checked = !!ai.aiEnabled;
+      document.getElementById('s-model').value = ai.model || '';
+      document.getElementById('s-system-prompt').value = ai.systemPrompt || '';
+
+      // Render API keys
+      const keysList = document.getElementById('s-api-keys-list');
+      keysList.innerHTML = '';
+      const keys = ai.apiKeys || [];
+      keys.forEach(k => addApiKeyField(k));
+      if (keys.length === 0) addApiKeyField('');
+    } catch(e) {
+      console.error('Failed to load settings:', e);
+    }
+  };
+
+  window.closeSettingsModal = function() {
+    document.getElementById('settings-modal').classList.remove('open');
+  };
+
+  document.getElementById('settings-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
+  });
+
+  window.addApiKeyField = function(value = '') {
+    const list = document.getElementById('s-api-keys-list');
+    const row = document.createElement('div');
+    row.className = 'api-key-row';
+    row.innerHTML = `
+      <input class="modal-input" type="text" value="${escapeHtml(value)}" placeholder="AIza..." style="font-family:monospace;font-size:0.78rem;" />
+      <button class="api-key-del" onclick="this.parentElement.remove()" title="Remove">&times;</button>
+    `;
+    list.appendChild(row);
+  };
+
+  window.saveSettings = async function() {
+    if (!isAdmin()) return;
+    const errEl = document.getElementById('settings-error');
+    const okEl = document.getElementById('settings-success');
+    errEl.style.display = 'none';
+    okEl.style.display = 'none';
+
+    const aiEnabled = document.getElementById('s-ai-enabled').checked;
+    const model = document.getElementById('s-model').value.trim();
+    const systemPrompt = document.getElementById('s-system-prompt').value.trim();
+    const keyInputs = document.querySelectorAll('#s-api-keys-list .api-key-row input');
+    const apiKeys = Array.from(keyInputs).map(i => i.value.trim()).filter(Boolean);
+
+    if (!model) { errEl.textContent = 'Model name is required.'; errEl.style.display = 'block'; return; }
+
+    try {
+      await updateDoc(doc(db, 'siteContent', 'main'), {
+        'aiSettings.aiEnabled': aiEnabled,
+        'aiSettings.model': model,
+        'aiSettings.systemPrompt': systemPrompt,
+        'aiSettings.apiKeys': apiKeys
+      });
+      okEl.textContent = 'Settings saved successfully!';
+      okEl.style.display = 'block';
+      // Reload AI config in memory
+      loadAiConfig();
+      setTimeout(() => { okEl.style.display = 'none'; }, 3000);
+    } catch(e) {
+      console.error('Save error:', e);
+      errEl.textContent = 'Failed to save: ' + (e.message || e.code || 'Unknown error');
+      errEl.style.display = 'block';
+    }
   };
 
   // ── UTILS ──
