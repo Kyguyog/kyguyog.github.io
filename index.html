@@ -3889,4 +3889,16 @@ window.completeOrder = async function(orderId, btn) {
 
 window.undoOrderComplete = async function(orderId, btn) {
   btn.disabled = true;
-  btn.
+  btn.textContent = '...';
+  try {
+    await window._markOrderActive(orderId);
+    await loadOrders();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '↩ Undo';
+    alert('Failed to undo: ' + e.message);
+  }
+};
+</script>
+</body>
+</html>
