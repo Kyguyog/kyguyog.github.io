@@ -3706,7 +3706,7 @@ renderCart();
   </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 window.openOrdersPanel = function() {
   const panel = document.getElementById('orders-panel');
   panel.style.display = 'flex';
@@ -3837,4 +3837,17 @@ window.completeOrder = async function(orderId, btn) {
 };
 
 window.undoOrderComplete = async function(orderId, btn) {
-  btn.disabled 
+  btn.disabled = true;
+  btn.textContent = '...';
+  try {
+    await window._markOrderActive(orderId);
+    await loadOrders();
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '↩ Undo';
+    alert('Failed to undo: ' + e.message);
+  }
+};
+</script>
+</body>
+</html>
