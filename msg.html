@@ -297,6 +297,26 @@
     }
     .conv-item:hover { background: rgba(168,85,247,0.05); }
     .conv-item.active { background: var(--primary-dim); border-left: 2px solid var(--primary); }
+    .conv-delete-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s;
+      padding: 0;
+    }
+    .conv-item:hover .conv-delete-btn { display: flex; }
+    .conv-delete-btn:hover { background: var(--danger-dim); color: var(--danger); }
+    /* Confirm delete state */
+    .conv-item.confirm-delete { background: var(--danger-dim) !important; }
+    .conv-item.confirm-delete .conv-preview { color: var(--danger); font-size: 0.7rem; }
     .conv-avatar {
       width: 38px;
       height: 38px;
@@ -1345,12 +1365,14 @@
 
   function renderConvList(convs) {
     const el = document.getElementById('conv-list');
-    if (convs.length === 0) {
+    // Filter out convos soft-deleted by the current user
+    const visible = convs.filter(c => !(c.deletedBy && c.deletedBy.includes(currentUser.email)));
+    if (visible.length === 0) {
       el.innerHTML = `<div class="conv-empty">No conversations yet.<br>Hit <strong>New</strong> to start one.</div>`;
       return;
     }
 
-    el.innerHTML = convs.map(c => {
+    el.innerHTML = visible.map(c => {
       const initial = (c.otherName || c.otherEmail || '?')[0].toUpperCase();
       const preview = c.lastMessage ? escapeHtml(c.lastMessage).slice(0, 40) + (c.lastMessage.length > 40 ? '…' : '') : 'No messages yet';
       const time = c.lastMessageAt ? formatTime(c.lastMessageAt.toDate()) : '';
@@ -1367,6 +1389,11 @@
           <div class="conv-time">${time}</div>
           ${hasUnread ? '<div class="unread-dot"></div>' : ''}
         </div>
+        <button class="conv-delete-btn" onclick="confirmDeleteConv(event,'${c.id}')" title="Delete conversation">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
+          </svg>
+        </button>
       </div>`;
     }).join('');
   }
@@ -1379,6 +1406,52 @@
       : allConversations;
     renderConvList(filtered);
   };
+
+  // ── DELETE CONVERSATION (soft delete — data kept in Firestore) ──
+  let deleteConfirmTimeout = null;
+
+  window.confirmDeleteConv = function(e, convId) {
+    e.stopPropagation();
+    const item = e.currentTarget.closest('.conv-item');
+    if (!item) return;
+
+    if (item.classList.contains('confirm-delete')) {
+      // Second click — do it
+      clearTimeout(deleteConfirmTimeout);
+      deleteConversation(convId, item);
+    } else {
+      // First click — ask for confirmation
+      item.classList.add('confirm-delete');
+      const preview = item.querySelector('.conv-preview');
+      const origText = preview.textContent;
+      preview.textContent = 'Tap again to delete';
+      deleteConfirmTimeout = setTimeout(() => {
+        item.classList.remove('confirm-delete');
+        preview.textContent = origText;
+      }, 2500);
+    }
+  };
+
+  async function deleteConversation(convId, itemEl) {
+    try {
+      // Soft delete: add current user to deletedBy array and record the clear timestamp.
+      // Data is kept intact in Firestore for admin review; clearedAt hides old messages from this user.
+      const safeKey = currentUser.email.replace(/[.@]/g, '_');
+      await updateDoc(doc(db, 'conversations', convId), {
+        deletedBy: [...((allConversations.find(c => c.id === convId)?.deletedBy) || []), currentUser.email],
+        [`clearedAt_${safeKey}`]: serverTimestamp()
+      });
+      // If this was the active conversation, close the chat pane
+      if (activeConvId === convId) {
+        if (messagesUnsubscribe) { messagesUnsubscribe(); messagesUnsubscribe = null; }
+        activeConvId = null;
+        document.getElementById('active-chat').style.display = 'none';
+        document.getElementById('chat-empty').style.display = '';
+      }
+    } catch(e) {
+      console.error('Delete error:', e);
+    }
+  }
 
   // ── MOBILE NAVIGATION ──
   function isMobile() { return window.innerWidth <= 700; }
@@ -1457,14 +1530,27 @@
 
     document.getElementById('messages-area').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
 
+    // Get this user's clearedAt threshold (if they previously deleted this conv)
+    const safeKey = currentUser.email.replace(/[.@]/g, '_');
+    const clearedAt = conv[`clearedAt_${safeKey}`] || null;
+
     messagesUnsubscribe = onSnapshot(msgsQuery, (snap) => {
-      renderMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      renderMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })), clearedAt);
     });
   };
 
-  function renderMessages(msgs) {
+  function renderMessages(msgs, clearedAt) {
     const area = document.getElementById('messages-area');
     const wasAtBottom = area.scrollHeight - area.scrollTop - area.clientHeight < 60;
+
+    // Hide messages sent before this user deleted the conversation
+    if (clearedAt) {
+      const cutoff = clearedAt.toMillis ? clearedAt.toMillis() : clearedAt;
+      msgs = msgs.filter(m => {
+        const t = m.sentAt?.toMillis ? m.sentAt.toMillis() : (m.sentAt ? new Date(m.sentAt).getTime() : 0);
+        return t > cutoff;
+      });
+    }
 
     if (msgs.length === 0) {
       area.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:0.8rem;padding:2rem 0;opacity:0.6;">No messages yet. Say hi!</div>`;
@@ -1534,11 +1620,13 @@
 
       const conv = allConversations.find(c => c.id === activeConvId);
       const otherEmail = conv?.otherEmail;
-
+      const currentDeletedBy = conv?.deletedBy || [];
       await updateDoc(doc(db, 'conversations', activeConvId), {
         lastMessage: text,
         lastMessageAt: serverTimestamp(),
-        unreadBy: otherEmail ? [otherEmail] : []
+        unreadBy: otherEmail ? [otherEmail] : [],
+        // Remove both users from deletedBy when a new message is sent
+        deletedBy: currentDeletedBy.filter(e => e !== currentUser.email && e !== otherEmail)
       });
 
       input.value = '';
@@ -1569,7 +1657,12 @@
     document.getElementById('new-conv-modal').classList.add('open');
     document.getElementById('user-search-input').value = '';
     document.getElementById('modal-error').classList.remove('show');
-    const existingEmails = new Set(allConversations.map(c => c.otherEmail));
+    // Only exclude people from active (non-deleted) conversations
+    const existingEmails = new Set(
+      allConversations
+        .filter(c => !(c.deletedBy && c.deletedBy.includes(currentUser.email)))
+        .map(c => c.otherEmail)
+    );
     const newUsers = allUsers.filter(u => !existingEmails.has(u.email));
     _renderUserList(newUsers);
     setTimeout(() => document.getElementById('user-search-input').focus(), 50);
@@ -1608,7 +1701,11 @@
   }
 
   function _searchUsers(q) {
-    const existingEmails = new Set(allConversations.map(c => c.otherEmail));
+    const existingEmails = new Set(
+      allConversations
+        .filter(c => !(c.deletedBy && c.deletedBy.includes(currentUser.email)))
+        .map(c => c.otherEmail)
+    );
     if (!q.trim()) {
       _renderUserList(allUsers.filter(u => !existingEmails.has(u.email)));
       return;
