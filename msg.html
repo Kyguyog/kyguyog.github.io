@@ -253,6 +253,14 @@
       transition:background 0.15s;
     }
     .api-key-del:hover { background:rgba(239,68,68,0.25); }
+    .model-option {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.6rem 1rem; cursor: pointer; transition: background 0.15s;
+      border-bottom: 1px solid rgba(34,34,48,0.5);
+    }
+    .model-option:last-child { border-bottom: none; }
+    .model-option:hover { background: var(--primary-dim); }
+    .model-option.selected { background: rgba(168,85,247,0.1); }
 
     /* ── MAIN LAYOUT ── */
     #app {
@@ -1123,7 +1131,20 @@
     <!-- Model -->
     <div class="settings-section">
       <div class="settings-section-title">Model</div>
-      <input class="modal-input" type="text" id="s-model" placeholder="e.g. gemini-2.5-flash-lite" />
+      <div style="position:relative;">
+        <div id="s-model-display" class="modal-input" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;" onclick="toggleModelDropdown()">
+          <span id="s-model-label" style="font-family:monospace;font-size:0.85rem;color:var(--text);">Click to select a model...</span>
+          <span id="s-model-arrow" style="color:var(--muted);font-size:0.7rem;transition:transform 0.2s;">▼</span>
+        </div>
+        <input type="hidden" id="s-model" />
+        <div id="s-model-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;">
+          <div id="s-model-list" style="max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,85,247,0.2) transparent;">
+            <div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;">
+              <div class="spinner" style="width:12px;height:12px;"></div> Loading models...
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- System Prompt -->
@@ -1894,7 +1915,11 @@
       const data = snap.data();
       const ai = data.aiSettings || {};
       document.getElementById('s-ai-enabled').checked = !!ai.aiEnabled;
-      document.getElementById('s-model').value = ai.model || '';
+      // Set model hidden input + display label
+      const currentModel = ai.model || '';
+      document.getElementById('s-model').value = currentModel;
+      document.getElementById('s-model-label').textContent = currentModel || 'Click to select a model...';
+      document.getElementById('s-model-label').style.color = currentModel ? 'var(--text)' : 'var(--muted)';
       document.getElementById('s-system-prompt').value = ai.systemPrompt || '';
 
       // Render API keys
@@ -1903,10 +1928,74 @@
       const keys = ai.apiKeys || [];
       keys.forEach(k => addApiKeyField(k));
       if (keys.length === 0) addApiKeyField('');
+
+      // Pre-fetch models using first available key
+      if (keys.length > 0) fetchGeminiModels(keys[0]);
     } catch(e) {
       console.error('Failed to load settings:', e);
     }
   };
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', e => {
+    const dd = document.getElementById('s-model-dropdown');
+    const display = document.getElementById('s-model-display');
+    if (dd && !dd.contains(e.target) && !display.contains(e.target)) {
+      dd.style.display = 'none';
+      document.getElementById('s-model-arrow').style.transform = '';
+    }
+  });
+
+  window.toggleModelDropdown = function() {
+    const dd = document.getElementById('s-model-dropdown');
+    const arrow = document.getElementById('s-model-arrow');
+    const isOpen = dd.style.display !== 'none';
+    if (isOpen) {
+      dd.style.display = 'none';
+      arrow.style.transform = '';
+    } else {
+      dd.style.display = 'block';
+      arrow.style.transform = 'rotate(180deg)';
+      // Fetch if list is empty or still showing loading
+      const list = document.getElementById('s-model-list');
+      if (!list.querySelector('.model-option')) {
+        const keys = Array.from(document.querySelectorAll('#s-api-keys-list .api-key-row input'))
+          .map(i => i.value.trim()).filter(Boolean);
+        if (keys.length > 0) fetchGeminiModels(keys[0]);
+      }
+    }
+  };
+
+  window.selectModel = function(modelId) {
+    document.getElementById('s-model').value = modelId;
+    document.getElementById('s-model-label').textContent = modelId;
+    document.getElementById('s-model-label').style.color = 'var(--text)';
+    document.getElementById('s-model-dropdown').style.display = 'none';
+    document.getElementById('s-model-arrow').style.transform = '';
+  };
+
+  async function fetchGeminiModels(apiKey) {
+    const list = document.getElementById('s-model-list');
+    list.innerHTML = `<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;"><div class="spinner" style="width:12px;height:12px;"></div> Loading models...</div>`;
+    try {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=100`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error?.message || 'API error');
+      const models = (data.models || [])
+        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+        .map(m => m.name.replace('models/', ''))
+        .sort();
+      if (models.length === 0) { list.innerHTML = `<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;">No models found.</div>`; return; }
+      const current = document.getElementById('s-model').value;
+      list.innerHTML = models.map(m => `
+        <div class="model-option ${m === current ? 'selected' : ''}" onclick="selectModel('${m}')">
+          <span style="font-family:monospace;font-size:0.8rem;">${m}</span>
+          ${m === current ? '<span style="color:var(--primary);font-size:0.65rem;">✓ current</span>' : ''}
+        </div>`).join('');
+    } catch(e) {
+      list.innerHTML = `<div style="padding:0.75rem 1rem;color:var(--danger);font-size:0.78rem;">Failed to load models: ${e.message}</div>`;
+    }
+  }
 
   window.closeSettingsModal = function() {
     document.getElementById('settings-modal').classList.remove('open');
