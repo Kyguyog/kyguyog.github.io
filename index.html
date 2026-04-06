@@ -2046,12 +2046,12 @@ document.addEventListener('click', function(e) {
   };
   // ── S3 credential storage (admin-only Firestore doc) ──
   window._fetchS3Creds = async function() {
-    const snap = await getDoc(doc(db, 'adminConfig', 's3'));
+    const snap = await getDoc(doc(db, 's3', 's3'));
     return snap.exists() ? snap.data() : null;
   };
 
   window._saveS3Creds = async function(creds) {
-    await setDoc(doc(db, 'adminConfig', 's3'), creds);
+    await setDoc(doc(db, 's3', 's3'), creds);
   };
 
   // Fetch pending signup requests
