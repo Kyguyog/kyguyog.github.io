@@ -2389,6 +2389,28 @@ document.addEventListener('click', function(e) {
     msg.className = 'popup-msg';
     if (!val) { msg.textContent = 'Please enter a username.'; msg.className = 'popup-msg err'; return; }
     try {
+      // Check username is not already taken
+      const valLower = val.toLowerCase();
+      const usersSnap = await getDocs(collection(db, 'users'));
+      for (const d of usersSnap.docs) {
+        if (d.id === auth.currentUser.email) continue; // skip own record
+        const uData = d.data();
+        if (uData.username && uData.username.toLowerCase() === valLower) {
+          msg.textContent = 'That username is already taken.';
+          msg.className = 'popup-msg err';
+          return;
+        }
+      }
+      const reqSnap = await getDocs(collection(db, 'signupRequests'));
+      for (const d of reqSnap.docs) {
+        const rData = d.data();
+        if (rData.username && rData.username.toLowerCase() === valLower &&
+            (rData.status === 'pending' || rData.status === 'approved')) {
+          msg.textContent = 'That username is already taken.';
+          msg.className = 'popup-msg err';
+          return;
+        }
+      }
       await updateProfile(auth.currentUser, { displayName: val });
       await setDoc(doc(db, 'users', auth.currentUser.email), { username: val }, { merge: true });
       // Update nav badge text
@@ -3259,9 +3281,9 @@ window.loadSignupRequests = async function() {
       return `<div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:#0d0d14;border:1px solid ${isPending ? 'rgba(168,85,247,0.3)' : 'var(--border)'};border-radius:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
           <div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">
-            ${r.fullName ? `<span style="font-size:0.9rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.03em;">${r.fullName}</span>` : ''}
-            ${r.username ? `<span style="font-size:0.75rem;color:var(--primary);font-weight:600;">@${r.username}</span>` : ''}
-            <span style="font-size:0.85rem;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.email}</span>
+            ${r.fullName ? `<span style="font-size:0.9rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.03em;">${escHtml(r.fullName)}</span>` : ''}
+            ${r.username ? `<span style="font-size:0.75rem;color:var(--primary);font-weight:600;">@${escHtml(r.username)}</span>` : ''}
+            <span style="font-size:0.85rem;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(r.email)}</span>
             <span style="font-size:0.7rem;color:var(--muted);">Requested ${date}</span>
           </div>
           <span style="font-size:0.7rem;font-weight:700;color:${statusColor};flex-shrink:0;">${statusLabel}</span>
@@ -3888,8 +3910,8 @@ function _buildOrderCard(o, isCompleted, showUser) {
   const itemLines = (o.items || []).map(i =>
     `<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);padding:0.2rem 0;">
       <span style="display:flex;align-items:center;gap:0.4rem;">
-        ${i.img ? `<img src="${i.img}" style="width:22px;height:22px;object-fit:contain;opacity:0.8;" onerror="this.style.display='none'" />` : ''}
-        ${i.name} <span style="color:var(--border)">×${i.qty}</span>
+        ${i.img ? `<img src="${escHtml(i.img)}" style="width:22px;height:22px;object-fit:contain;opacity:0.8;" onerror="this.style.display='none'" />` : ''}
+        ${escHtml(i.name)} <span style="color:var(--border)">×${i.qty}</span>
       </span>
       <span style="color:var(--text);font-weight:600;">$${(i.qty * i.price).toFixed(2)}</span>
     </div>`
@@ -3909,12 +3931,12 @@ function _buildOrderCard(o, isCompleted, showUser) {
   const opacity = isCompleted ? '0.7' : '1';
 
   const userLine = showUser
-    ? `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${o.fullName || o.username || o.email}</span>
-       <span style="font-size:0.68rem;color:var(--muted);">${o.email} · ${date}</span>`
+    ? `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${escHtml(o.fullName || o.username || o.email)}</span>
+       <span style="font-size:0.68rem;color:var(--muted);">${escHtml(o.email)} · ${date}</span>`
     : `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">Your Order</span>
        <span style="font-size:0.68rem;color:var(--muted);">${date}</span>`;
 
-  return `<div data-order-id="${o.id}" style="background:var(--bg);border:1px solid ${borderColor};border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.5rem;opacity:${opacity};">
+  return `<div data-order-id="${escHtml(o.id)}" style="background:var(--bg);border:1px solid ${borderColor};border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.5rem;opacity:${opacity};">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;">
       <div style="display:flex;flex-direction:column;gap:0.05rem;flex:1;min-width:0;">
         ${userLine}
