@@ -1652,6 +1652,14 @@
     <!-- SIGN UP FORM -->
     <form class="auth-form" id="signup-form-wrap" style="display:none;" autocomplete="on" onsubmit="handleSignupRequest();return false;">
       <div class="auth-field">
+        <label>Full Name <span style="color:var(--muted);font-weight:400;font-size:0.65rem;">(First &amp; Last required)</span></label>
+        <input type="text" id="signup-fullname" placeholder="First Last" autocomplete="name" />
+      </div>
+      <div class="auth-field">
+        <label>Username</label>
+        <input type="text" id="signup-username" placeholder="e.g. Kyguy" autocomplete="username" />
+      </div>
+      <div class="auth-field">
         <label>Email</label>
         <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
       </div>
@@ -1900,6 +1908,7 @@ document.addEventListener('click', function(e) {
   <div class="popup-header">
     <div class="popup-header-label">Signed in as</div>
     <div class="popup-header-name" id="popup-display-name"></div>
+    <div id="popup-full-name" style="display:none;font-size:0.78rem;color:var(--primary);margin-top:0.1rem;font-weight:500;"></div>
     <div class="popup-header-email" id="popup-email"></div>
   </div>
   <div class="popup-section" id="admin-popup-section" style="display:none;">
@@ -1980,12 +1989,20 @@ document.addEventListener('click', function(e) {
     const user = auth.currentUser;
     if (!user) throw new Error('Not logged in');
     const snap = await getDoc(doc(db, 'users', user.email));
-    const username = (snap.exists() && snap.data().username) || user.email;
-    // Generate a random 6-digit order number (100000–999999)
-    const orderNumber = Math.floor(100000 + Math.random() * 900000);
+    const snapData = snap.exists() ? snap.data() : {};
+    const username = snapData.username || user.email;
+    const fullName = snapData.fullName || snapData.username || user.email;
+    // Generate a unique 6-digit order number (100000–999999), retrying on collision
+    let orderNumber;
+    const existingOrders = await getDocs(collection(db, 'orders'));
+    const usedNumbers = new Set(existingOrders.docs.map(d => d.data().orderNumber).filter(Boolean));
+    do {
+      orderNumber = Math.floor(100000 + Math.random() * 900000);
+    } while (usedNumbers.has(orderNumber));
     const orderDoc = {
       email: user.email,
       username,
+      fullName,
       items: orderData.items,
       total: orderData.total,
       orderNumber,
@@ -1996,7 +2013,7 @@ document.addEventListener('click', function(e) {
     await setDoc(doc(db, 'users', user.email, 'orders', orderId), orderDoc);
     // Also store a flat copy in top-level 'orders' collection for the orders panel
     await setDoc(doc(db, 'orders', orderId), orderDoc);
-    return orderNumber;
+    return { orderNumber, fullName };
   };
 
   // Fetch all orders (orders: true / admin users only)
@@ -2069,7 +2086,7 @@ document.addEventListener('click', function(e) {
 
   // Approve a signup request: create the Firebase Auth user via a secondary app instance
   // (avoids ADMIN_ONLY_OPERATION and keeps the current admin session untouched)
-  window._approveSignup = async function(requestId, email, password) {
+  window._approveSignup = async function(requestId, email, password, fullName, username) {
     // 1. Create a secondary Firebase app instance just for account creation
     //    This keeps the primary auth session (admin) completely intact
     const secondaryAppName = 'secondary-signup-' + Date.now();
@@ -2090,7 +2107,8 @@ document.addEventListener('click', function(e) {
     // 5. Create Firestore user doc
     await setDoc(doc(db, 'users', email), {
       email,
-      username: '',
+      username: username || '',
+      fullName: fullName || '',
       createdAt: new Date().toISOString(),
       admin: false
     }, { merge: true });
@@ -2117,6 +2135,11 @@ document.addEventListener('click', function(e) {
     document.getElementById('login-form-wrap').style.display = tab === 'login' ? 'flex' : 'none';
     document.getElementById('signup-form-wrap').style.display = tab === 'signup' ? 'flex' : 'none';
     document.getElementById('auth-error').classList.remove('show');
+    // Clear any active denial countdown when switching tabs
+    if (window._retryCountdownInterval) {
+      clearInterval(window._retryCountdownInterval);
+      window._retryCountdownInterval = null;
+    }
   };
 
   // ── Friendly error messages ──
@@ -2164,6 +2187,8 @@ document.addEventListener('click', function(e) {
 
   // ── Handle sign-up request (pending admin approval) ──
   window.handleSignupRequest = async function() {
+    const fullName = document.getElementById('signup-fullname').value.trim();
+    const username = document.getElementById('signup-username').value.trim();
     const email = document.getElementById('signup-email').value.trim();
     const password = document.getElementById('signup-password').value;
     const confirm = document.getElementById('signup-confirm').value;
@@ -2174,8 +2199,15 @@ document.addEventListener('click', function(e) {
     errEl.classList.remove('show');
     successEl.style.display = 'none';
 
-    if (!email || !password || !confirm) {
+    if (!fullName || !email || !password || !confirm) {
       errEl.textContent = 'Please fill in all fields.';
+      errEl.classList.add('show');
+      return;
+    }
+    // Require at least first and last name (two words)
+    const nameParts = fullName.split(/\s+/).filter(Boolean);
+    if (nameParts.length < 2) {
+      errEl.textContent = 'Please enter your full name (first and last).';
       errEl.classList.add('show');
       return;
     }
@@ -2199,25 +2231,101 @@ document.addEventListener('click', function(e) {
     btn.textContent = 'Sending request...';
 
     try {
-      // Check for existing pending or approved request for this email
-      const existing = await getDocs(collection(db, 'signupRequests'));
-      const alreadyRequested = existing.docs.some(d => {
-        const data = d.data();
-        return data.email === email && (data.status === 'pending' || data.status === 'approved');
-      });
+      const RETRY_MS = 60 * 60 * 1000; // 1 hour
+      const finalUsername = username || fullName.split(/\s+/)[0];
+      const usernameLower = finalUsername.toLowerCase();
 
-      if (alreadyRequested) {
-        errEl.textContent = 'A request for this email has already been submitted.';
-        errEl.classList.add('show');
-        btn.disabled = false;
-        btn.textContent = 'Request Access';
-        return;
+      // ── Check 1: email already has an active account in users collection ──
+      const usersSnap = await getDocs(collection(db, 'users'));
+      for (const d of usersSnap.docs) {
+        if (d.id.toLowerCase() === email.toLowerCase()) {
+          errEl.textContent = 'An account with that email already exists. Try logging in instead.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Request Access';
+          return;
+        }
+        const uData = d.data();
+        if (uData.username && uData.username.toLowerCase() === usernameLower) {
+          errEl.textContent = 'That username is already taken. Please choose a different one.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Request Access';
+          return;
+        }
+      }
+
+      // ── Check 2: existing signup requests (pending/approved/denied) ──
+      const existing = await getDocs(collection(db, 'signupRequests'));
+
+      for (const d of existing.docs) {
+        const data = d.data();
+
+        // Username clash in requests (pending or approved)
+        if (data.username && data.username.toLowerCase() === usernameLower &&
+            (data.status === 'pending' || data.status === 'approved')) {
+          errEl.textContent = 'That username is already taken. Please choose a different one.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Request Access';
+          return;
+        }
+
+        if (data.email !== email) continue;
+
+        if (data.status === 'pending' || data.status === 'approved') {
+          errEl.textContent = 'A request for this email has already been submitted.';
+          errEl.classList.add('show');
+          btn.disabled = false;
+          btn.textContent = 'Request Access';
+          return;
+        }
+
+        if (data.status === 'denied') {
+          const deniedAt = data.deniedAt ? new Date(data.deniedAt).getTime() : 0;
+          const elapsed = Date.now() - deniedAt;
+          if (elapsed < RETRY_MS) {
+            const remaining = RETRY_MS - elapsed;
+            btn.disabled = false;
+            btn.textContent = 'Request Access';
+            // Show live countdown in error message
+            function formatCountdown(ms) {
+              const totalSec = Math.ceil(ms / 1000);
+              const m = Math.floor(totalSec / 60);
+              const s = totalSec % 60;
+              return `${m}m ${s.toString().padStart(2,'0')}s`;
+            }
+            let countdownMs = remaining;
+            errEl.innerHTML = `Your signup request was denied. You can retry in <strong id="retry-countdown">${formatCountdown(countdownMs)}</strong>.`;
+            errEl.classList.add('show');
+            btn.disabled = true;
+            btn.textContent = 'Try Again Later';
+            // Clear any previous interval
+            if (window._retryCountdownInterval) clearInterval(window._retryCountdownInterval);
+            window._retryCountdownInterval = setInterval(() => {
+              countdownMs -= 1000;
+              if (countdownMs <= 0) {
+                clearInterval(window._retryCountdownInterval);
+                errEl.classList.remove('show');
+                btn.disabled = false;
+                btn.textContent = 'Request Access';
+              } else {
+                const el = document.getElementById('retry-countdown');
+                if (el) el.textContent = formatCountdown(countdownMs);
+              }
+            }, 1000);
+            return;
+          }
+          // Past the 1-hour window — allow resubmit (fall through)
+        }
       }
 
       // Store the request in Firestore (password stored to create the account on approval)
       const requestId = email.replace(/[^a-zA-Z0-9]/g, '_') + '_' + Date.now();
       await setDoc(doc(db, 'signupRequests', requestId), {
         email,
+        fullName,
+        username: finalUsername,
         password,
         status: 'pending',
         requestedAt: new Date().toISOString()
@@ -2227,6 +2335,8 @@ document.addEventListener('click', function(e) {
       successEl.textContent = '✓ Request submitted! An admin will review your application. You\'ll be able to log in once approved.';
       successEl.style.display = 'block';
       btn.style.display = 'none';
+      document.getElementById('signup-fullname').value = '';
+      document.getElementById('signup-username').value = '';
       document.getElementById('signup-email').value = '';
       document.getElementById('signup-password').value = '';
       document.getElementById('signup-confirm').value = '';
@@ -2343,16 +2453,22 @@ document.addEventListener('click', function(e) {
       wall.classList.add('hidden');
       main.classList.add('visible');
 
-      // Always fetch username from Firestore so admin changes reflect immediately
+      // Always fetch username + fullName from Firestore so admin changes reflect immediately
       let username = user.email;
+      let fullName = '';
       try {
         const snap = await getDoc(doc(db, 'users', user.email));
-        if (snap.exists() && snap.data().username) {
-          username = snap.data().username;
-          // Sync back to Auth profile if it differs
-          if (user.displayName !== username) {
-            await updateProfile(user, { displayName: username });
+        if (snap.exists()) {
+          const snapData = snap.data();
+          if (snapData.username) {
+            username = snapData.username;
+            if (user.displayName !== username) {
+              await updateProfile(user, { displayName: username });
+            }
+          } else {
+            username = user.displayName || user.email;
           }
+          fullName = snapData.fullName || '';
         } else {
           username = user.displayName || user.email;
         }
@@ -2368,6 +2484,11 @@ document.addEventListener('click', function(e) {
           </button>`;
         document.getElementById('popup-display-name').textContent = username;
         document.getElementById('popup-email').textContent = user.email;
+        const fullNameEl = document.getElementById('popup-full-name');
+        if (fullNameEl) {
+          fullNameEl.textContent = fullName;
+          fullNameEl.style.display = fullName ? 'block' : 'none';
+        }
       }
 
       // Load site content from Firestore (protected — logged-in users only)
@@ -2421,6 +2542,8 @@ document.addEventListener('click', function(e) {
       document.getElementById('auth-password').value = '';
       document.getElementById('auth-error').classList.remove('show');
       // Reset signup form
+      document.getElementById('signup-fullname').value = '';
+      document.getElementById('signup-username').value = '';
       document.getElementById('signup-email').value = '';
       document.getElementById('signup-password').value = '';
       document.getElementById('signup-confirm').value = '';
@@ -3130,18 +3253,22 @@ window.loadSignupRequests = async function() {
       const date = new Date(r.requestedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
       const statusColor = r.status === 'approved' ? '#22c55e' : r.status === 'denied' ? 'var(--danger)' : 'var(--secondary)';
       const statusLabel = r.status === 'approved' ? '✓ Approved' : r.status === 'denied' ? '✗ Denied' : '⏳ Pending';
+      const safeFullName = (r.fullName || '').replace(/'/g, "\\'");
+      const safeUsername = (r.username || '').replace(/'/g, "\\'");
 
       return `<div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:#0d0d14;border:1px solid ${isPending ? 'rgba(168,85,247,0.3)' : 'var(--border)'};border-radius:8px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
           <div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">
-            <span style="font-size:0.85rem;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.email}</span>
+            ${r.fullName ? `<span style="font-size:0.9rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.03em;">${r.fullName}</span>` : ''}
+            ${r.username ? `<span style="font-size:0.75rem;color:var(--primary);font-weight:600;">@${r.username}</span>` : ''}
+            <span style="font-size:0.85rem;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.email}</span>
             <span style="font-size:0.7rem;color:var(--muted);">Requested ${date}</span>
           </div>
           <span style="font-size:0.7rem;font-weight:700;color:${statusColor};flex-shrink:0;">${statusLabel}</span>
         </div>
         ${isPending ? `
         <div style="display:flex;gap:0.5rem;">
-          <button onclick="approveRequest('${r.id}','${r.email}','${r.password}')" style="flex:1;padding:0.5rem;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:6px;color:#22c55e;font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.22)'" onmouseout="this.style.background='rgba(34,197,94,0.12)'">✓ Approve</button>
+          <button onclick="approveRequest('${r.id}','${r.email}','${r.password}','${safeFullName}','${safeUsername}')" style="flex:1;padding:0.5rem;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:6px;color:#22c55e;font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.22)'" onmouseout="this.style.background='rgba(34,197,94,0.12)'">✓ Approve</button>
           <button onclick="denyRequest('${r.id}')" style="flex:1;padding:0.5rem;background:var(--danger-dim);border:1px solid rgba(239,68,68,0.3);border-radius:6px;color:var(--danger);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='var(--danger-dim)'">✗ Deny</button>
         </div>` : ''}
       </div>`;
@@ -3158,11 +3285,11 @@ window.loadSignupRequests = async function() {
   }
 };
 
-window.approveRequest = async function(requestId, email, password) {
+window.approveRequest = async function(requestId, email, password, fullName, username) {
   const btn = event && event.target;
   if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; }
   try {
-    await window._approveSignup(requestId, email, password);
+    await window._approveSignup(requestId, email, password, fullName, username);
     loadSignupRequests();
   } catch(e) {
     alert('Failed to approve: ' + e.message);
@@ -3609,7 +3736,7 @@ window.shopCheckout = async function() {
   if (btn) { btn.disabled = true; btn.textContent = 'Placing order...'; }
 
   try {
-    const orderNumber = await window._saveOrder({
+    const result = await window._saveOrder({
       items: items.map(i => ({ name: i.name, qty: i.qty, price: i.price, img: i.img })),
       total: parseFloat(total.toFixed(2))
     });
@@ -3617,7 +3744,7 @@ window.shopCheckout = async function() {
     shopCart = {};
     renderCart();
     toggleCart();
-    showOrderConfirmation(orderNumber);
+    showOrderConfirmation(result.orderNumber, result.fullName);
   } catch(e) {
     alert('Failed to place order: ' + e.message);
   } finally {
@@ -3625,8 +3752,14 @@ window.shopCheckout = async function() {
   }
 };
 
-window.showOrderConfirmation = function(orderNumber) {
+window.showOrderConfirmation = function(orderNumber, fullName) {
   document.getElementById('order-confirm-number').textContent = '#' + orderNumber;
+  // Store copy text for the copy button
+  const copyText = 'Order #' + orderNumber + ' by ' + (fullName || '');
+  const copyBtn = document.getElementById('order-confirm-copy-btn');
+  copyBtn.dataset.copy = copyText;
+  const preview = document.getElementById('order-confirm-copy-preview');
+  if (preview) preview.textContent = copyText;
   document.getElementById('order-confirm-modal').style.display = 'flex';
 };
 
@@ -3687,7 +3820,7 @@ renderCart();
     </div>
     <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1.1rem 1.25rem;width:100%;text-align:left;display:flex;flex-direction:column;gap:0.75rem;">
       <div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--secondary);">Next Step &mdash; Contact Us</div>
-      <p style="font-size:0.87rem;color:var(--text);line-height:1.6;">Please text or email us with your <strong style="color:var(--primary);">order number</strong> and <strong style="color:var(--primary);">first name</strong> so we can fulfill your order:</p>
+      <p style="font-size:0.87rem;color:var(--text);line-height:1.6;">Please text or email us with your order info so we can fulfill your order:</p>
       <div style="display:flex;flex-direction:column;gap:0.5rem;">
         <a href="sms:3855129648" style="display:flex;align-items:center;gap:0.6rem;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.35);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.2)'" onmouseout="this.style.background='rgba(168,85,247,0.1)'">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 10 19.79 19.79 0 0 1 1.69 1.4 2 2 0 0 1 3.68 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -3698,7 +3831,13 @@ renderCart();
           <span style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.05em;color:var(--secondary);"><span class="__cf_email__" data-cfemail="9ef5f0f1e9e9f6fbecfbf9fff3f7f0f9f6ebfcdef9f3fff7f2b0fdf1f3">[email&#160;protected]</span></span>
         </a>
       </div>
-      <p style="font-size:0.78rem;color:var(--muted);line-height:1.5;">Send us: <em style="color:var(--text);">"Order #[your number], First Name: [your name]"</em></p>
+      <div style="display:flex;flex-direction:column;gap:0.4rem;">
+        <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Send this message:</div>
+        <button id="order-confirm-copy-btn" data-copy="" onclick="(function(btn){const txt=btn.dataset.copy;function showCopied(){const orig=btn.innerHTML;btn.innerHTML='<svg width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'20 6 9 17 4 12\'/></svg> Copied!';btn.style.background='rgba(34,197,94,0.15)';btn.style.borderColor='rgba(34,197,94,0.5)';btn.style.color='#22c55e';setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';btn.style.borderColor='';btn.style.color='';},2000);}function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');showCopied();}catch(e){alert(t);}document.body.removeChild(ta);}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(showCopied).catch(()=>fallbackCopy(txt));}else{fallbackCopy(txt);}})(this)" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.4);border-radius:8px;padding:0.75rem 1rem;cursor:pointer;text-align:left;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.15)'" onmouseout="this.style.background='rgba(168,85,247,0.08)'">
+          <span id="order-confirm-copy-preview" style="font-family:var(--font-display);font-size:0.78rem;font-weight:700;letter-spacing:0.04em;color:var(--primary);flex:1;text-align:left;word-break:break-all;"></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
     </div>
     <button onclick="closeOrderConfirmation()" style="width:100%;padding:0.85rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 20px rgba(168,85,247,0.35);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 0 32px rgba(168,85,247,0.6)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 20px rgba(168,85,247,0.35)'">Got It!</button>
   </div>
@@ -3770,7 +3909,7 @@ function _buildOrderCard(o, isCompleted, showUser) {
   const opacity = isCompleted ? '0.7' : '1';
 
   const userLine = showUser
-    ? `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${o.username || o.email}</span>
+    ? `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${o.fullName || o.username || o.email}</span>
        <span style="font-size:0.68rem;color:var(--muted);">${o.email} · ${date}</span>`
     : `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">Your Order</span>
        <span style="font-size:0.68rem;color:var(--muted);">${date}</span>`;
