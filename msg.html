@@ -1023,7 +1023,7 @@
     Messages
   </div>
   <div class="nav-right">
-    <span class="nav-user-chip" id="nav-username" onclick="copyUsername()" title="Copy username" style="cursor:pointer;"></span>
+    <span class="nav-user-chip" id="nav-username" onclick="copyUsername()" title="Copy Your Link" style="cursor:pointer;"></span>
   </div>
 </nav>
 
@@ -1074,7 +1074,7 @@
           <div class="chat-header-name" id="chat-header-name"></div>
           <div class="chat-header-sub" id="chat-header-sub"></div>
         </div>
-        <button class="nav-settings-btn" id="copy-link-btn" onclick="copyConvLink()" title="Copy link to this conversation" style="display:none;margin-left:auto;">
+        <button class="nav-settings-btn" id="copy-link-btn" onclick="copyConvLink()" title="Copy link to this Person" style="display:none;margin-left:auto;">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         </button>
         <button class="nav-settings-btn" id="chat-settings-btn" onclick="openSettingsModal()" title="AI Settings" style="display:none;">
@@ -2123,7 +2123,7 @@
     });
   };
 
-  // ── COPY USERNAME ──
+  // ── COPY User Link ──
   window.copyUsername = function() {
     const chip = document.getElementById('nav-username');
     const username = chip.textContent.trim();
