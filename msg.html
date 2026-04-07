@@ -1023,7 +1023,7 @@
     Messages
   </div>
   <div class="nav-right">
-    <span class="nav-user-chip" id="nav-username"></span>
+    <span class="nav-user-chip" id="nav-username" onclick="copyUsername()" title="Copy username" style="cursor:pointer;"></span>
     <button class="nav-signout" onclick="handleSignOut()">Sign Out</button>
   </div>
 </nav>
@@ -2121,6 +2121,28 @@
       }, 1500);
     }).catch(() => {
       prompt('Copy this link:', url);
+    });
+  };
+
+  // ── COPY USERNAME ──
+  window.copyUsername = function() {
+    const chip = document.getElementById('nav-username');
+    const username = chip.textContent.trim();
+    if (!username) return;
+    const base = window.location.origin + window.location.pathname;
+    const url = base + '?' + encodeURIComponent(username);
+    navigator.clipboard.writeText(url).then(() => {
+      const orig = chip.textContent;
+      chip.textContent = 'Link Copied!';
+      chip.style.color = 'var(--secondary)';
+      chip.style.borderColor = 'rgba(34,211,238,0.5)';
+      setTimeout(() => {
+        chip.textContent = orig;
+        chip.style.color = '';
+        chip.style.borderColor = '';
+      }, 1500);
+    }).catch(() => {
+      prompt('Your contact link:', url);
     });
   };
   // ── UTILS ──
