@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>KnowWhere Gaming Hub</title>
   <link rel="icon" href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -4046,6 +4046,18 @@ window.undoOrderComplete = async function(orderId, btn) {
     alert('Failed to undo: ' + e.message);
   }
 };
+</script>
+<script>
+// Prevent pinch zoom on iOS
+document.addEventListener("touchmove", function(e) {
+  if (e.touches.length > 1) { e.preventDefault(); }
+}, { passive: false });
+var lastTouch = 0;
+document.addEventListener("touchend", function(e) {
+  var now = Date.now();
+  if (now - lastTouch < 300) { e.preventDefault(); }
+  lastTouch = now;
+}, false);
 </script>
 </body>
 </html>
