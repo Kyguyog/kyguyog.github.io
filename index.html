@@ -2689,15 +2689,9 @@ window.injectAdminPanels = function() {
       <button class="admin-tab" onclick="switchAdminTab('shop')">🛒 Shop</button>
       <button class="admin-tab" onclick="switchAdminTab('banned')">🚫 Banned</button>
       <button class="admin-tab" onclick="switchAdminTab('command')">Command</button>
-      <button class="admin-tab" onclick="switchAdminTab('notice')">Notice</button>
       <button class="admin-tab" onclick="switchAdminTab('s3')">🖼️ Images</button>
     </div>
     <div class="admin-body">
-      <div class="admin-section" id="admin-notice">
-        <div class="admin-field"><label>Notice Title</label><input class="admin-input" id="ae-notice-title" /></div>
-        <div class="admin-field"><label>Notice Text (HTML allowed)</label><textarea class="admin-textarea" id="ae-notice-text" style="min-height:100px;"></textarea></div>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('notice')">Save Notice</button><span class="admin-status" id="status-notice"></span></div>
-      </div>
       <div class="admin-section" id="admin-toptier">
         <p class="admin-hint" style="margin-bottom:1rem;">Fill in name, badge, game URL, and background image URL for each card.</p>
         <div id="ae-toptier-list"></div>
@@ -2799,7 +2793,7 @@ window.injectAdminPanels = function() {
 
   // Hide restricted tabs for editors
   if (window._isEditor) {
-    ['command','notice','s3'].forEach(tab => {
+    ['command','s3'].forEach(tab => {
       document.querySelectorAll('.admin-tab').forEach(t => {
         if (t.getAttribute('onclick') === "switchAdminTab('" + tab + "')") {
           t.style.display = 'none';
@@ -2832,10 +2826,6 @@ window.openAdminPanel = function() {
   if (!window._isAdmin && !window._isEditor) return;
   const data = window._siteData;
   if (!data) { alert('Site data not loaded yet. Try again in a moment.'); return; }
-
-  // Notice
-  document.getElementById('ae-notice-title').value = data.notice?.title || '';
-  document.getElementById('ae-notice-text').value = data.notice?.text || '';
 
   // Top Tier
   renderTopTierEditor(data.topTier || []);
@@ -2895,7 +2885,7 @@ window.closeAdminPanel = function() {
 
 window.switchAdminTab = function(tab) {
   // Editor-restricted tabs
-  const editorRestricted = ['command', 'notice', 'ai', 's3'];
+  const editorRestricted = ['command', 'ai', 's3'];
   if (window._isEditor && editorRestricted.includes(tab)) return;
   document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
@@ -3043,12 +3033,7 @@ window.adminSave = async function(section) {
   try {
     let patch = {};
 
-    if (section === 'notice') {
-      patch.notice = {
-        title: document.getElementById('ae-notice-title').value.trim(),
-        text:  document.getElementById('ae-notice-text').value.trim()
-      };
-    } else if (section === 'toptier') {
+    if (section === 'toptier') {
       patch.topTier = [...document.querySelectorAll('#ae-toptier-list .admin-card-item')].map(card => ({
         name:            card.querySelector('.tt-name').value.trim(),
         badge:           card.querySelector('.tt-badge').value.trim(),
