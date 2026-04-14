@@ -702,6 +702,8 @@
 
     /* ── GAME PREVIEW TOOLTIP ── */
     .game-preview-tooltip {
+      --preview-width: 240px;
+      --preview-height: 140px;
       position: fixed;
       z-index: 9000;
       pointer-events: none;
@@ -711,7 +713,7 @@
       border-radius: 10px;
       overflow: hidden;
       box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(168,85,247,0.25), 0 0 24px rgba(168,85,247,0.15);
-      width: 240px;
+      width: var(--preview-width);
       background: var(--card);
       border: 1px solid rgba(168,85,247,0.3);
     }
@@ -720,9 +722,9 @@
       transform: translateY(0) scale(1);
     }
     .game-preview-tooltip img {
-      width: 100%;
-      height: 140px;
-      object-fit: cover;
+      width: var(--preview-width);
+      height: var(--preview-height);
+      object-fit: contain;
       display: block;
       background: var(--bg);
     }
@@ -751,8 +753,8 @@
       text-overflow: ellipsis;
     }
     .game-preview-loading {
-      width: 100%;
-      height: 140px;
+      width: var(--preview-width);
+      height: var(--preview-height);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -4230,9 +4232,48 @@ window.undoOrderComplete = async function(orderId, btn) {
   const loading  = document.getElementById('game-preview-loading');
   const nameEl   = document.getElementById('game-preview-name');
   const PAD      = 14; // gap from cursor
+  const PREVIEW_DEFAULT = { width: 240, height: 140 };
+  const PREVIEW_MIN = { width: 190, height: 110 };
+  const PREVIEW_MAX = { width: 260, height: 170 };
   let  hideTimer = null;
   let  current   = null;
   const cache    = {};
+
+  function setPreviewSize(width, height) {
+    const safeWidth = Math.max(1, width || PREVIEW_DEFAULT.width);
+    const safeHeight = Math.max(1, height || PREVIEW_DEFAULT.height);
+    const scale = Math.min(PREVIEW_MAX.width / safeWidth, PREVIEW_MAX.height / safeHeight);
+    let finalWidth = Math.round(safeWidth * scale);
+    let finalHeight = Math.round(safeHeight * scale);
+
+    if (finalWidth < PREVIEW_MIN.width) {
+      const ratio = PREVIEW_MIN.width / finalWidth;
+      finalWidth = Math.round(finalWidth * ratio);
+      finalHeight = Math.round(finalHeight * ratio);
+    }
+    if (finalHeight < PREVIEW_MIN.height) {
+      const ratio = PREVIEW_MIN.height / finalHeight;
+      finalWidth = Math.round(finalWidth * ratio);
+      finalHeight = Math.round(finalHeight * ratio);
+    }
+    if (finalWidth > PREVIEW_MAX.width) {
+      const ratio = PREVIEW_MAX.width / finalWidth;
+      finalWidth = Math.round(finalWidth * ratio);
+      finalHeight = Math.round(finalHeight * ratio);
+    }
+    if (finalHeight > PREVIEW_MAX.height) {
+      const ratio = PREVIEW_MAX.height / finalHeight;
+      finalWidth = Math.round(finalWidth * ratio);
+      finalHeight = Math.round(finalHeight * ratio);
+    }
+
+    tooltip.style.setProperty('--preview-width', `${finalWidth}px`);
+    tooltip.style.setProperty('--preview-height', `${finalHeight}px`);
+  }
+
+  function resetPreviewSize() {
+    setPreviewSize(PREVIEW_DEFAULT.width, PREVIEW_DEFAULT.height);
+  }
 
   function showTooltip(target) {
     const url  = target.getAttribute('href');
@@ -4244,6 +4285,7 @@ window.undoOrderComplete = async function(orderId, btn) {
     clearTimeout(hideTimer);
 
     nameEl.textContent = name;
+    resetPreviewSize();
     img.style.display  = 'none';
     loading.style.display = 'flex';
     loading.innerHTML = screenshot
@@ -4269,8 +4311,12 @@ window.undoOrderComplete = async function(orderId, btn) {
             }
             return;
           }
-          cache[screenshot] = screenshot;
-          if (current === cacheKey) showImg(screenshot);
+          cache[screenshot] = {
+            src: screenshot,
+            width: preload.naturalWidth,
+            height: preload.naturalHeight
+          };
+          if (current === cacheKey) showImg(cache[screenshot]);
         };
         preload.onerror = () => {
           if (current === cacheKey) {
@@ -4284,8 +4330,12 @@ window.undoOrderComplete = async function(orderId, btn) {
     }, 120);
   }
 
-  function showImg(src) {
-    img.src = src;
+  function showImg(preview) {
+    const previewData = typeof preview === 'string'
+      ? { src: preview, width: PREVIEW_DEFAULT.width, height: PREVIEW_DEFAULT.height }
+      : preview;
+    setPreviewSize(previewData.width, previewData.height);
+    img.src = previewData.src;
     img.style.display = 'block';
     loading.style.display = 'none';
     loading.innerHTML = '<div class="game-preview-spinner"></div><span>Loading preview…</span>';
