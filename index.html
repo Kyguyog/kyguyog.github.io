@@ -2923,7 +2923,7 @@ window.injectAdminPanels = function() {
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('toptier')">Save Top Tier</button><span class="admin-status" id="status-toptier"></span></div>
       </div>
       <div class="admin-section" id="admin-games">
-        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name and URL. Screenshot previews only appear when you add a screenshot URL here.</p>
+        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name and URL. Screenshot previews only appear when you add a screenshot URL here. You can also upload an image or paste one directly into the screenshot field to send it to S3 automatically.</p>
         <div id="ae-games-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
@@ -3158,18 +3158,26 @@ window.adminAddTopTier = function() {
 };
 
 // ── Games ──
+function renderGameRow(g = {}) {
+  return `
+    <div class="admin-row-item" data-original-name="${escAttr(g.name || '')}">
+      <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name || '')}" style="flex:1;" />
+      <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(g.url||'')}" style="flex:2;" />
+      <div style="flex:2;display:flex;align-items:center;gap:0.45rem;min-width:0;">
+        <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:1;min-width:0;" onpaste="adminHandleGameScreenshotPaste(event, this)" />
+        <input type="file" class="game-screenshot-file-input" accept="image/*" style="display:none;" onchange="adminHandleGameScreenshotFiles(this)" />
+        <button type="button" class="admin-game-upload-btn" onclick="adminOpenGameScreenshotPicker(this)" style="padding:0.48rem 0.7rem;background:var(--secondary-dim);border:1px solid rgba(34,211,238,0.35);border-radius:6px;color:var(--secondary);font-family:var(--font-display);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:background 0.15s,border-color 0.15s;flex-shrink:0;" onmouseover="this.style.background='rgba(34,211,238,0.22)';this.style.borderColor='rgba(34,211,238,0.55)'" onmouseout="this.style.background='var(--secondary-dim)';this.style.borderColor='rgba(34,211,238,0.35)'">Upload</button>
+      </div>
+      <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
+    </div>`;
+}
+
 function renderGamesEditor(gamesObj) {
   const flat = [];
   for (const [, games] of Object.entries(gamesObj || {}).sort(([a],[b]) => a.localeCompare(b))) {
     for (const g of games) flat.push(g);
   }
-  document.getElementById('ae-games-list').innerHTML = flat.map(g => `
-    <div class="admin-row-item" data-original-name="${escAttr(g.name || '')}">
-      <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name)}" style="flex:1;" />
-      <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(g.url||'')}" style="flex:2;" />
-      <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:2;" />
-      <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
-    </div>`).join('');
+  document.getElementById('ae-games-list').innerHTML = flat.map(g => renderGameRow(g)).join('');
 }
 
 function normalizeGameKey(name) {
@@ -3252,16 +3260,65 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
   return mergedGames;
 }
 
+window.adminOpenGameScreenshotPicker = function(btn) {
+  const row = btn.closest('.admin-row-item');
+  const fileInput = row && row.querySelector('.game-screenshot-file-input');
+  if (fileInput) fileInput.click();
+};
+
+async function adminUploadGameScreenshotFile(file, input, btn) {
+  if (!file || !input || !btn) return;
+  const originalText = btn.textContent;
+  const originalDisabled = btn.disabled;
+  btn.disabled = true;
+  btn.textContent = 'Uploading';
+  try {
+    const uploaded = await s3UploadFile(file);
+    input.value = uploaded.url;
+    btn.textContent = 'Uploaded';
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.disabled = originalDisabled;
+    }, 1200);
+  } catch (e) {
+    btn.textContent = 'Failed';
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.disabled = originalDisabled;
+    }, 1600);
+    alert('Upload failed: ' + e.message);
+  }
+}
+
+window.adminHandleGameScreenshotFiles = function(fileInput) {
+  const file = fileInput && fileInput.files && fileInput.files[0];
+  if (!file) return;
+  const row = fileInput.closest('.admin-row-item');
+  const input = row && row.querySelector('.game-screenshot-input');
+  const btn = row && row.querySelector('.admin-game-upload-btn');
+  adminUploadGameScreenshotFile(file, input, btn).finally(() => {
+    fileInput.value = '';
+  });
+};
+
+window.adminHandleGameScreenshotPaste = function(e, input) {
+  const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
+  const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
+  if (!imageItem) return;
+  const file = imageItem.getAsFile();
+  if (!file) return;
+  e.preventDefault();
+  const row = input.closest('.admin-row-item');
+  const btn = row && row.querySelector('.admin-game-upload-btn');
+  adminUploadGameScreenshotFile(file, input, btn);
+};
+
 window.adminAddGame = function() {
-  const div = document.createElement('div');
-  div.className = 'admin-row-item';
-  div.innerHTML = `
-    <input class="admin-row-input game-name-input" placeholder="Game name" style="flex:1;" />
-    <input class="admin-row-input game-url-input" placeholder="Game URL" style="flex:2;" />
-    <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" style="flex:2;" />
-    <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
-  document.getElementById('ae-games-list').appendChild(div);
-  div.querySelector('input').focus();
+  const wrap = document.createElement('div');
+  wrap.innerHTML = renderGameRow({}).trim();
+  const row = wrap.firstElementChild;
+  document.getElementById('ae-games-list').appendChild(row);
+  row.querySelector('input').focus();
 };
 function renderSitesEditor(items) {
   document.getElementById('ae-sites-list').innerHTML = items.map(s => `
@@ -3726,16 +3783,74 @@ window.s3DeleteImage = async function(key, btn) {
   }
 };
 
+async function s3EnsureCreds() {
+  if (_s3Creds && _s3Creds.keyId) return _s3Creds;
+  if (window._fetchS3Creds) {
+    _s3Creds = await window._fetchS3Creds();
+  }
+  if (!_s3Creds || !_s3Creds.keyId) throw new Error('Save S3 credentials first.');
+  return _s3Creds;
+}
+
+function s3ObjectUrl(key) {
+  const { region, bucket } = _s3Creds;
+  return `https://${bucket}.s3.${region}.amazonaws.com/${key.split('/').map(encodeURIComponent).join('/')}`;
+}
+
+function s3GuessExtension(file) {
+  const type = (file && file.type) || '';
+  if (type === 'image/jpeg') return 'jpg';
+  if (type === 'image/png') return 'png';
+  if (type === 'image/webp') return 'webp';
+  if (type === 'image/gif') return 'gif';
+  if (type === 'image/svg+xml') return 'svg';
+  if (type === 'image/bmp') return 'bmp';
+  if (type === 'image/x-icon') return 'ico';
+  return 'png';
+}
+
+function s3SafeUploadName(file) {
+  const rawName = (file && file.name) ? file.name : `pasted-image.${s3GuessExtension(file)}`;
+  const parts = rawName.split('.');
+  const ext = parts.length > 1 ? parts.pop() : s3GuessExtension(file);
+  const base = parts.join('.') || 'image';
+  const safeBase = base.toLowerCase().replace(/[^a-z0-9._-]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'image';
+  const safeExt = (ext || s3GuessExtension(file)).toLowerCase().replace(/[^a-z0-9]+/g, '') || 'png';
+  const stamp = new Date().toISOString().replace(/[-:.TZ]/g, '');
+  const rand = Math.random().toString(36).slice(2, 8);
+  return `${stamp}-${rand}-${safeBase}.${safeExt}`;
+}
+
+async function s3UploadFile(file) {
+  await s3EnsureCreds();
+  const prefix = (_s3Creds.prefix || '');
+  const key = prefix + s3SafeUploadName(file);
+  const ab = await file.arrayBuffer();
+  const ct = file.type || 'application/octet-stream';
+  const res = await _s3Fetch('PUT', key, null, ab, ct);
+  if (!res.ok) {
+    const txt = await res.text();
+    const msg = txt.match(/<Message>(.*?)<\/Message>/)?.[1] || `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+  if (!_s3AllImages.includes(key)) _s3AllImages.push(key);
+  const s3Status = document.getElementById('s3-status');
+  const s3Search = document.getElementById('s3-search');
+  if (s3Status && s3Search) {
+    s3Status.textContent = `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
+    s3FilterGrid(s3Search.value);
+  }
+  return { key, url: s3ObjectUrl(key) };
+}
+
 window.s3HandleFiles = function(files) {
   if (!files || !files.length) return;
-  if (!_s3Creds || !_s3Creds.keyId) { alert('Save S3 credentials first.'); return; }
   s3UploadFiles(Array.from(files));
 };
 
 window.s3HandleDrop = function(e) {
   const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
   if (!files.length) return;
-  if (!_s3Creds || !_s3Creds.keyId) { alert('Save S3 credentials first.'); return; }
   s3UploadFiles(files);
 };
 
@@ -3744,35 +3859,36 @@ async function s3UploadFiles(files) {
   progressEl.style.display = 'block';
   progressEl.innerHTML = '';
 
+  try {
+    await s3EnsureCreds();
+  } catch (e) {
+    progressEl.innerHTML = `<div style="color:var(--danger);font-size:0.78rem;">${escapeHtml(e.message)}</div>`;
+    setTimeout(() => { progressEl.style.display = 'none'; progressEl.innerHTML = ''; }, 2500);
+    return;
+  }
+
   for (const file of files) {
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:0.5rem;padding:0.4rem 0;border-bottom:1px solid var(--border);font-size:0.78rem;';
-    row.innerHTML = `<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${file.name}</span><span class="upl-st" style="color:var(--muted);flex-shrink:0;">Uploading…</span>`;
+    row.innerHTML = `<span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);">${escapeHtml(file.name || 'pasted-image')}</span><span class="upl-st" style="color:var(--muted);flex-shrink:0;">Uploading…</span>`;
     progressEl.appendChild(row);
     const stEl = row.querySelector('.upl-st');
 
     try {
-      const prefix = (_s3Creds.prefix || '');
-      const key = prefix + file.name;
-      const ab = await file.arrayBuffer();
-      const ct = file.type || 'application/octet-stream';
-
-      const res = await _s3Fetch('PUT', key, null, ab, ct);
-      if (!res.ok) {
-        const txt = await res.text();
-        const msg = txt.match(/<Message>(.*?)<\/Message>/)?.[1] || `HTTP ${res.status}`;
-        throw new Error(msg);
-      }
+      await s3UploadFile(file);
       stEl.textContent = '✓ Done'; stEl.style.color = '#22c55e';
-      if (!_s3AllImages.includes(key)) _s3AllImages.push(key);
     } catch(e) {
       stEl.textContent = '✗ ' + e.message; stEl.style.color = 'var(--danger)';
     }
   }
 
   document.getElementById('s3-file-input').value = '';
-  document.getElementById('s3-status').textContent = `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
-  s3FilterGrid(document.getElementById('s3-search').value);
+  const s3Status = document.getElementById('s3-status');
+  const s3Search = document.getElementById('s3-search');
+  if (s3Status && s3Search) {
+    s3Status.textContent = `${_s3AllImages.length} image${_s3AllImages.length !== 1 ? 's' : ''} found`;
+    s3FilterGrid(s3Search.value);
+  }
   setTimeout(() => { progressEl.style.display = 'none'; progressEl.innerHTML = ''; }, 5000);
 }
 </script>
