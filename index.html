@@ -699,6 +699,78 @@
       box-shadow: 0 0 14px rgba(168,85,247,0.2);
     }
     .game-card:hover svg { color: var(--primary); }
+
+    /* ── GAME PREVIEW TOOLTIP ── */
+    .game-preview-tooltip {
+      position: fixed;
+      z-index: 9000;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(6px) scale(0.97);
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(168,85,247,0.25), 0 0 24px rgba(168,85,247,0.15);
+      width: 240px;
+      background: var(--card);
+      border: 1px solid rgba(168,85,247,0.3);
+    }
+    .game-preview-tooltip.visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .game-preview-tooltip img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      background: var(--bg);
+    }
+    .game-preview-tooltip-label {
+      padding: 0.5rem 0.75rem;
+      font-family: var(--font-display);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--primary);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      border-top: 1px solid var(--border);
+    }
+    .game-preview-tooltip-label span {
+      color: var(--muted);
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0;
+      text-transform: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .game-preview-loading {
+      width: 100%;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      color: var(--muted);
+      font-size: 0.75rem;
+      gap: 0.5rem;
+    }
+    @keyframes spin-sm { to { transform: rotate(360deg); } }
+    .game-preview-spinner {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(168,85,247,0.3);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin-sm 0.7s linear infinite;
+      flex-shrink: 0;
+    }
+
     .no-results {
       text-align: center;
       padding: 4rem 1rem;
@@ -2646,7 +2718,7 @@ document.addEventListener('click', function(e) {
       if (matched.length === 0) continue;
       totalMatches += matched.length;
       const cards = matched.map(g => {
-        return `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-card">${GAMEPAD_SVG}<span>${g.name}</span></a>`;
+        return `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-card" data-screenshot="${escAttr(g.screenshot || '')}">${GAMEPAD_SVG}<span>${g.name}</span></a>`;
       }).join('');
       html += `<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;
     }
@@ -2844,7 +2916,7 @@ window.injectAdminPanels = function() {
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('toptier')">Save Top Tier</button><span class="admin-status" id="status-toptier"></span></div>
       </div>
       <div class="admin-section" id="admin-games">
-        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name; URL is NOT optional.</p>
+        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name and URL. Screenshot previews only appear when you add a screenshot URL here.</p>
         <div id="ae-games-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
@@ -3086,7 +3158,8 @@ function renderGamesEditor(gamesObj) {
   document.getElementById('ae-games-list').innerHTML = flat.map(g => `
     <div class="admin-row-item">
       <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name)}" style="flex:1;" />
-      <input class="admin-row-input game-url-input" placeholder="https://..." value="${escAttr(g.url||'')}" style="flex:2;" />
+      <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(g.url||'')}" style="flex:2;" />
+      <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:2;" />
       <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
     </div>`).join('');
 }
@@ -3096,7 +3169,8 @@ window.adminAddGame = function() {
   div.className = 'admin-row-item';
   div.innerHTML = `
     <input class="admin-row-input game-name-input" placeholder="Game name" style="flex:1;" />
-    <input class="admin-row-input game-url-input" placeholder="https://..." style="flex:2;" />
+    <input class="admin-row-input game-url-input" placeholder="Game URL" style="flex:2;" />
+    <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" style="flex:2;" />
     <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>`;
   document.getElementById('ae-games-list').appendChild(div);
   div.querySelector('input').focus();
@@ -3190,10 +3264,13 @@ window.adminSave = async function(section) {
       for (const row of document.querySelectorAll('#ae-games-list .admin-row-item')) {
         const name = row.querySelector('.game-name-input').value.trim();
         const url  = row.querySelector('.game-url-input').value.trim();
+        const screenshot = row.querySelector('.game-screenshot-input').value.trim();
         if (!name) continue;
         const letter = name[0].toUpperCase();
         if (!games[letter]) games[letter] = [];
-        games[letter].push({ name, url });
+        const game = { name, url };
+        if (screenshot) game.screenshot = screenshot;
+        games[letter].push(game);
       }
       patch.games = games;
     } else if (section === 'sites') {
@@ -4047,6 +4124,136 @@ window.undoOrderComplete = async function(orderId, btn) {
   }
 };
 </script>
+<!-- GAME PREVIEW TOOLTIP -->
+<div id="game-preview-tooltip" class="game-preview-tooltip" aria-hidden="true">
+  <div class="game-preview-loading" id="game-preview-loading">
+    <div class="game-preview-spinner"></div>
+    <span>Loading preview…</span>
+  </div>
+  <img id="game-preview-img" src="" alt="" style="display:none;" />
+  <div class="game-preview-tooltip-label">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M7 9v2"/><path d="M6 10h2"/><path d="M17 12h.01"/><path d="M12 12h.01"/></svg>
+    <span id="game-preview-name"></span>
+  </div>
+</div>
+
+<script>
+(function() {
+  const tooltip  = document.getElementById('game-preview-tooltip');
+  const img      = document.getElementById('game-preview-img');
+  const loading  = document.getElementById('game-preview-loading');
+  const nameEl   = document.getElementById('game-preview-name');
+  const PAD      = 14; // gap from cursor
+  let  hideTimer = null;
+  let  current   = null;
+  const cache    = {};
+
+  function showTooltip(target) {
+    const url  = target.getAttribute('href');
+    const screenshot = target.dataset.screenshot || '';
+    const name = target.querySelector('span') ? target.querySelector('span').textContent : target.textContent.trim();
+    const cacheKey = `${url}::${screenshot}`;
+    if (!url || current === cacheKey) return;
+    current = cacheKey;
+    clearTimeout(hideTimer);
+
+    nameEl.textContent = name;
+    img.style.display  = 'none';
+    loading.style.display = 'flex';
+    loading.innerHTML = screenshot
+      ? '<div class="game-preview-spinner"></div><span>Loading preview…</span>'
+      : '<span style="color:var(--muted);font-size:0.72rem;">No preview added</span>';
+    tooltip.classList.remove('visible');
+
+    positionTooltip(target._lastMouseEvent || { clientX: 0, clientY: 0 });
+
+    tooltip._showTimer = setTimeout(() => {
+      tooltip.classList.add('visible');
+      if (!screenshot) return;
+      if (cache[screenshot]) {
+        showImg(cache[screenshot]);
+      } else {
+        const preload = new Image();
+        preload.onload = () => {
+          if (preload.naturalWidth < 10 || preload.naturalHeight < 10) {
+            if (current === cacheKey) {
+              loading.style.display = 'flex';
+              img.style.display = 'none';
+              loading.innerHTML = '<span style="color:var(--muted);font-size:0.72rem;">Preview image is invalid</span>';
+            }
+            return;
+          }
+          cache[screenshot] = screenshot;
+          if (current === cacheKey) showImg(screenshot);
+        };
+        preload.onerror = () => {
+          if (current === cacheKey) {
+            loading.style.display = 'flex';
+            img.style.display = 'none';
+            loading.innerHTML = '<span style="color:var(--muted);font-size:0.72rem;">Preview image failed to load</span>';
+          }
+        };
+        preload.src = screenshot;
+      }
+    }, 120);
+  }
+
+  function showImg(src) {
+    img.src = src;
+    img.style.display = 'block';
+    loading.style.display = 'none';
+    loading.innerHTML = '<div class="game-preview-spinner"></div><span>Loading preview…</span>';
+  }
+
+  function hideTooltip() {
+    clearTimeout(tooltip._showTimer);
+    current = null;
+    hideTimer = setTimeout(() => {
+      tooltip.classList.remove('visible');
+    }, 80);
+  }
+
+  function positionTooltip(e) {
+    const tw = tooltip.offsetWidth  || 240;
+    const th = tooltip.offsetHeight || 190;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    let x = e.clientX + PAD;
+    let y = e.clientY + PAD;
+    if (x + tw > vw - 8) x = e.clientX - tw - PAD;
+    if (y + th > vh - 8) y = e.clientY - th - PAD;
+    if (x < 8) x = 8;
+    if (y < 8) y = 8;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top  = y + 'px';
+  }
+
+  // Delegate events on #archive (re-rendered on search)
+  document.addEventListener('mouseover', (e) => {
+    const card = e.target.closest('#archive .game-card');
+    if (card) {
+      card._lastMouseEvent = e;
+      showTooltip(card);
+    }
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    const card = e.target.closest('#archive .game-card');
+    if (card) {
+      card._lastMouseEvent = e;
+      positionTooltip(e);
+    }
+  });
+
+  document.addEventListener('mouseout', (e) => {
+    const card = e.target.closest('#archive .game-card');
+    if (card && !card.contains(e.relatedTarget)) {
+      hideTooltip();
+    }
+  });
+})();
+</script>
+
 <script>
 // Prevent pinch zoom on iOS
 document.addEventListener("touchmove", function(e) {
