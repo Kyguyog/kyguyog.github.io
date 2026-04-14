@@ -3189,10 +3189,13 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     if (key) latestMap.set(key, { ...game });
   });
 
-  const originalKeys = new Set(
-    flattenGames(originalGamesObj).map(game => normalizeGameKey(game.name)).filter(Boolean)
-  );
-  const retainedOriginalKeys = new Set();
+  const originalMap = new Map();
+  flattenGames(originalGamesObj).forEach(game => {
+    const key = normalizeGameKey(game.name);
+    if (key) originalMap.set(key, { ...game });
+  });
+
+  const remainingOriginalKeys = new Set(originalMap.keys());
 
   rows.forEach(row => {
     const name = row.querySelector('.game-name-input').value.trim();
@@ -3201,19 +3204,38 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     const originalName = (row.dataset.originalName || '').trim();
     const originalKey = normalizeGameKey(originalName);
     const nextKey = normalizeGameKey(name);
+    const originalGame = originalKey ? originalMap.get(originalKey) : null;
+    const nextGame = name ? { name, url } : null;
+    if (nextGame && screenshot) nextGame.screenshot = screenshot;
 
-    if (originalKey) retainedOriginalKeys.add(originalKey);
-    if (!name) return;
+    if (originalKey) remainingOriginalKeys.delete(originalKey);
 
-    const nextGame = { name, url };
-    if (screenshot) nextGame.screenshot = screenshot;
+    if (!originalGame) {
+      if (nextGame) latestMap.set(nextKey, nextGame);
+      return;
+    }
 
-    if (originalKey && originalKey !== nextKey) latestMap.delete(originalKey);
-    latestMap.set(nextKey, nextGame);
+    const originalComparable = {
+      name: originalGame.name || '',
+      url: originalGame.url || ''
+    };
+    if (originalGame.screenshot) originalComparable.screenshot = originalGame.screenshot;
+
+    const nextComparable = nextGame ? {
+      name: nextGame.name || '',
+      url: nextGame.url || ''
+    } : null;
+    if (nextComparable && nextGame.screenshot) nextComparable.screenshot = nextGame.screenshot;
+
+    const unchanged = JSON.stringify(originalComparable) === JSON.stringify(nextComparable);
+    if (unchanged) return;
+
+    latestMap.delete(originalKey);
+    if (nextGame) latestMap.set(nextKey, nextGame);
   });
 
-  originalKeys.forEach(key => {
-    if (!retainedOriginalKeys.has(key)) latestMap.delete(key);
+  remainingOriginalKeys.forEach(key => {
+    latestMap.delete(key);
   });
 
   const mergedGames = {};
