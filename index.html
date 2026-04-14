@@ -2884,6 +2884,7 @@ if (homeBtns && data.home) {
 // ═══════════════════════════════════════════
 window._isAdmin = false;
 window._siteData = null;
+window._adminOriginalData = null;
 
 window.injectAdminPanels = function() {
   if (document.getElementById('admin-panel')) return; // already injected
@@ -3043,6 +3044,7 @@ window.openAdminPanel = function() {
   if (!window._isAdmin && !window._isEditor) return;
   const data = window._siteData;
   if (!data) { alert('Site data not loaded yet. Try again in a moment.'); return; }
+  window._adminOriginalData = JSON.parse(JSON.stringify(data));
 
   // Top Tier
   renderTopTierEditor(data.topTier || []);
@@ -3156,12 +3158,70 @@ function renderGamesEditor(gamesObj) {
     for (const g of games) flat.push(g);
   }
   document.getElementById('ae-games-list').innerHTML = flat.map(g => `
-    <div class="admin-row-item">
+    <div class="admin-row-item" data-original-name="${escAttr(g.name || '')}">
       <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name)}" style="flex:1;" />
       <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(g.url||'')}" style="flex:2;" />
       <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:2;" />
       <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
     </div>`).join('');
+}
+
+function normalizeGameKey(name) {
+  return (name || '').trim().toLowerCase();
+}
+
+function flattenGames(gamesObj) {
+  const flat = [];
+  for (const [, games] of Object.entries(gamesObj || {}).sort(([a],[b]) => a.localeCompare(b))) {
+    for (const g of games || []) flat.push(g);
+  }
+  return flat;
+}
+
+function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
+  const latestMap = new Map();
+  flattenGames(latestGamesObj).forEach(game => {
+    const key = normalizeGameKey(game.name);
+    if (key) latestMap.set(key, { ...game });
+  });
+
+  const originalKeys = new Set(
+    flattenGames(originalGamesObj).map(game => normalizeGameKey(game.name)).filter(Boolean)
+  );
+  const retainedOriginalKeys = new Set();
+
+  rows.forEach(row => {
+    const name = row.querySelector('.game-name-input').value.trim();
+    const url = row.querySelector('.game-url-input').value.trim();
+    const screenshot = row.querySelector('.game-screenshot-input').value.trim();
+    const originalName = (row.dataset.originalName || '').trim();
+    const originalKey = normalizeGameKey(originalName);
+    const nextKey = normalizeGameKey(name);
+
+    if (originalKey) retainedOriginalKeys.add(originalKey);
+    if (!name) return;
+
+    const nextGame = { name, url };
+    if (screenshot) nextGame.screenshot = screenshot;
+
+    if (originalKey && originalKey !== nextKey) latestMap.delete(originalKey);
+    latestMap.set(nextKey, nextGame);
+  });
+
+  originalKeys.forEach(key => {
+    if (!retainedOriginalKeys.has(key)) latestMap.delete(key);
+  });
+
+  const mergedGames = {};
+  Array.from(latestMap.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .forEach(game => {
+      const letter = (game.name[0] || '#').toUpperCase();
+      if (!mergedGames[letter]) mergedGames[letter] = [];
+      mergedGames[letter].push(game);
+    });
+
+  return mergedGames;
 }
 
 window.adminAddGame = function() {
@@ -3260,19 +3320,17 @@ window.adminSave = async function(section) {
         backgroundImage: card.querySelector('.tt-bg').value.trim()
       }));
     } else if (section === 'games') {
-      const games = {};
-      for (const row of document.querySelectorAll('#ae-games-list .admin-row-item')) {
-        const name = row.querySelector('.game-name-input').value.trim();
-        const url  = row.querySelector('.game-url-input').value.trim();
-        const screenshot = row.querySelector('.game-screenshot-input').value.trim();
-        if (!name) continue;
-        const letter = name[0].toUpperCase();
-        if (!games[letter]) games[letter] = [];
-        const game = { name, url };
-        if (screenshot) game.screenshot = screenshot;
-        games[letter].push(game);
-      }
-      patch.games = games;
+      const latestSnap = await getDoc(doc(db, 'siteContent', 'main'));
+      const latestData = latestSnap.exists() ? latestSnap.data() : {};
+      const rows = [...document.querySelectorAll('#ae-games-list .admin-row-item')];
+      const mergedGames = mergeGameEditorChanges(
+        latestData.games || {},
+        window._adminOriginalData?.games || {},
+        rows
+      );
+      patch.games = mergedGames;
+      window._siteData = Object.assign({}, latestData, { games: mergedGames });
+      window._adminOriginalData = Object.assign({}, window._adminOriginalData || {}, { games: JSON.parse(JSON.stringify(mergedGames)) });
     } else if (section === 'sites') {
       patch.sites = [...document.querySelectorAll('#ae-sites-list .admin-row-item')].map(row => {
         const [n, u] = row.querySelectorAll('input');
@@ -3314,6 +3372,9 @@ window.adminSave = async function(section) {
 
     // Merge patch into local cache and re-render page live
     window._siteData = Object.assign({}, window._siteData, patch);
+    if (window._adminOriginalData) {
+      window._adminOriginalData = Object.assign({}, window._adminOriginalData, JSON.parse(JSON.stringify(patch)));
+    }
     populatePage(window._siteData);
 
     statusEl.textContent = '✓ Saved';
