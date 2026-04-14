@@ -2051,9 +2051,13 @@ document.addEventListener('click', function(e) {
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // Expose update bridge for admin panel (non-module script)
+  // Expose Firestore bridges for admin panel (non-module script)
   window._firestoreUpdate = async function(patch) {
     await updateDoc(doc(db, 'siteContent', 'main'), patch);
+  };
+  window._firestoreGetSiteContent = async function() {
+    const snap = await getDoc(doc(db, 'siteContent', 'main'));
+    return snap.exists() ? snap.data() : {};
   };
 
   // Save a shop order to Firestore under the user's email doc
@@ -3320,8 +3324,7 @@ window.adminSave = async function(section) {
         backgroundImage: card.querySelector('.tt-bg').value.trim()
       }));
     } else if (section === 'games') {
-      const latestSnap = await getDoc(doc(db, 'siteContent', 'main'));
-      const latestData = latestSnap.exists() ? latestSnap.data() : {};
+      const latestData = await window._firestoreGetSiteContent();
       const rows = [...document.querySelectorAll('#ae-games-list .admin-row-item')];
       const mergedGames = mergeGameEditorChanges(
         latestData.games || {},
