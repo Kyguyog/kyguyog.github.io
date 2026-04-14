@@ -3164,9 +3164,9 @@ function renderGameRow(g = {}) {
       <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name || '')}" style="flex:1;" />
       <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(g.url||'')}" style="flex:2;" />
       <div style="flex:2;display:flex;align-items:center;gap:0.45rem;min-width:0;">
-        <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:1;min-width:0;" onpaste="adminHandleGameScreenshotPaste(event, this)" />
+        <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:1;min-width:0;" onpaste="adminHandleGameScreenshotPaste(event, this)" onchange="adminHandleGameScreenshotUrlChange(this)" />
         <input type="file" class="game-screenshot-file-input" accept="image/*" style="display:none;" onchange="adminHandleGameScreenshotFiles(this)" />
-        <button type="button" class="admin-game-upload-btn" onclick="adminOpenGameScreenshotPicker(this)" style="padding:0.48rem 0.7rem;background:var(--secondary-dim);border:1px solid rgba(34,211,238,0.35);border-radius:6px;color:var(--secondary);font-family:var(--font-display);font-size:0.62rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;transition:background 0.15s,border-color 0.15s;flex-shrink:0;" onmouseover="this.style.background='rgba(34,211,238,0.22)';this.style.borderColor='rgba(34,211,238,0.55)'" onmouseout="this.style.background='var(--secondary-dim)';this.style.borderColor='rgba(34,211,238,0.35)'">Upload</button>
+        <button type="button" class="admin-game-upload-btn" onclick="adminOpenGameScreenshotPicker(this)" title="Upload screenshot" aria-label="Upload screenshot" style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--secondary-dim);border:1px solid rgba(34,211,238,0.35);border-radius:6px;color:var(--secondary);cursor:pointer;transition:background 0.15s,border-color 0.15s;flex-shrink:0;" onmouseover="this.style.background='rgba(34,211,238,0.22)';this.style.borderColor='rgba(34,211,238,0.55)'" onmouseout="this.style.background='var(--secondary-dim)';this.style.borderColor='rgba(34,211,238,0.35)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="16"/></svg></button>
       </div>
       <button class="admin-row-remove" onclick="this.closest('.admin-row-item').remove()">✕</button>
     </div>`;
@@ -3266,26 +3266,43 @@ window.adminOpenGameScreenshotPicker = function(btn) {
   if (fileInput) fileInput.click();
 };
 
+function adminSetGameUploadBtnState(btn, state) {
+  if (!btn) return;
+  if (!btn.dataset.defaultHtml) btn.dataset.defaultHtml = btn.innerHTML;
+  if (state === 'uploading') {
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="animation:spin-sm 0.7s linear infinite;"><circle cx="12" cy="12" r="8" stroke-opacity="0.35"></circle><path d="M20 12a8 8 0 0 0-8-8"></path></svg>';
+    return;
+  }
+  if (state === 'success') {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(() => {
+      btn.innerHTML = btn.dataset.defaultHtml;
+    }, 1200);
+    return;
+  }
+  if (state === 'error') {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    setTimeout(() => {
+      btn.innerHTML = btn.dataset.defaultHtml;
+    }, 1600);
+    return;
+  }
+  btn.disabled = false;
+  btn.innerHTML = btn.dataset.defaultHtml;
+}
+
 async function adminUploadGameScreenshotFile(file, input, btn) {
   if (!file || !input || !btn) return;
-  const originalText = btn.textContent;
-  const originalDisabled = btn.disabled;
-  btn.disabled = true;
-  btn.textContent = 'Uploading';
+  adminSetGameUploadBtnState(btn, 'uploading');
   try {
     const uploaded = await s3UploadFile(file);
     input.value = uploaded.url;
-    btn.textContent = 'Uploaded';
-    setTimeout(() => {
-      btn.textContent = originalText;
-      btn.disabled = originalDisabled;
-    }, 1200);
+    adminSetGameUploadBtnState(btn, 'success');
   } catch (e) {
-    btn.textContent = 'Failed';
-    setTimeout(() => {
-      btn.textContent = originalText;
-      btn.disabled = originalDisabled;
-    }, 1600);
+    adminSetGameUploadBtnState(btn, 'error');
     alert('Upload failed: ' + e.message);
   }
 }
@@ -3301,16 +3318,51 @@ window.adminHandleGameScreenshotFiles = function(fileInput) {
   });
 };
 
+async function adminImportGameScreenshotUrl(url, input, btn) {
+  const trimmed = (url || '').trim();
+  if (!trimmed || isS3ImageUrl(trimmed)) return false;
+  adminSetGameUploadBtnState(btn, 'uploading');
+  try {
+    const file = await s3FileFromUrl(trimmed);
+    const uploaded = await s3UploadFile(file);
+    input.value = uploaded.url;
+    adminSetGameUploadBtnState(btn, 'success');
+    return true;
+  } catch (e) {
+    adminSetGameUploadBtnState(btn, 'error');
+    alert('Image import failed: ' + e.message);
+    return false;
+  }
+}
+
 window.adminHandleGameScreenshotPaste = function(e, input) {
-  const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
-  const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
-  if (!imageItem) return;
-  const file = imageItem.getAsFile();
-  if (!file) return;
-  e.preventDefault();
   const row = input.closest('.admin-row-item');
   const btn = row && row.querySelector('.admin-game-upload-btn');
-  adminUploadGameScreenshotFile(file, input, btn);
+  const items = Array.from((e.clipboardData && e.clipboardData.items) || []);
+  const imageItem = items.find(item => item.kind === 'file' && item.type.startsWith('image/'));
+  if (imageItem) {
+    const file = imageItem.getAsFile();
+    if (!file) return;
+    e.preventDefault();
+    adminUploadGameScreenshotFile(file, input, btn);
+    return;
+  }
+  const pastedText = e.clipboardData && e.clipboardData.getData('text');
+  if (looksLikeImageUrl(pastedText) && !isS3ImageUrl(pastedText)) {
+    e.preventDefault();
+    adminImportGameScreenshotUrl(pastedText, input, btn);
+  }
+};
+
+window.adminHandleGameScreenshotUrlChange = function(input) {
+  const value = input.value.trim();
+  if (!looksLikeImageUrl(value) || isS3ImageUrl(value) || input.dataset.importing === 'true') return;
+  const row = input.closest('.admin-row-item');
+  const btn = row && row.querySelector('.admin-game-upload-btn');
+  input.dataset.importing = 'true';
+  adminImportGameScreenshotUrl(value, input, btn).finally(() => {
+    input.dataset.importing = 'false';
+  });
 };
 
 window.adminAddGame = function() {
@@ -3795,6 +3847,62 @@ async function s3EnsureCreds() {
 function s3ObjectUrl(key) {
   const { region, bucket } = _s3Creds;
   return `https://${bucket}.s3.${region}.amazonaws.com/${key.split('/').map(encodeURIComponent).join('/')}`;
+}
+
+function looksLikeImageUrl(url) {
+  return /^https?:\/\//i.test((url || '').trim()) && /(\.(png|jpe?g|gif|webp|bmp|svg|ico)(\?.*)?$)/i.test((url || '').trim());
+}
+
+function isS3ImageUrl(url) {
+  const trimmed = (url || '').trim();
+  if (!trimmed) return false;
+  if (/\.s3[.-][^/]+\.amazonaws\.com\//i.test(trimmed)) return true;
+  if (/s3\.amazonaws\.com\//i.test(trimmed)) return true;
+  if (_s3Creds && _s3Creds.bucket && _s3Creds.region) {
+    const direct = `https://${_s3Creds.bucket}.s3.${_s3Creds.region}.amazonaws.com/`;
+    if (trimmed.startsWith(direct)) return true;
+  }
+  return false;
+}
+
+function s3ProxyImageUrl(url) {
+  const parsed = new URL(url);
+  const normalized = parsed.protocol === 'https:'
+    ? `https://${parsed.host}${parsed.pathname}${parsed.search}`
+    : `${parsed.host}${parsed.pathname}${parsed.search}`;
+  return `https://wsrv.nl/?url=${encodeURIComponent(normalized)}&default=404`;
+}
+
+async function s3FileFromUrl(url) {
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (err) {
+    res = null;
+  }
+
+  if (!res || !res.ok) {
+    try {
+      res = await fetch(s3ProxyImageUrl(url));
+    } catch (err) {
+      res = null;
+    }
+  }
+
+  if (!res || !res.ok) {
+    const status = res ? `HTTP ${res.status}` : 'request blocked';
+    throw new Error(`Failed to fetch image: ${status}`);
+  }
+
+  const blob = await res.blob();
+  const type = blob.type || 'image/png';
+  if (!type.startsWith('image/')) throw new Error('URL did not return an image');
+  const cleanUrl = url.split('?')[0];
+  const nameFromUrl = cleanUrl.split('/').pop() || '';
+  const extFromUrl = (nameFromUrl.split('.').pop() || '').toLowerCase();
+  const ext = extFromUrl && /^[a-z0-9]+$/.test(extFromUrl) ? extFromUrl : s3GuessExtension({ type });
+  const base = nameFromUrl.replace(/\.[^.]+$/, '') || 'imported-image';
+  return new File([blob], `${base}.${ext}`, { type });
 }
 
 function s3GuessExtension(file) {
