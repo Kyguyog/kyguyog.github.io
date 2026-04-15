@@ -3121,6 +3121,12 @@ window.switchAdminTab = function(tab) {
   document.querySelectorAll('.admin-tab').forEach(t => {
     if (t.getAttribute('onclick') === "switchAdminTab('" + tab + "')") t.classList.add('active');
   });
+  if (tab === 's3') {
+    s3Connect().catch(e => {
+      const statusEl = document.getElementById('s3-status');
+      if (statusEl) statusEl.textContent = '✗ ' + e.message;
+    });
+  }
 };
 
 // ── Top Tier ──
