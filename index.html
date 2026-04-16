@@ -700,6 +700,54 @@
     }
     .game-card:hover svg { color: var(--primary); }
 
+    /* ── BLOCK STATUS INDICATOR ── */
+    .block-dot {
+      flex-shrink: 0;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-left: auto;
+      margin-top: 4px;
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    .block-dot[data-status="checking"] {
+      background: rgba(100,116,139,0.4);
+      border: 1.5px solid var(--muted);
+      animation: dot-pulse 1.2s ease-in-out infinite;
+    }
+    .block-dot[data-status="ok"] {
+      background: #22c55e;
+      box-shadow: 0 0 6px rgba(34,197,94,0.6);
+    }
+    .block-dot[data-status="blocked"] {
+      background: var(--danger);
+      box-shadow: 0 0 6px rgba(239,68,68,0.6);
+    }
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+    .block-dot-tooltip {
+      position: relative;
+    }
+    .block-dot-tooltip:hover::after {
+      content: attr(data-label);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      right: 0;
+      background: #1a1a2e;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.25rem 0.55rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      white-space: nowrap;
+      color: var(--text);
+      pointer-events: none;
+      z-index: 200;
+      letter-spacing: 0.04em;
+    }
+
     /* ── GAME PREVIEW TOOLTIP ── */
     .game-preview-tooltip {
       --preview-width: 240px;
@@ -806,6 +854,17 @@
       box-shadow: 0 0 16px rgba(34,211,238,0.15);
     }
     .site-pill:hover svg { opacity: 1; }
+    .site-block-dot {
+      margin-left: 0.35rem;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+    .site-pill .block-dot-tooltip:hover::after {
+      bottom: calc(100% + 6px);
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+    }
 
     /* ── STATS ── */
     .stats-grid {
@@ -2725,7 +2784,8 @@ document.addEventListener('click', function(e) {
       if (matched.length === 0) continue;
       totalMatches += matched.length;
       const cards = matched.map(g => {
-        return `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-card" data-screenshot="${escAttr(g.screenshot || '')}">${GAMEPAD_SVG}<span>${g.name}</span></a>`;
+        const safeUrl = escAttr(g.url || '');
+        return `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-card" data-screenshot="${escAttr(g.screenshot || '')}" data-url="${safeUrl}">${GAMEPAD_SVG}<span>${g.name}</span><span class="block-dot block-dot-tooltip" data-status="checking" data-url="${safeUrl}" data-label="Checking\u2026"></span></a>`;
       }).join('');
       html += `<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;
     }
@@ -2742,6 +2802,7 @@ document.addEventListener('click', function(e) {
       archive.style.display = 'flex';
       searchCount.textContent = q ? `${totalMatches} game${totalMatches !== 1 ? 's' : ''} found` : '';
     }
+    scheduleBlockChecks();
   }
 
   // Populate page from content data
@@ -2797,12 +2858,15 @@ if (homeBtns && data.home) {
     // Games archive
     GAMES = data.games;
     buildArchive('');
+    scheduleBlockChecks();
 
     // Sites
     const sitesList = document.getElementById('sites-list');
-    sitesList.innerHTML = data.sites.map(s =>
-      `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="site-pill">${s.name}${EXT_SVG}</a>`
-    ).join('');
+    sitesList.innerHTML = data.sites.map(s => {
+      const safeUrl = escAttr(s.url || '');
+      return `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="site-pill" data-url="${safeUrl}">${s.name}${EXT_SVG}<span class="block-dot block-dot-tooltip site-block-dot" data-status="checking" data-url="${safeUrl}" data-label="Checking…"></span></a>`;
+    }).join('');
+    scheduleBlockChecks();
 
     // Shop
     renderShop(data.shop || []);
@@ -4623,6 +4687,204 @@ window.undoOrderComplete = async function(orderId, btn) {
       hideTooltip();
     }
   });
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════
+//  BLOCK STATUS CHECKER  v2
+//  – One check per domain (all URLs sharing
+//    the same hostname share the result).
+//  – Improved accuracy: no false-positive from
+//    opaque iframe loads.
+//  – Works for both game cards AND site pills.
+// ═══════════════════════════════════════════
+(function() {
+  const BLOCKED_HOST    = 'ckf02.alpinedistrict.org';
+  const CHECK_TIMEOUT_MS = 7000;   // 7 s per domain
+  const CONCURRENCY      = 5;      // parallel domain checks
+
+  // domain → 'ok' | 'blocked'
+  const domainCache = {};
+  // domain → Promise (in-flight check)
+  const domainInflight = {};
+
+  function getHostname(url) {
+    try { return new URL(url).hostname.toLowerCase(); }
+    catch(_) { return null; }
+  }
+
+  // Returns a representative URL to test for a given hostname.
+  // We test the origin (scheme + host) — no path — so it's
+  // the same request regardless of which game on that domain we pick.
+  function getOriginUrl(url) {
+    try { const u = new URL(url); return u.origin; }
+    catch(_) { return url; }
+  }
+
+  // ── Core check (per domain origin) ──────────────────────────
+  // Strategy:
+  //   1. fetch() HEAD with redirect:follow — catches CORS-open hosts
+  //      and redirect-to-blocker accurately.
+  //   2. fetch() no-cors — if step 1 was a CORS TypeError, try no-cors.
+  //      An opaque response means the server replied → ok.
+  //      A network error means the host is unreachable → blocked.
+  //   3. Timeout of either fetch → blocked.
+  //
+  // We deliberately do NOT use iframes because:
+  //   • iframe.onload fires even when the blocker redirect page loads,
+  //     causing false "ok" results.
+  //   • Cross-origin iframes can't reveal the final URL, so we can't
+  //     distinguish game-site load from blocker-redirect load.
+
+  function checkDomain(originUrl) {
+    return new Promise((resolve) => {
+      let done = false;
+      function finish(status) {
+        if (done) return;
+        done = true;
+        resolve(status);
+      }
+
+      const globalTimer = setTimeout(() => finish('blocked'), CHECK_TIMEOUT_MS);
+
+      // Step 1 — HEAD with redirect:follow
+      (async () => {
+        try {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), CHECK_TIMEOUT_MS - 500);
+          const resp = await fetch(originUrl, {
+            method: 'HEAD',
+            redirect: 'follow',
+            signal: ctrl.signal,
+            cache: 'no-store',
+            mode: 'cors'
+          });
+          clearTimeout(t);
+          // Explicit redirect to blocker → blocked
+          const finalHost = resp.url ? new URL(resp.url).hostname : '';
+          if (finalHost === BLOCKED_HOST) {
+            clearTimeout(globalTimer);
+            finish('blocked');
+            return;
+          }
+          // Got a real response → ok
+          clearTimeout(globalTimer);
+          finish('ok');
+        } catch (e1) {
+          if (e1 && e1.name === 'AbortError') {
+            clearTimeout(globalTimer);
+            finish('blocked');
+            return;
+          }
+          // CORS TypeError — try no-cors fallback
+          try {
+            const ctrl2 = new AbortController();
+            const t2 = setTimeout(() => ctrl2.abort(), CHECK_TIMEOUT_MS - 1000);
+            await fetch(originUrl, {
+              method: 'GET',
+              redirect: 'follow',
+              signal: ctrl2.signal,
+              cache: 'no-store',
+              mode: 'no-cors'
+            });
+            clearTimeout(t2);
+            // Opaque response received — host is reachable → ok
+            clearTimeout(globalTimer);
+            finish('ok');
+          } catch (e2) {
+            clearTimeout(globalTimer);
+            // AbortError = timeout = blocked; NetworkError = unreachable = blocked
+            finish('blocked');
+          }
+        }
+      })();
+    });
+  }
+
+  // Returns (or starts) a deduped promise for a domain
+  function checkForDomain(domain, representativeUrl) {
+    if (domainCache[domain] !== undefined) {
+      return Promise.resolve(domainCache[domain]);
+    }
+    if (domainInflight[domain]) return domainInflight[domain];
+    const originUrl = getOriginUrl(representativeUrl);
+    const p = checkDomain(originUrl).then(status => {
+      domainCache[domain] = status;
+      delete domainInflight[domain];
+      return status;
+    });
+    domainInflight[domain] = p;
+    return p;
+  }
+
+  // ── Dot helpers ──────────────────────────────────────────────
+  function setDotStatus(dot, status) {
+    dot.dataset.status  = status;
+    dot.dataset.label   = status === 'ok' ? 'Accessible' : 'Blocked';
+  }
+
+  // ── Queue-based concurrency runner ───────────────────────────
+  let queue   = [];   // { domain, representativeUrl, dots[] }
+  let running = 0;
+
+  function runNext() {
+    while (running < CONCURRENCY && queue.length > 0) {
+      const { domain, representativeUrl, dots } = queue.shift();
+      running++;
+      checkForDomain(domain, representativeUrl).then(status => {
+        dots.forEach(d => setDotStatus(d, status));
+        running--;
+        runNext();
+      }).catch(() => {
+        dots.forEach(d => setDotStatus(d, 'blocked'));
+        running--;
+        runNext();
+      });
+    }
+  }
+
+  // ── Public: call after rendering any dots ────────────────────
+  window.scheduleBlockChecks = function() {
+    // Gather dots from both games archive AND sites list
+    const allDots = document.querySelectorAll('.block-dot[data-url]');
+
+    // Group by DOMAIN (not full URL) — this is the key dedup step
+    const domainMap = {}; // domain → { representativeUrl, dots[] }
+
+    allDots.forEach(dot => {
+      const url = dot.dataset.url;
+      if (!url) return;
+      const domain = getHostname(url);
+      if (!domain) return;
+
+      // Already have a cached domain result → apply immediately
+      if (domainCache[domain] !== undefined) {
+        setDotStatus(dot, domainCache[domain]);
+        return;
+      }
+
+      // Mark as checking
+      dot.dataset.status = 'checking';
+      dot.dataset.label  = 'Checking\u2026';
+
+      if (!domainMap[domain]) domainMap[domain] = { representativeUrl: url, dots: [] };
+      domainMap[domain].dots.push(dot);
+    });
+
+    // Enqueue domains not already in-flight or queued
+    const queuedDomains = new Set(queue.map(i => i.domain));
+    for (const [domain, { representativeUrl, dots }] of Object.entries(domainMap)) {
+      if (domainInflight[domain]) {
+        // Already checking — hook dots onto the existing promise
+        domainInflight[domain].then(status => dots.forEach(d => setDotStatus(d, status)));
+        continue;
+      }
+      if (queuedDomains.has(domain)) continue;
+      queue.push({ domain, representativeUrl, dots });
+    }
+    runNext();
+  };
 })();
 </script>
 
