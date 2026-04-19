@@ -2052,8 +2052,8 @@ document.addEventListener('click', function(e) {
       Edit Site Content
     </button>
     <button class="popup-btn" id="approvals-popup-btn" onclick="openApprovalsPanel()" style="color:var(--primary);display:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
-      Sign-Up Approvals
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      User Management
     </button>
   </div>
   <div class="popup-section" id="orders-popup-section" style="display:none;">
@@ -2221,6 +2221,40 @@ document.addEventListener('click', function(e) {
   window._fetchSignupRequests = async function() {
     const snap = await getDocs(collection(db, 'signupRequests'));
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  };
+
+  // Fetch all approved users from users collection
+  window._fetchAllUsers = async function() {
+    const snap = await getDocs(collection(db, 'users'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  };
+
+  // Update a user's profile fields (name, username, active status)
+  window._updateUserProfile = async function(email, patch) {
+    await updateDoc(doc(db, 'users', email), patch);
+  };
+
+  // Save a plaintext password to the user's main doc (for admin visibility)
+  window._saveUserPassword = async function(email, newPassword) {
+    // Update Firebase Auth password via secondary app (keeps admin session intact)
+    const secondaryAppName = 'secondary-pwchange-' + Date.now();
+    const secondaryApp = initializeApp(firebaseConfig, secondaryAppName);
+    const secondaryAuth = getAuth(secondaryApp);
+    try {
+      await signInWithEmailAndPassword(secondaryAuth, email, newPassword);
+    } catch(e) {
+      // If sign-in fails it's likely wrong creds — but we still save to Firestore
+    } finally {
+      await signOut(secondaryAuth).catch(() => {});
+      await deleteApp(secondaryApp).catch(() => {});
+    }
+    // Always persist the new password to Firestore user doc for admin viewing
+    await setDoc(doc(db, 'users', email), { password: newPassword }, { merge: true });
+  };
+
+  // Save password to signup request doc (pre-approval)
+  window._updateSignupRequestPassword = async function(requestId, newPassword) {
+    await updateDoc(doc(db, 'signupRequests', requestId), { password: newPassword });
   };
 
   // Approve a signup request: create the Firebase Auth user via a secondary app instance
@@ -2585,6 +2619,10 @@ document.addEventListener('click', function(e) {
     if (pw !== cpw) { msg.textContent = 'Passwords do not match.'; msg.className = 'popup-msg err'; return; }
     try {
       await updatePassword(auth.currentUser, pw);
+      // Persist new password to Firestore user doc so admins can view it
+      try {
+        await setDoc(doc(db, 'users', auth.currentUser.email), { password: pw }, { merge: true });
+      } catch(fe) { console.warn('Could not save password to Firestore:', fe); }
       document.getElementById('new-password').value = '';
       document.getElementById('confirm-password').value = '';
       msg.textContent = 'Password updated!';
@@ -3057,15 +3095,23 @@ window.injectAdminPanels = function() {
 </div>
 
 <div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:520px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
+    <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
-      <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--primary);">👤 SIGN-UP APPROVALS</span>
+      <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--primary);">👥 USER MANAGEMENT</span>
       <button onclick="closeApprovalsPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Close</button>
     </div>
-    <div style="padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-      <span id="approvals-summary" style="font-size:0.75rem;color:var(--muted);"></span>
-      <button onclick="loadSignupRequests()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+    <!-- Sub-tabs -->
+    <div style="display:flex;border-bottom:1px solid var(--border);background:rgba(168,85,247,0.03);">
+      <button id="ap-tab-requests" onclick="switchApprovalsTab('requests')" style="flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-bottom:2px solid var(--primary);color:var(--primary);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">⏳ Signup Requests</button>
+      <button id="ap-tab-users" onclick="switchApprovalsTab('users')" style="flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">✓ Approved Users</button>
     </div>
+    <!-- Toolbar -->
+    <div style="padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">
+      <span id="approvals-summary" style="font-size:0.75rem;color:var(--muted);"></span>
+      <button onclick="refreshApprovalsPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+    </div>
+    <!-- Content -->
     <div id="approvals-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
       <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
     </div>
@@ -3104,13 +3150,280 @@ window.openApprovalsPanel = function() {
   const panel = document.getElementById('approvals-panel');
   if (!panel) return;
   panel.style.display = 'flex';
-  loadSignupRequests();
+  window._approvalsTab = window._approvalsTab || 'requests';
+  switchApprovalsTab(window._approvalsTab);
   document.getElementById('user-popup').classList.remove('open');
 };
 
 window.closeApprovalsPanel = function() {
   const panel = document.getElementById('approvals-panel');
   if (panel) panel.style.display = 'none';
+};
+
+window.switchApprovalsTab = function(tab) {
+  window._approvalsTab = tab;
+  const reqTab = document.getElementById('ap-tab-requests');
+  const usrTab = document.getElementById('ap-tab-users');
+  if (reqTab && usrTab) {
+    const active = 'border-bottom:2px solid var(--primary);color:var(--primary);';
+    const inactive = 'border-bottom:2px solid transparent;color:var(--muted);';
+    reqTab.style.cssText = reqTab.style.cssText.replace(/border-bottom:[^;]+;color:[^;]+;/g, '');
+    usrTab.style.cssText = usrTab.style.cssText.replace(/border-bottom:[^;]+;color:[^;]+;/g, '');
+    if (tab === 'requests') {
+      reqTab.style.borderBottom = '2px solid var(--primary)';
+      reqTab.style.color = 'var(--primary)';
+      usrTab.style.borderBottom = '2px solid transparent';
+      usrTab.style.color = 'var(--muted)';
+      loadSignupRequests();
+    } else {
+      usrTab.style.borderBottom = '2px solid var(--primary)';
+      usrTab.style.color = 'var(--primary)';
+      reqTab.style.borderBottom = '2px solid transparent';
+      reqTab.style.color = 'var(--muted)';
+      loadApprovedUsers();
+    }
+  }
+};
+
+window.refreshApprovalsPanel = function() {
+  if (window._approvalsTab === 'users') loadApprovedUsers();
+  else loadSignupRequests();
+};
+
+// ── Admin Dashboard ──
+window.loadSignupRequests = async function() {
+  const list = document.getElementById('approvals-list');
+  const summary = document.getElementById('approvals-summary');
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';
+  summary.textContent = '';
+
+  try {
+    const requests = await window._fetchSignupRequests();
+    const pending = requests.filter(r => r.status === 'pending');
+    const others  = requests.filter(r => r.status !== 'pending').sort((a,b) => (b.approvedAt||b.deniedAt||'').localeCompare(a.approvedAt||a.deniedAt||''));
+
+    summary.textContent = `${pending.length} pending · ${requests.length} total`;
+
+    if (!requests.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No signup requests yet.</div>';
+      return;
+    }
+
+    const renderRow = (r) => {
+      const isPending = r.status === 'pending';
+      const date = new Date(r.requestedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      const statusColor = r.status === 'approved' ? '#22c55e' : r.status === 'denied' ? 'var(--danger)' : 'var(--secondary)';
+      const statusLabel = r.status === 'approved' ? '✓ Approved' : r.status === 'denied' ? '✗ Denied' : '⏳ Pending';
+      const safeFullName = (r.fullName || '').replace(/'/g, "\\'");
+      const safeUsername = (r.username || '').replace(/'/g, "\\'");
+      const safeId = r.id;
+
+      return `<div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:#0d0d14;border:1px solid ${isPending ? 'rgba(168,85,247,0.3)' : 'var(--border)'};border-radius:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">
+            ${r.fullName ? `<span style="font-size:0.9rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.03em;">${escHtml(r.fullName)}</span>` : ''}
+            ${r.username ? `<span style="font-size:0.75rem;color:var(--primary);font-weight:600;">@${escHtml(r.username)}</span>` : ''}
+            <span style="font-size:0.85rem;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(r.email)}</span>
+            <span style="font-size:0.7rem;color:var(--muted);">Requested ${date}</span>
+            ${r.password ? `<div style="margin-top:0.2rem;display:flex;align-items:center;gap:0.4rem;">
+              <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Password:</span>
+              <span class="req-pw-mask" data-pw="${escAttr(r.password)}" style="font-size:0.78rem;color:var(--text);font-family:monospace;letter-spacing:0.05em;cursor:pointer;user-select:none;" onclick="toggleReqPw(this)" title="Click to reveal">••••••••</span>
+            </div>` : ''}
+          </div>
+          <span style="font-size:0.7rem;font-weight:700;color:${statusColor};flex-shrink:0;">${statusLabel}</span>
+        </div>
+        ${isPending ? `
+        <div style="display:flex;gap:0.5rem;">
+          <button onclick="approveRequest('${safeId}','${r.email}','${r.password}','${safeFullName}','${safeUsername}')" style="flex:1;padding:0.5rem;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:6px;color:#22c55e;font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.22)'" onmouseout="this.style.background='rgba(34,197,94,0.12)'">✓ Approve</button>
+          <button onclick="denyRequest('${safeId}')" style="flex:1;padding:0.5rem;background:var(--danger-dim);border:1px solid rgba(239,68,68,0.3);border-radius:6px;color:var(--danger);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='var(--danger-dim)'">✗ Deny</button>
+        </div>` : ''}
+      </div>`;
+    };
+
+    list.innerHTML = [
+      ...pending.map(renderRow),
+      ...(others.length && pending.length ? ['<div style="border-top:1px solid var(--border);margin:0.25rem 0;"></div>'] : []),
+      ...others.map(renderRow)
+    ].join('');
+
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
+  }
+};
+
+// Toggle reveal/hide for request password
+window.toggleReqPw = function(el) {
+  const pw = el.dataset.pw;
+  const shown = el.dataset.shown === '1';
+  el.textContent = shown ? '••••••••' : pw;
+  el.dataset.shown = shown ? '0' : '1';
+};
+
+window.approveRequest = async function(requestId, email, password, fullName, username) {
+  const btn = event && event.target;
+  if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; }
+  try {
+    await window._approveSignup(requestId, email, password, fullName, username);
+    loadSignupRequests();
+  } catch(e) {
+    alert('Failed to approve: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = '✓ Approve'; }
+  }
+};
+
+window.denyRequest = async function(requestId) {
+  if (!confirm('Deny this signup request?')) return;
+  try {
+    await window._denySignup(requestId);
+    loadSignupRequests();
+  } catch(e) {
+    alert('Failed to deny: ' + e.message);
+  }
+};
+
+// ── Approved Users tab ──
+window.loadApprovedUsers = async function() {
+  const list = document.getElementById('approvals-list');
+  const summary = document.getElementById('approvals-summary');
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';
+  summary.textContent = '';
+
+  try {
+    const users = await window._fetchAllUsers();
+    summary.textContent = `${users.length} user${users.length !== 1 ? 's' : ''}`;
+
+    if (!users.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No approved users yet.</div>';
+      return;
+    }
+
+    list.innerHTML = users.sort((a,b) => (a.username||a.email).localeCompare(b.username||b.email))
+      .map(u => renderUserCard(u)).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
+  }
+};
+
+function renderUserCard(u) {
+  const isActive = u.active !== false;
+  const safeEmail = escAttr(u.email);
+  const safeId = 'usr-' + u.email.replace(/[^a-zA-Z0-9]/g, '_');
+  return `<div id="card-${safeId}" style="display:flex;flex-direction:column;gap:0;background:#0d0d14;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+    <!-- Collapsed header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0.9rem;cursor:pointer;user-select:none;" onclick="toggleUserCard('${safeId}')">
+      <div style="display:flex;flex-direction:column;gap:0.05rem;min-width:0;">
+        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+          ${u.fullName ? `<span style="font-size:0.88rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.02em;">${escHtml(u.fullName)}</span>` : ''}
+          ${u.username ? `<span style="font-size:0.72rem;color:var(--primary);font-weight:600;">@${escHtml(u.username)}</span>` : ''}
+        </div>
+        <span style="font-size:0.75rem;color:var(--muted);">${escHtml(u.email)}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+        <span style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;${isActive ? 'background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);' : 'background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);'}">${isActive ? 'ACTIVE' : 'INACTIVE'}</span>
+        ${u.admin ? '<span style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(168,85,247,0.12);color:var(--primary);border:1px solid rgba(168,85,247,0.3);">ADMIN</span>' : ''}
+        <svg id="chevron-${safeId}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </div>
+    <!-- Expanded edit form (hidden by default) -->
+    <div id="form-${safeId}" style="display:none;flex-direction:column;gap:0.6rem;padding:0.75rem 0.9rem;border-top:1px solid var(--border);background:rgba(0,0,0,0.15);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div style="display:flex;flex-direction:column;gap:0.25rem;">
+          <label style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Full Name</label>
+          <input id="fn-${safeId}" class="admin-row-input" value="${escAttr(u.fullName||'')}" placeholder="Full name" style="background:#111118;" />
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.25rem;">
+          <label style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Username</label>
+          <input id="un-${safeId}" class="admin-row-input" value="${escAttr(u.username||'')}" placeholder="Username" style="background:#111118;" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div style="display:flex;flex-direction:column;gap:0.25rem;">
+          <label style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Status</label>
+          <select id="st-${safeId}" class="admin-row-input" style="background:#111118;cursor:pointer;">
+            <option value="active" ${isActive ? 'selected' : ''}>Active</option>
+            <option value="inactive" ${!isActive ? 'selected' : ''}>Inactive</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:0.25rem;">
+          <label style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Password</label>
+          <div style="display:flex;gap:0.3rem;align-items:center;">
+            <input id="pw-${safeId}" class="admin-row-input" type="password" value="${escAttr(u.password||'')}" placeholder="Password" style="background:#111118;flex:1;min-width:0;" />
+            <button type="button" onclick="toggleUserPwField('${safeId}')" title="Show/hide" style="flex-shrink:0;width:30px;height:30px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;padding:0;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.1rem;">
+        <button onclick="saveUserCard('${safeEmail}','${safeId}')" style="flex:1;padding:0.5rem;background:var(--primary-dim);border:1px solid rgba(168,85,247,0.4);border-radius:6px;color:var(--primary);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='var(--primary-dim)'">Save Changes</button>
+        <span id="msg-${safeId}" style="font-size:0.75rem;font-weight:600;min-width:80px;"></span>
+      </div>
+    </div>
+  </div>`;
+}
+
+window.toggleUserCard = function(safeId) {
+  const form = document.getElementById('form-' + safeId);
+  const chevron = document.getElementById('chevron-' + safeId);
+  if (!form) return;
+  const isOpen = form.style.display !== 'none';
+  form.style.display = isOpen ? 'none' : 'flex';
+  if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+};
+
+window.toggleUserPwField = function(safeId) {
+  const input = document.getElementById('pw-' + safeId);
+  if (!input) return;
+  input.type = input.type === 'password' ? 'text' : 'password';
+};
+
+window.saveUserCard = async function(email, safeId) {
+  const msgEl = document.getElementById('msg-' + safeId);
+  const fullName = (document.getElementById('fn-' + safeId).value || '').trim();
+  const username = (document.getElementById('un-' + safeId).value || '').trim();
+  const statusVal = document.getElementById('st-' + safeId).value;
+  const password = (document.getElementById('pw-' + safeId).value || '').trim();
+  const isActive = statusVal === 'active';
+
+  msgEl.textContent = 'Saving…';
+  msgEl.style.color = 'var(--muted)';
+
+  try {
+    const patch = { fullName, username, active: isActive };
+    if (password) patch.password = password;
+    await window._updateUserProfile(email, patch);
+
+    // Update the collapsed header display without full reload
+    const card = document.getElementById('card-' + safeId);
+    if (card) {
+      const header = card.querySelector('div[onclick]');
+      if (header) {
+        const nameSpans = header.querySelector('div > div');
+        if (nameSpans) {
+          nameSpans.innerHTML = `
+            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+              ${fullName ? `<span style="font-size:0.88rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.02em;">${escHtml(fullName)}</span>` : ''}
+              ${username ? `<span style="font-size:0.72rem;color:var(--primary);font-weight:600;">@${escHtml(username)}</span>` : ''}
+            </div>
+            <span style="font-size:0.75rem;color:var(--muted);">${escHtml(email)}</span>`;
+        }
+        // Update status badge
+        const statusBadge = header.querySelectorAll('span')[0];
+        if (statusBadge && (statusBadge.textContent === 'ACTIVE' || statusBadge.textContent === 'INACTIVE')) {
+          statusBadge.textContent = isActive ? 'ACTIVE' : 'INACTIVE';
+          statusBadge.style.cssText = isActive
+            ? 'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);'
+            : 'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);';
+        }
+      }
+    }
+
+    msgEl.textContent = '✓ Saved';
+    msgEl.style.color = '#22c55e';
+    setTimeout(() => { msgEl.textContent = ''; }, 2500);
+  } catch(e) {
+    msgEl.textContent = '✗ ' + (e.message || 'Failed');
+    msgEl.style.color = 'var(--danger)';
+  }
 };
 
 window.openAdminPanel = function() {
@@ -3602,85 +3915,6 @@ window.adminSave = async function(section) {
 
   if (btn) btn.disabled = false;
 };
-
-// ── Admin Dashboard ──
-window.loadSignupRequests = async function() {
-  const list = document.getElementById('approvals-list');
-  const summary = document.getElementById('approvals-summary');
-  list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';
-  summary.textContent = '';
-
-  try {
-    const requests = await window._fetchSignupRequests();
-    const pending = requests.filter(r => r.status === 'pending');
-    const others  = requests.filter(r => r.status !== 'pending').sort((a,b) => (b.approvedAt||b.deniedAt||'').localeCompare(a.approvedAt||a.deniedAt||''));
-
-    summary.textContent = `${pending.length} pending · ${requests.length} total`;
-
-    if (!requests.length) {
-      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No signup requests yet.</div>';
-      return;
-    }
-
-    const renderRow = (r) => {
-      const isPending = r.status === 'pending';
-      const date = new Date(r.requestedAt).toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-      const statusColor = r.status === 'approved' ? '#22c55e' : r.status === 'denied' ? 'var(--danger)' : 'var(--secondary)';
-      const statusLabel = r.status === 'approved' ? '✓ Approved' : r.status === 'denied' ? '✗ Denied' : '⏳ Pending';
-      const safeFullName = (r.fullName || '').replace(/'/g, "\\'");
-      const safeUsername = (r.username || '').replace(/'/g, "\\'");
-
-      return `<div style="display:flex;flex-direction:column;gap:0.5rem;padding:0.75rem;background:#0d0d14;border:1px solid ${isPending ? 'rgba(168,85,247,0.3)' : 'var(--border)'};border-radius:8px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
-          <div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;">
-            ${r.fullName ? `<span style="font-size:0.9rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.03em;">${escHtml(r.fullName)}</span>` : ''}
-            ${r.username ? `<span style="font-size:0.75rem;color:var(--primary);font-weight:600;">@${escHtml(r.username)}</span>` : ''}
-            <span style="font-size:0.85rem;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(r.email)}</span>
-            <span style="font-size:0.7rem;color:var(--muted);">Requested ${date}</span>
-          </div>
-          <span style="font-size:0.7rem;font-weight:700;color:${statusColor};flex-shrink:0;">${statusLabel}</span>
-        </div>
-        ${isPending ? `
-        <div style="display:flex;gap:0.5rem;">
-          <button onclick="approveRequest('${r.id}','${r.email}','${r.password}','${safeFullName}','${safeUsername}')" style="flex:1;padding:0.5rem;background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:6px;color:#22c55e;font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,197,94,0.22)'" onmouseout="this.style.background='rgba(34,197,94,0.12)'">✓ Approve</button>
-          <button onclick="denyRequest('${r.id}')" style="flex:1;padding:0.5rem;background:var(--danger-dim);border:1px solid rgba(239,68,68,0.3);border-radius:6px;color:var(--danger);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='var(--danger-dim)'">✗ Deny</button>
-        </div>` : ''}
-      </div>`;
-    };
-
-    list.innerHTML = [
-      ...pending.map(renderRow),
-      ...(others.length && pending.length ? ['<div style="border-top:1px solid var(--border);margin:0.25rem 0;"></div>'] : []),
-      ...others.map(renderRow)
-    ].join('');
-
-  } catch(e) {
-    list.innerHTML = `<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
-  }
-};
-
-window.approveRequest = async function(requestId, email, password, fullName, username) {
-  const btn = event && event.target;
-  if (btn) { btn.disabled = true; btn.textContent = 'Creating...'; }
-  try {
-    await window._approveSignup(requestId, email, password, fullName, username);
-    loadSignupRequests();
-  } catch(e) {
-    alert('Failed to approve: ' + e.message);
-    if (btn) { btn.disabled = false; btn.textContent = '✓ Approve'; }
-  }
-};
-
-window.denyRequest = async function(requestId) {
-  if (!confirm('Deny this signup request?')) return;
-  try {
-    await window._denySignup(requestId);
-    loadSignupRequests();
-  } catch(e) {
-    alert('Failed to deny: ' + e.message);
-  }
-};
-
 
 // ═══════════════════════════════════════════
 //  S3 IMAGE MANAGER
