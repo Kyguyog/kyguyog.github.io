@@ -30,7 +30,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: transparent;
+      background: #000;
       color: var(--text);
       font-family: var(--font-body);
       min-height: 100vh;
@@ -300,21 +300,19 @@
       position: fixed;
       inset: 0;
       z-index: 10000;
-      background: rgba(0,0,0,0.75);
-      backdrop-filter: blur(6px);
-      padding: 1.5rem;
+      background: #000;
       overflow-y: auto;
     }
     #admin-panel.open { display: flex; align-items: flex-start; justify-content: center; }
     .admin-modal {
-      background: #0d0d14;
-      border: 1px solid rgba(168,85,247,0.4);
-      border-radius: 16px;
+      background: #000;
+      border: none;
+      border-radius: 0;
       width: 100%;
-      max-width: min(1400px, 92vw);
-      box-shadow: 0 0 80px rgba(168,85,247,0.15);
+      max-width: 100%;
+      min-height: 100vh;
       overflow: hidden;
-      margin: auto;
+      margin: 0;
     }
     .admin-header {
       display: flex;
@@ -1326,15 +1324,6 @@ window.injectAdminPanels = function() {
 
 <div id="approvals-panel" style="display:none;"></div>`;
 
-  // Bind backdrop click to close admin panel
-  document.getElementById('admin-panel').addEventListener('click', function(e) {
-    if (e.target === this) closeAdminPanel();
-  });
-
-  // Bind backdrop click to close approvals panel
-  document.getElementById('approvals-panel').addEventListener('click', function(e) {
-    if (e.target === this) closeApprovalsPanel();
-  });
 
   // Hide restricted tabs for editors
   if (window._isEditor) {

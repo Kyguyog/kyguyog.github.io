@@ -30,7 +30,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: transparent;
+      background: #000;
       color: var(--text);
       font-family: var(--font-body);
       min-height: 100vh;
@@ -1233,8 +1233,8 @@ window.injectAdminPanels = function() {
   mount.innerHTML = `
 <div id="admin-panel" style="display:none;"></div>
 
-<div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
+<div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:#000;">
+  <div style="background:#000;width:100%;height:100vh;display:flex;flex-direction:column;">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
       <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--primary);">👥 USER MANAGEMENT</span>
@@ -1261,10 +1261,6 @@ window.injectAdminPanels = function() {
   </div>
 </div>`;
 
-  // Bind backdrop click to close approvals panel
-  document.getElementById('approvals-panel').addEventListener('click', function(e) {
-    if (e.target === this) closeApprovalsPanel();
-  });
 };
 
 
