@@ -649,7 +649,7 @@
     <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" style="width:28px;height:28px;object-fit:contain;">
     <span style="font-family:var(--font-display);font-weight:900;letter-spacing:0.05em;color:var(--text);">KNOW<span style="color:var(--primary);">WHERE</span></span>
   </a>
-  <span style="font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--primary);position:absolute;left:50%;transform:translateX(-50%);">USER MANAGEMENT</span>
+  <span style="font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--primary);position:absolute;left:50%;transform:translateX(-50%);">👥 USER MANAGEMENT</span>
   <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
 </nav>
 
@@ -1233,13 +1233,8 @@ window.injectAdminPanels = function() {
   mount.innerHTML = `
 <div id="admin-panel" style="display:none;"></div>
 
-<div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:#000;">
-  <div style="background:#000;width:100%;height:100vh;display:flex;flex-direction:column;">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
-      <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--primary);">👥 USER MANAGEMENT</span>
-      <button onclick="closeApprovalsPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Close</button>
-    </div>
+<div id="approvals-panel" style="display:none;position:fixed;top:56px;left:0;right:0;bottom:0;z-index:10000;background:#000;">
+  <div style="background:#000;width:100%;height:100%;display:flex;flex-direction:column;">
     <!-- Sub-tabs -->
     <div style="display:flex;border-bottom:1px solid var(--border);background:rgba(168,85,247,0.03);">
       <button id="ap-tab-requests" onclick="switchApprovalsTab('requests')" style="flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-bottom:2px solid var(--primary);color:var(--primary);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">⏳ Signup Requests</button>
