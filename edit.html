@@ -1231,14 +1231,6 @@ window.injectAdminPanels = function() {
   mount.innerHTML = `
 <div id="admin-panel">
   <div class="admin-modal">
-    <div class="admin-header">
-      <div class="admin-header-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        Site Editor
-        <span id="admin-role-badge" style="display:none;align-items:center;font-size:0.55rem;font-weight:700;letter-spacing:0.12em;padding:0.15rem 0.5rem;border-radius:4px;border:1px solid;margin-left:0.35rem;"></span>
-      </div>
-      <button class="admin-close" onclick="closeAdminPanel()">✕ Close</button>
-    </div>
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchAdminTab('games')">🎮 Games</button>
       <button class="admin-tab" onclick="switchAdminTab('toptier')">⭐ Top Tier</button>
