@@ -30,7 +30,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
+      background: transparent;
       color: var(--text);
       font-family: var(--font-body);
       min-height: 100vh;
@@ -653,53 +653,6 @@
   <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
 </nav>
 
-<!-- USER POPUP -->
-<div id="user-popup">
-  <div class="popup-header">
-    <div class="popup-header-label">Signed in as</div>
-    <div class="popup-header-name" id="popup-display-name"></div>
-    <div id="popup-full-name" style="display:none;font-size:0.78rem;color:var(--primary);margin-top:0.1rem;font-weight:500;"></div>
-    <div class="popup-header-email" id="popup-email"></div>
-  </div>
-  <div class="popup-section" id="admin-popup-section" style="display:none;">
-    <button class="popup-btn" id="admin-popup-btn" onclick="openAdminPanel()" style="color:var(--primary);display:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      Edit Site Content
-    </button>
-    <button class="popup-btn" id="approvals-popup-btn" onclick="openApprovalsPanel()" style="color:var(--primary);display:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      User Management
-    </button>
-  </div>
-  <div class="popup-section" id="orders-popup-section" style="display:none;">
-    <button class="popup-btn" id="orders-popup-btn" onclick="openOrdersPanel();toggleUserPopup();" style="color:var(--secondary);">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      Orders
-    </button>
-  </div>
-  <div class="popup-section">
-    <button class="popup-btn" onclick="togglePopupForm('password-form')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Change Password
-    </button>
-    <form class="popup-inline-form" id="password-form" autocomplete="on" onsubmit="savePassword();return false;">
-      <input type="text" id="password-form-username" autocomplete="username" style="display:none;" aria-hidden="true" />
-      <input type="password" id="new-password" placeholder="New password" autocomplete="new-password" />
-      <input type="password" id="confirm-password" placeholder="Confirm new password" autocomplete="new-password" />
-      <div class="popup-msg" id="password-msg"></div>
-      <div class="popup-inline-form-row">
-        <button class="popup-save-btn" type="submit">Save</button>
-        <button class="popup-cancel-btn" type="button" onclick="togglePopupForm('password-form')">Cancel</button>
-      </div>
-    </form>
-  </div>
-  <div class="popup-section">
-    <button class="popup-btn danger" onclick="handleSignOut()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign Out
-    </button>
-  </div>
-</div>
 
 </div><!-- end #main-content -->
 
@@ -1208,17 +1161,10 @@ window.adminAddShopItem = function() {
 
       if (badge) {
         badge.innerHTML = `
-          <button class="auth-user-name" onclick="toggleUserPopup()">
+          <span class="auth-user-name" style="cursor:default;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             ${username}
-          </button>`;
-        document.getElementById('popup-display-name').textContent = username;
-        document.getElementById('popup-email').textContent = user.email;
-        const fullNameEl = document.getElementById('popup-full-name');
-        if (fullNameEl) {
-          fullNameEl.textContent = fullName;
-          fullNameEl.style.display = fullName ? 'block' : 'none';
-        }
+          </span>`;
       }
 
       // Load site content for admin panel use
@@ -1378,33 +1324,7 @@ window.injectAdminPanels = function() {
   </div>
 </div>
 
-<div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
-      <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--primary);">👥 USER MANAGEMENT</span>
-      <button onclick="closeApprovalsPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.75rem;padding:0.35rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">✕ Close</button>
-    </div>
-    <!-- Sub-tabs -->
-    <div style="display:flex;border-bottom:1px solid var(--border);background:rgba(168,85,247,0.03);">
-      <button id="ap-tab-requests" onclick="switchApprovalsTab('requests')" style="flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-bottom:2px solid var(--primary);color:var(--primary);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">⏳ Signup Requests</button>
-      <button id="ap-tab-users" onclick="switchApprovalsTab('users')" style="flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">✓ Approved Users</button>
-    </div>
-    <!-- Toolbar -->
-    <div style="padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;">
-      <div style="position:relative;flex:1;">
-        <svg style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input id="user-search" type="text" placeholder="Search by name, username or email…" oninput="filterUsers(this.value)" style="width:100%;background:#0d0d14;border:1px solid var(--border);border-radius:6px;padding:0.38rem 0.75rem 0.38rem 2rem;color:var(--text);font-size:0.8rem;font-family:var(--font-body);outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
-      </div>
-      <span id="approvals-summary" style="font-size:0.73rem;color:var(--muted);white-space:nowrap;flex-shrink:0;"></span>
-      <button onclick="refreshApprovalsPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;flex-shrink:0;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
-    </div>
-    <!-- Content -->
-    <div id="approvals-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-      <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
-    </div>
-  </div>
-</div>`;
+<div id="approvals-panel" style="display:none;"></div>`;
 
   // Bind backdrop click to close admin panel
   document.getElementById('admin-panel').addEventListener('click', function(e) {
@@ -1440,7 +1360,7 @@ window.openApprovalsPanel = function() {
   panel.style.display = 'flex';
   window._approvalsTab = window._approvalsTab || 'requests';
   switchApprovalsTab(window._approvalsTab);
-  document.getElementById('user-popup').classList.remove('open');
+  
 };
 
 window.closeApprovalsPanel = function() {
@@ -1847,7 +1767,7 @@ window.openAdminPanel = function() {
 
   switchAdminTab('games');
   document.getElementById('admin-panel').classList.add('open');
-  document.getElementById('user-popup').classList.remove('open');
+  
   // Load S3 creds async (non-blocking) — admin only
   if (window._isAdmin) s3LoadCreds().catch(() => {});
 };

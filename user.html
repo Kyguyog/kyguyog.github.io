@@ -30,7 +30,7 @@
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
+      background: transparent;
       color: var(--text);
       font-family: var(--font-body);
       min-height: 100vh;
@@ -653,53 +653,6 @@
   <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
 </nav>
 
-<!-- USER POPUP -->
-<div id="user-popup">
-  <div class="popup-header">
-    <div class="popup-header-label">Signed in as</div>
-    <div class="popup-header-name" id="popup-display-name"></div>
-    <div id="popup-full-name" style="display:none;font-size:0.78rem;color:var(--primary);margin-top:0.1rem;font-weight:500;"></div>
-    <div class="popup-header-email" id="popup-email"></div>
-  </div>
-  <div class="popup-section" id="admin-popup-section" style="display:none;">
-    <button class="popup-btn" id="admin-popup-btn" onclick="openAdminPanel()" style="color:var(--primary);display:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-      Edit Site Content
-    </button>
-    <button class="popup-btn" id="approvals-popup-btn" onclick="openApprovalsPanel()" style="color:var(--primary);display:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      User Management
-    </button>
-  </div>
-  <div class="popup-section" id="orders-popup-section" style="display:none;">
-    <button class="popup-btn" id="orders-popup-btn" onclick="openOrdersPanel();toggleUserPopup();" style="color:var(--secondary);">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      Orders
-    </button>
-  </div>
-  <div class="popup-section">
-    <button class="popup-btn" onclick="togglePopupForm('password-form')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      Change Password
-    </button>
-    <form class="popup-inline-form" id="password-form" autocomplete="on" onsubmit="savePassword();return false;">
-      <input type="text" id="password-form-username" autocomplete="username" style="display:none;" aria-hidden="true" />
-      <input type="password" id="new-password" placeholder="New password" autocomplete="new-password" />
-      <input type="password" id="confirm-password" placeholder="Confirm new password" autocomplete="new-password" />
-      <div class="popup-msg" id="password-msg"></div>
-      <div class="popup-inline-form-row">
-        <button class="popup-save-btn" type="submit">Save</button>
-        <button class="popup-cancel-btn" type="button" onclick="togglePopupForm('password-form')">Cancel</button>
-      </div>
-    </form>
-  </div>
-  <div class="popup-section">
-    <button class="popup-btn danger" onclick="handleSignOut()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Sign Out
-    </button>
-  </div>
-</div>
 
 </div><!-- end #main-content -->
 
@@ -1208,17 +1161,10 @@ window.adminAddShopItem = function() {
 
       if (badge) {
         badge.innerHTML = `
-          <button class="auth-user-name" onclick="toggleUserPopup()">
+          <span class="auth-user-name" style="cursor:default;">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             ${username}
-          </button>`;
-        document.getElementById('popup-display-name').textContent = username;
-        document.getElementById('popup-email').textContent = user.email;
-        const fullNameEl = document.getElementById('popup-full-name');
-        if (fullNameEl) {
-          fullNameEl.textContent = fullName;
-          fullNameEl.style.display = fullName ? 'block' : 'none';
-        }
+          </span>`;
       }
 
       // Load site content for admin panel use
@@ -1282,101 +1228,10 @@ window._siteData = null;
 window._adminOriginalData = null;
 
 window.injectAdminPanels = function() {
-  if (document.getElementById('admin-panel')) return; // already injected
+  if (document.getElementById('approvals-panel')) return; // already injected
   const mount = document.getElementById('admin-panels-mount');
   mount.innerHTML = `
-<div id="admin-panel">
-  <div class="admin-modal">
-    <div class="admin-header">
-      <div class="admin-header-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-        Site Editor
-        <span id="admin-role-badge" style="display:none;align-items:center;font-size:0.55rem;font-weight:700;letter-spacing:0.12em;padding:0.15rem 0.5rem;border-radius:4px;border:1px solid;margin-left:0.35rem;"></span>
-      </div>
-      <button class="admin-close" onclick="closeAdminPanel()">✕ Close</button>
-    </div>
-    <div class="admin-tabs">
-      <button class="admin-tab active" onclick="switchAdminTab('games')">🎮 Games</button>
-      <button class="admin-tab" onclick="switchAdminTab('toptier')">⭐ Top Tier</button>
-      <button class="admin-tab" onclick="switchAdminTab('sites')">Sites</button>
-      <button class="admin-tab" onclick="switchAdminTab('shop')">🛒 Shop</button>
-      <button class="admin-tab" onclick="switchAdminTab('banned')">🚫 Banned</button>
-      <button class="admin-tab" onclick="switchAdminTab('command')">Command</button>
-      <button class="admin-tab" onclick="switchAdminTab('s3')">🖼️ Images</button>
-    </div>
-    <div class="admin-body">
-      <div class="admin-section" id="admin-toptier">
-        <p class="admin-hint" style="margin-bottom:1rem;">Fill in name, badge, game URL, and background image URL for each card.</p>
-        <div id="ae-toptier-list"></div>
-        <button class="admin-add-btn" onclick="adminAddTopTier()">+ Add Card</button>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('toptier')">Save Top Tier</button><span class="admin-status" id="status-toptier"></span></div>
-      </div>
-      <div class="admin-section" id="admin-games">
-        <p class="admin-hint" style="margin-bottom:0.75rem;">Add, edit, or remove games. Each entry needs a name and URL. Screenshot previews only appear when you add a screenshot URL here. You can also upload an image or paste one directly into the screenshot field to send it to S3 automatically.</p>
-        <div id="ae-games-list" class="admin-row-list"></div>
-        <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
-      </div>
-      <div class="admin-section" id="admin-sites">
-        <div id="ae-sites-list" class="admin-row-list"></div>
-        <button class="admin-add-btn" onclick="adminAddSite()">+ Add Site</button>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('sites')">Save Sites</button><span class="admin-status" id="status-sites"></span></div>
-      </div>
-      <div class="admin-section" id="admin-shop">
-        <p class="admin-hint" style="margin-bottom:1rem;">Add drinks to the shop shelf. Paste a transparent PNG image URL, set the name and price.</p>
-        <div id="ae-shop-list" class="admin-row-list"></div>
-        <button class="admin-add-btn" onclick="adminAddShopItem()">+ Add Drink</button>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('shop')">Save Shop</button><span class="admin-status" id="status-shop"></span></div>
-      </div>
-      <div class="admin-section" id="admin-banned">
-        <div id="ae-banned-list" class="admin-row-list"></div>
-        <button class="admin-add-btn" onclick="adminAddBanned()">+ Add Person</button>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('banned')">Save Banned</button><span class="admin-status" id="status-banned"></span></div>
-      </div>
-      <div class="admin-section" id="admin-command">
-        <div class="admin-sublabel" style="margin-top:0;">Hiring Banner</div>
-        <div class="admin-field">
-          <label>Active?</label>
-          <select class="admin-input" id="ae-hiring-active" style="cursor:pointer;">
-            <option value="true">Yes — show banner</option>
-            <option value="false">No — hide banner</option>
-          </select>
-        </div>
-        <div class="admin-field"><label>Badge Label</label><input class="admin-input" id="ae-hiring-badge" /></div>
-        <div class="admin-field"><label>Title</label><input class="admin-input" id="ae-hiring-title" /></div>
-        <div class="admin-field"><label>Description</label><input class="admin-input" id="ae-hiring-desc" /></div>
-        <div class="admin-field"><label>Form URL</label><input class="admin-input" id="ae-hiring-url" /></div>
-        <hr class="admin-divider">
-        <div class="admin-sublabel">Links</div>
-        <div id="ae-command-links-list"></div>
-        <button class="admin-add-btn" onclick="adminAddCommandLink()">+ Add Link</button>
-        <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('command')">Save Command</button><span class="admin-status" id="status-command"></span></div>
-      </div>
-      <div class="admin-section" id="admin-s3">
-        <p class="admin-hint" style="margin-bottom:1rem;">Manage images stored in your AWS S3 bucket. Make sure your bucket has CORS enabled for browser uploads.</p>
-        <hr class="admin-divider">
-        <div class="admin-sublabel">Upload New Image</div>
-        <div id="s3-upload-zone" style="border:2px dashed var(--border);border-radius:10px;padding:2rem;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:0.75rem;position:relative;" onclick="document.getElementById('s3-file-input').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)';this.style.background='var(--primary-dim)';" ondragleave="this.style.borderColor='var(--border)';this.style.background='';" ondrop="event.preventDefault();this.style.borderColor='var(--border)';this.style.background='';s3HandleDrop(event);">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);margin:0 auto 0.5rem;display:block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <div style="font-size:0.8rem;color:var(--muted);">Click or drag &amp; drop images here</div>
-          <div style="font-size:0.7rem;color:var(--muted);margin-top:0.25rem;opacity:0.6;">JPG, PNG, GIF, WebP, SVG</div>
-          <input type="file" id="s3-file-input" accept="image/*" multiple style="display:none;" onchange="s3HandleFiles(this.files)" />
-        </div>
-        <div id="s3-upload-progress" style="display:none;margin-bottom:0.75rem;"></div>
-        <hr class="admin-divider">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
-          <div class="admin-sublabel" style="margin:0;">Bucket Images</div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <input class="admin-input" id="s3-search" placeholder="Search…" style="width:160px;padding:0.4rem 0.75rem;font-size:0.8rem;" oninput="s3FilterGrid(this.value)" />
-            <button onclick="s3Connect()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.38rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
-          </div>
-        </div>
-        <div id="s3-status" style="font-size:0.8rem;color:var(--muted);margin-bottom:0.5rem;min-height:1.2em;"></div>
-        <div id="s3-image-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.6rem;max-height:360px;overflow-y:auto;padding-right:2px;"></div>
-      </div>
-    </div>
-  </div>
-</div>
+<div id="admin-panel" style="display:none;"></div>
 
 <div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
@@ -1406,26 +1261,10 @@ window.injectAdminPanels = function() {
   </div>
 </div>`;
 
-  // Bind backdrop click to close admin panel
-  document.getElementById('admin-panel').addEventListener('click', function(e) {
-    if (e.target === this) closeAdminPanel();
-  });
-
   // Bind backdrop click to close approvals panel
   document.getElementById('approvals-panel').addEventListener('click', function(e) {
     if (e.target === this) closeApprovalsPanel();
   });
-
-  // Hide restricted tabs for editors
-  if (window._isEditor) {
-    ['command','s3'].forEach(tab => {
-      document.querySelectorAll('.admin-tab').forEach(t => {
-        if (t.getAttribute('onclick') === "switchAdminTab('" + tab + "')") {
-          t.style.display = 'none';
-        }
-      });
-    });
-  }
 };
 
 
@@ -1440,7 +1279,6 @@ window.openApprovalsPanel = function() {
   panel.style.display = 'flex';
   window._approvalsTab = window._approvalsTab || 'requests';
   switchApprovalsTab(window._approvalsTab);
-  document.getElementById('user-popup').classList.remove('open');
 };
 
 window.closeApprovalsPanel = function() {
@@ -1847,7 +1685,7 @@ window.openAdminPanel = function() {
 
   switchAdminTab('games');
   document.getElementById('admin-panel').classList.add('open');
-  document.getElementById('user-popup').classList.remove('open');
+  
   // Load S3 creds async (non-blocking) — admin only
   if (window._isAdmin) s3LoadCreds().catch(() => {});
 };
