@@ -1241,7 +1241,7 @@ window.injectAdminPanels = function() {
       <button id="ap-tab-users" onclick="switchApprovalsTab('users')" style="flex:1;padding:0.7rem 1rem;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:color 0.2s,border-color 0.2s;">✓ Approved Users</button>
     </div>
     <!-- Toolbar -->
-    <div style="padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;">
+    <div id="ap-toolbar" style="display:none;padding:0.6rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0.6rem;">
       <div style="position:relative;flex:1;">
         <svg style="position:absolute;left:0.6rem;top:50%;transform:translateY(-50%);pointer-events:none;color:var(--muted);" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input id="user-search" type="text" placeholder="Search by name, username or email…" oninput="filterUsers(this.value)" style="width:100%;background:#0d0d14;border:1px solid var(--border);border-radius:6px;padding:0.38rem 0.75rem 0.38rem 2rem;color:var(--text);font-size:0.8rem;font-family:var(--font-body);outline:none;transition:border-color 0.2s;" onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
@@ -1292,12 +1292,14 @@ window.switchApprovalsTab = function(tab) {
       usrTab.style.borderBottom = '2px solid transparent';
       usrTab.style.color = 'var(--muted)';
       const _s = document.getElementById('user-search'); if (_s) _s.value = '';
+      const _tb = document.getElementById('ap-toolbar'); if (_tb) _tb.style.display = 'none';
       loadSignupRequests();
     } else {
       usrTab.style.borderBottom = '2px solid var(--primary)';
       usrTab.style.color = 'var(--primary)';
       reqTab.style.borderBottom = '2px solid transparent';
       reqTab.style.color = 'var(--muted)';
+      const _tb = document.getElementById('ap-toolbar'); if (_tb) _tb.style.display = 'flex';
       loadApprovedUsers();
     }
   }
