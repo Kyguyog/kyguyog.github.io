@@ -3193,7 +3193,7 @@ window.injectAdminPanels = function() {
 </div>
 
 <div id="approvals-panel" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1rem;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:680px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:900px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(168,85,247,0.12);">
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
       <span style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--primary);">👥 USER MANAGEMENT</span>
@@ -3425,9 +3425,9 @@ function renderUserCard(u) {
       </div>
     </div>
     <!-- Expanded edit form (hidden by default) -->
-    <div id="form-${safeId}" style="display:none;flex-direction:column;gap:0.45rem;padding:0.6rem 0.9rem;border-top:1px solid var(--border);background:rgba(0,0,0,0.15);">
-      <!-- Row 1: Full Name | Username | Password -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.4rem;">
+    <div id="form-${safeId}" style="display:none;flex-direction:column;gap:0.5rem;padding:0.65rem 0.9rem;border-top:1px solid var(--border);background:rgba(0,0,0,0.15);">
+      <!-- Row 1: Full Name + Username -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Full Name</label>
           <input id="fn-${safeId}" class="admin-row-input" value="${escAttr(u.fullName||'')}" placeholder="Full name" style="background:#111118;" />
@@ -3436,16 +3436,9 @@ function renderUserCard(u) {
           <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Username</label>
           <input id="un-${safeId}" class="admin-row-input" value="${escAttr(u.username||'')}" placeholder="Username" style="background:#111118;" />
         </div>
-        <div style="display:flex;flex-direction:column;gap:0.2rem;">
-          <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Password</label>
-          <div style="display:flex;gap:0.3rem;align-items:center;">
-            <input id="pw-${safeId}" class="admin-row-input" type="password" value="${escAttr(u.password||'')}" placeholder="••••••••" style="background:#111118;flex:1;min-width:0;" />
-            <button type="button" onclick="toggleUserPwField('${safeId}')" title="Show/hide" style="flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;padding:0;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-          </div>
-        </div>
       </div>
-      <!-- Row 2: Toggles + Save (all inline) -->
-      <div style="display:flex;align-items:center;gap:0.75rem;">
+      <!-- Row 2: Toggles + Password -->
+      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:0.75rem;align-items:center;">
         <div style="display:flex;align-items:center;gap:0.4rem;">
           <label class="toggle-switch" style="margin:0;">
             <input type="checkbox" id="st-${safeId}" ${isActive ? 'checked' : ''} onchange="updateToggleLabel('st-lbl-${safeId}',this.checked,'Active','Inactive')">
@@ -3453,7 +3446,6 @@ function renderUserCard(u) {
           </label>
           <span id="st-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isActive ? '#22c55e' : 'var(--danger)'};">${isActive ? 'Active' : 'Inactive'}</span>
         </div>
-        <div style="width:1px;height:18px;background:var(--border);flex-shrink:0;"></div>
         <div style="display:flex;align-items:center;gap:0.4rem;">
           <label class="toggle-switch admin-toggle" style="margin:0;">
             <input type="checkbox" id="ad-${safeId}" ${isAdmin ? 'checked' : ''} onchange="updateToggleLabel('ad-lbl-${safeId}',this.checked,'Admin','Not Admin')">
@@ -3461,9 +3453,18 @@ function renderUserCard(u) {
           </label>
           <span id="ad-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isAdmin ? 'var(--primary)' : 'var(--muted)'};">${isAdmin ? 'Admin' : 'Not Admin'}</span>
         </div>
-        <div style="flex:1;"></div>
-        <button onclick="saveUserCard('${safeEmail}','${safeId}')" style="padding:0.4rem 1rem;background:var(--primary-dim);border:1px solid rgba(168,85,247,0.4);border-radius:6px;color:var(--primary);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;white-space:nowrap;" onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='var(--primary-dim)'">Save</button>
-        <span id="msg-${safeId}" style="font-size:0.73rem;font-weight:600;min-width:54px;text-align:right;"></span>
+        <div style="display:flex;flex-direction:column;gap:0.2rem;">
+          <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Password</label>
+          <div style="display:flex;gap:0.3rem;align-items:center;">
+            <input id="pw-${safeId}" class="admin-row-input" type="password" value="${escAttr(u.password||'')}" placeholder="••••••••" style="background:#111118;flex:1;min-width:0;" />
+            <button type="button" onclick="toggleUserPwField('${safeId}')" title="Show/hide" style="flex-shrink:0;min-width:28px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;padding:0;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <!-- Row 3: Save -->
+      <div style="display:flex;align-items:center;gap:0.5rem;">
+        <button onclick="saveUserCard('${safeEmail}','${safeId}')" style="flex:1;padding:0.45rem;background:var(--primary-dim);border:1px solid rgba(168,85,247,0.4);border-radius:6px;color:var(--primary);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='var(--primary-dim)'">Save Changes</button>
+        <span id="msg-${safeId}" style="font-size:0.73rem;font-weight:600;min-width:60px;text-align:right;"></span>
       </div>
     </div>
   </div>`;
