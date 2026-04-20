@@ -606,7 +606,6 @@
     .admin-divider { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
 
         
-    /* nav */
     nav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(10,10,15,0.95);
@@ -707,12 +706,48 @@
 <div id="admin-panels-mount"></div>
 
 <script>
-// escHtml needed by admin panel user list renderer
+window.populatePage = function() {};
+</script>
+
+<script>
+// escHtml — used by admin panel renderers
 function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
-// populatePage stub — no page content on this route
-window.populatePage = function() {};
+
+
+// ── Admin: render shop editor ──
+function renderShopEditor(items) {
+  const list = document.getElementById('ae-shop-list');
+  if (!list) return;
+  list.innerHTML = (items || []).map((item, i) => shopEditorCard(item, i + 1)).join('');
+}
+
+function shopEditorCard(item, n) {
+  const safeImg   = escHtml(item.img   || '');
+  const safeName  = escHtml(item.name  || '');
+  const safePrice = escHtml(item.price || '');
+  return `
+  <div class="admin-card-item">
+    <div class="admin-card-header">
+      <span class="admin-card-label">Drink ${n}</span>
+      <button class="admin-row-remove" onclick="this.closest('.admin-card-item').remove()">✕</button>
+    </div>
+    <input class="shop-item-name admin-card-input" placeholder="Name (e.g. Monster Zero)" value="${safeName}" />
+    <input class="shop-item-price admin-card-input" placeholder="Price (e.g. 3.99)" value="${safePrice}" type="number" min="0" step="0.01" />
+    <input class="shop-item-img admin-card-input" placeholder="Image URL (transparent PNG recommended)" value="${safeImg}" />
+    ${safeImg ? `<img src="${safeImg}" alt="preview" style="height:60px;object-fit:contain;margin-top:0.25rem;opacity:0.85;filter:drop-shadow(0 2px 6px rgba(168,85,247,0.3));" onerror="this.style.display='none'" />` : ''}
+  </div>`;
+}
+
+window.adminAddShopItem = function() {
+  const list = document.getElementById('ae-shop-list');
+  const n = list.querySelectorAll('.admin-card-item').length + 1;
+  const div = document.createElement('div');
+  div.innerHTML = shopEditorCard({}, n);
+  list.appendChild(div.firstElementChild);
+  list.lastElementChild.querySelector('.shop-item-name').focus();
+};
 </script>
 
 <script type="module">
@@ -1205,7 +1240,6 @@ window.populatePage = function() {};
           injectAdminPanels();
           setTimeout(() => openAdminPanel(), 100);
         } else {
-          // Not admin/editor — redirect home
           window.location.href = '/';
         }
         // Store privilege flags for orders panel scoping
@@ -2647,11 +2681,10 @@ async function s3UploadFiles(files) {
 }
 </script>
 
-
 <script>
-// On these dedicated pages, Close → go back home
-window.closeAdminPanel = function() { window.location.href = '/'; };
+window.closeAdminPanel    = function() { window.location.href = '/'; };
 window.closeApprovalsPanel = function() { window.location.href = '/'; };
 </script>
+
 </body>
 </html>
