@@ -1243,6 +1243,10 @@
     .toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); background: #22c55e; }
     .toggle-switch.admin-toggle input:checked + .toggle-track { background: var(--primary-dim); border-color: rgba(168,85,247,0.5); }
     .toggle-switch.admin-toggle input:checked + .toggle-track::after { background: var(--primary); }
+    .toggle-switch.editor-toggle input:checked + .toggle-track { background: rgba(34,211,238,0.2); border-color: rgba(34,211,238,0.5); }
+    .toggle-switch.editor-toggle input:checked + .toggle-track::after { background: var(--secondary); }
+    .toggle-switch.orders-toggle input:checked + .toggle-track { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.5); }
+    .toggle-switch.orders-toggle input:checked + .toggle-track::after { background: #22c55e; }
     .toggle-label {
       font-size: 0.78rem;
       font-weight: 600;
@@ -2395,18 +2399,7 @@ document.addEventListener('click', function(e) {
       const user = cred.user;
       // Use updateDoc (not setDoc) so we never touch active/admin flags on login.
       // Falls back to setDoc only if the document doesn't exist yet (first-ever login).
-      try {
-        await updateDoc(doc(db, 'users', user.email), {
-          lastLogin: new Date().toISOString()
-        });
-      } catch (writeErr) {
-        // Document doesn't exist yet — safe to create it without sensitive flags
-        await setDoc(doc(db, 'users', user.email), {
-          email: user.email,
-          username: user.displayName || '',
-          lastLogin: new Date().toISOString()
-        }, { merge: true });
-      }
+      // No lastLogin tracking — nothing to write on login
     } catch (err) {
       errEl.textContent = friendlyError(err.code);
       errEl.classList.add('show');
@@ -3404,8 +3397,10 @@ window.loadApprovedUsers = async function() {
 };
 
 function renderUserCard(u) {
-  const isActive = u.active !== false;
-  const isAdmin  = u.admin === true;
+  const isActive  = u.active  !== false;
+  const isAdmin   = u.admin   === true;
+  const isEditor  = u.editor  === true;
+  const isOrders  = u.orders  === true;
   const safeEmail = escAttr(u.email);
   const safeId = 'usr-' + u.email.replace(/[^a-zA-Z0-9]/g, '_');
   return `<div id="card-${safeId}" style="display:flex;flex-direction:column;gap:0;background:#0d0d14;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
@@ -3421,6 +3416,8 @@ function renderUserCard(u) {
       <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
         <span id="badge-active-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;${isActive ? 'background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);' : 'background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);'}">${isActive ? 'ACTIVE' : 'INACTIVE'}</span>
         <span id="badge-admin-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(168,85,247,0.12);color:var(--primary);border:1px solid rgba(168,85,247,0.3);display:${isAdmin ? 'inline-block' : 'none'};">ADMIN</span>
+        <span id="badge-editor-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,211,238,0.1);color:var(--secondary);border:1px solid rgba(34,211,238,0.3);display:${isEditor ? 'inline-block' : 'none'};">EDITOR</span>
+        <span id="badge-orders-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.3);display:${isOrders ? 'inline-block' : 'none'};">ORDERS</span>
         <svg id="chevron-${safeId}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
     </div>
@@ -3438,7 +3435,7 @@ function renderUserCard(u) {
         </div>
       </div>
       <!-- Row 2: Toggles + Password -->
-      <div style="display:grid;grid-template-columns:auto auto 1fr;gap:0.75rem;align-items:center;">
+      <div style="display:grid;grid-template-columns:auto auto auto auto 1fr;gap:0.75rem;align-items:center;">
         <div style="display:flex;align-items:center;gap:0.4rem;">
           <label class="toggle-switch" style="margin:0;">
             <input type="checkbox" id="st-${safeId}" ${isActive ? 'checked' : ''} onchange="updateToggleLabel('st-lbl-${safeId}',this.checked,'Active','Inactive')">
@@ -3452,6 +3449,20 @@ function renderUserCard(u) {
             <span class="toggle-track"></span>
           </label>
           <span id="ad-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isAdmin ? 'var(--primary)' : 'var(--muted)'};">${isAdmin ? 'Admin' : 'Not Admin'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <label class="toggle-switch editor-toggle" style="margin:0;">
+            <input type="checkbox" id="ed-${safeId}" ${isEditor ? 'checked' : ''} onchange="updateToggleLabel('ed-lbl-${safeId}',this.checked,'Editor','Not Editor')">
+            <span class="toggle-track"></span>
+          </label>
+          <span id="ed-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isEditor ? 'var(--secondary)' : 'var(--muted)'};">${isEditor ? 'Editor' : 'Not Editor'}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.4rem;">
+          <label class="toggle-switch orders-toggle" style="margin:0;">
+            <input type="checkbox" id="or-${safeId}" ${isOrders ? 'checked' : ''} onchange="updateToggleLabel('or-lbl-${safeId}',this.checked,'Orders','No Orders')">
+            <span class="toggle-track"></span>
+          </label>
+          <span id="or-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isOrders ? '#22c55e' : 'var(--muted)'};">${isOrders ? 'Orders' : 'No Orders'}</span>
         </div>
         <div style="display:flex;flex-direction:column;gap:0.2rem;">
           <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Password</label>
@@ -3474,11 +3485,11 @@ window.updateToggleLabel = function(labelId, checked, onText, offText) {
   const el = document.getElementById(labelId);
   if (!el) return;
   el.textContent = checked ? onText : offText;
-  if (onText === 'Active') {
-    el.style.color = checked ? '#22c55e' : 'var(--danger)';
-  } else {
-    el.style.color = checked ? 'var(--primary)' : 'var(--muted)';
-  }
+  if (onText === 'Active')      el.style.color = checked ? '#22c55e' : 'var(--danger)';
+  else if (onText === 'Admin')  el.style.color = checked ? 'var(--primary)' : 'var(--muted)';
+  else if (onText === 'Editor') el.style.color = checked ? 'var(--secondary)' : 'var(--muted)';
+  else if (onText === 'Orders') el.style.color = checked ? '#22c55e' : 'var(--muted)';
+  else                          el.style.color = checked ? 'var(--primary)' : 'var(--muted)';
 };
 
 window.toggleUserCard = function(safeId) {
@@ -3500,15 +3511,17 @@ window.saveUserCard = async function(email, safeId) {
   const msgEl = document.getElementById('msg-' + safeId);
   const fullName = (document.getElementById('fn-' + safeId).value || '').trim();
   const username = (document.getElementById('un-' + safeId).value || '').trim();
-  const isActive = document.getElementById('st-' + safeId).checked;
-  const isAdmin  = document.getElementById('ad-' + safeId).checked;
+  const isActive  = document.getElementById('st-' + safeId).checked;
+  const isAdmin   = document.getElementById('ad-' + safeId).checked;
+  const isEditor  = document.getElementById('ed-' + safeId).checked;
+  const isOrders  = document.getElementById('or-' + safeId).checked;
   const password = (document.getElementById('pw-' + safeId).value || '').trim();
 
   msgEl.textContent = 'Saving…';
   msgEl.style.color = 'var(--muted)';
 
   try {
-    const patch = { fullName, username, active: isActive, admin: isAdmin };
+    const patch = { fullName, username, active: isActive, admin: isAdmin, editor: isEditor, orders: isOrders };
     if (password) patch.password = password;
     await window._updateUserProfile(email, patch);
 
@@ -3521,9 +3534,11 @@ window.saveUserCard = async function(email, safeId) {
         : 'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);';
     }
     const adminBadge = document.getElementById('badge-admin-' + safeId);
-    if (adminBadge) {
-      adminBadge.style.display = isAdmin ? 'inline-block' : 'none';
-    }
+    if (adminBadge) adminBadge.style.display = isAdmin ? 'inline-block' : 'none';
+    const editorBadge = document.getElementById('badge-editor-' + safeId);
+    if (editorBadge) editorBadge.style.display = isEditor ? 'inline-block' : 'none';
+    const ordersBadge = document.getElementById('badge-orders-' + safeId);
+    if (ordersBadge) ordersBadge.style.display = isOrders ? 'inline-block' : 'none';
     // Update name/username in header
     const card = document.getElementById('card-' + safeId);
     if (card) {
