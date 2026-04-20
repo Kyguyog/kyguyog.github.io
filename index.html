@@ -2556,7 +2556,7 @@ if (homeBtns && data.home) {
     const hiring = data.command.hiring;
     let hiringHTML = '';
     if (hiring && hiring.active) {
-      hiringHTML = `<a href="${hiring.url}" class="command-link reveal">
+      hiringHTML = `<a href="${hiring.url}" target="_blank" rel="noopener noreferrer" class="command-link reveal">
         <div>
           <h4>${hiring.title}</h4>
           <p>${hiring.description}</p>
