@@ -1,89 +1,21 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<script>
-  // ── About:Blank Cloak ──
-  // Triggered by user interaction to avoid popup blockers.
-  (function () {
-    // Only run if we're the top-level page (not already inside an iframe cloak)
-    if (window.self !== window.top) return;
-
-    // Build a tiny entry page that sits at about:blank and iframes the real content
-    var currentUrl = window.location.href;
-
-    function launchCloak() {
-      var blank = window.open('about:blank', '_blank');
-      if (!blank) return; // popup was blocked — do nothing
-      var iframeStyle = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;';
-      var bodyStyle   = 'margin:0;padding:0;overflow:hidden;background:#0a0a0f;';
-      blank.document.open();
-      blank.document.write(
-        '<!DOCTYPE html><html><head><title> </title></head>' +
-        '<body style="' + bodyStyle + '">' +
-        '<iframe src="' + currentUrl + '" style="' + iframeStyle + '" allowfullscreen></iframe>' +
-        '</body></html>'
-      );
-      blank.document.close();
-      window.close(); // close the original tab
-    }
-
-    // Show a full-screen "Enter" overlay so the open() is tied to a click
-    var overlay = document.createElement('div');
-    overlay.id = 'cloak-entry';
-    overlay.style.cssText = [
-      'position:fixed', 'inset:0', 'z-index:999999',
-      'background:#0a0a0f',
-      'display:flex', 'flex-direction:column',
-      'align-items:center', 'justify-content:center', 'gap:1.5rem',
-      'font-family:sans-serif'
-    ].join(';');
-
-    var logo = document.createElement('div');
-    logo.style.cssText = 'font-size:1.1rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;';
-    logo.textContent = 'KNOWWHERE';
-
-    var btn = document.createElement('button');
-    btn.textContent = 'Enter';
-    btn.style.cssText = [
-      'padding:0.85rem 3rem',
-      'background:#a855f7',
-      'color:#fff',
-      'border:none',
-      'border-radius:6px',
-      'font-size:0.85rem',
-      'font-weight:700',
-      'letter-spacing:0.15em',
-      'text-transform:uppercase',
-      'cursor:pointer',
-      'box-shadow:0 0 24px rgba(168,85,247,0.5)'
-    ].join(';');
-    btn.onclick = launchCloak;
-
-    overlay.appendChild(logo);
-    overlay.appendChild(btn);
-
-    // Insert overlay as soon as <body> is available
-    function attach() {
-      if (document.body) {
-        document.body.appendChild(overlay);
-      } else {
-        document.addEventListener('DOMContentLoaded', function () {
-          document.body.appendChild(overlay);
-        });
-      }
-    }
-    attach();
-  })();
-</script>
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>KnowWhere Gaming Hub</title>
-  <link rel="icon" href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" type="image/x-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
+<script>(function(){if(window.self!==window.top)return;var currentUrl=window.location.href;function launchCloak(){var blank=window.open('about:blank','_blank');if(!blank)return;var iframeStyle='position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;';var bodyStyle='margin:0;padding:0;overflow:hidden;background:#0a0a0f;';blank.document.open();blank.document.write('<!DOCTYPE html><html><head><title> </title></head>'+
+'<body style="'+bodyStyle+'">'+
+'<iframe src="'+currentUrl+'" style="'+iframeStyle+'" allowfullscreen></iframe>'+
+'</body></html>');blank.document.close();window.close();}
+var overlay=document.createElement('div');overlay.id='cloak-entry';overlay.style.cssText=['position:fixed','inset:0','z-index:999999','background:#0a0a0f','display:flex','flex-direction:column','align-items:center','justify-content:center','gap:1.5rem','font-family:sans-serif'].join(';');var logo=document.createElement('div');logo.style.cssText='font-size:1.1rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;';logo.textContent='KNOWWHERE';var btn=document.createElement('button');btn.textContent='Enter';btn.style.cssText=['padding:0.85rem 3rem','background:#a855f7','color:#fff','border:none','border-radius:6px','font-size:0.85rem','font-weight:700','letter-spacing:0.15em','text-transform:uppercase','cursor:pointer','box-shadow:0 0 24px rgba(168,85,247,0.5)'].join(';');btn.onclick=launchCloak;overlay.appendChild(logo);overlay.appendChild(btn);function attach(){if(document.body){document.body.appendChild(overlay);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(overlay);});}}
+attach();})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>KnowWhere Gaming Hub</title>
+<link href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&amp;family=Orbitron:wght@400;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -1567,1018 +1499,335 @@
 </head>
 <body>
 
-<!-- AUTH WALL -->
 <div id="auth-wall">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" alt="KnowWhere">
-      <div class="auth-logo-name">KNOW<span>WHERE</span></div>
-    </div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
-      <button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
-    </div>
-
-    <!-- LOGIN FORM -->
-    <form class="auth-form" id="login-form-wrap" autocomplete="on" onsubmit="handleAuth();return false;">
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="auth-email" placeholder="you@example.com" autocomplete="email" />
-      </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="auth-password" placeholder="••••••••" autocomplete="current-password" />
-      </div>
-      <div class="auth-error" id="auth-error"></div>
-      <button class="auth-submit" id="auth-submit" type="submit">Login</button>
-    </form>
-
-    <!-- SIGN UP FORM -->
-    <form class="auth-form" id="signup-form-wrap" style="display:none;" autocomplete="on" onsubmit="handleSignupRequest();return false;">
-      <div class="auth-field">
-        <label>Full Name <span style="color:var(--muted);font-weight:400;font-size:0.65rem;">(First &amp; Last required)</span></label>
-        <input type="text" id="signup-fullname" placeholder="First Last" autocomplete="name" />
-      </div>
-      <div class="auth-field">
-        <label>Username</label>
-        <input type="text" id="signup-username" placeholder="e.g. Kyguy" autocomplete="username" />
-      </div>
-      <div class="auth-field">
-        <label>Email</label>
-        <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" />
-      </div>
-      <div class="auth-field">
-        <label>Password</label>
-        <input type="password" id="signup-password" placeholder="Min 6 characters" autocomplete="new-password" />
-      </div>
-      <div class="auth-field">
-        <label>Confirm Password</label>
-        <input type="password" id="signup-confirm" placeholder="••••••••" autocomplete="new-password" />
-      </div>
-      <div class="auth-error" id="signup-error"></div>
-      <!-- Success state shown after request submitted -->
-      <div id="signup-success" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:0.9rem 1rem;color:#22c55e;font-size:0.85rem;line-height:1.5;text-align:center;"></div>
-      <button class="auth-submit" id="signup-submit" type="submit" style="display:block;">Request Access</button>
-    </form>
-  </div>
+<div class="auth-box">
+<div class="auth-logo">
+<img alt="KnowWhere" src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png"/>
+<div class="auth-logo-name">KNOW<span>WHERE</span></div>
+</div>
+<div class="auth-tabs">
+<button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Login</button>
+<button class="auth-tab" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
 </div>
 
-<!-- MAIN CONTENT -->
+<form autocomplete="on" class="auth-form" id="login-form-wrap" onsubmit="handleAuth();return false;">
+<div class="auth-field">
+<label>Email</label>
+<input autocomplete="email" id="auth-email" placeholder="you@example.com" type="email"/>
+</div>
+<div class="auth-field">
+<label>Password</label>
+<input autocomplete="current-password" id="auth-password" placeholder="••••••••" type="password"/>
+</div>
+<div class="auth-error" id="auth-error"></div>
+<button class="auth-submit" id="auth-submit" type="submit">Login</button>
+</form>
+
+<form autocomplete="on" class="auth-form" id="signup-form-wrap" onsubmit="handleSignupRequest();return false;" style="display:none;">
+<div class="auth-field">
+<label>Full Name <span style="color:var(--muted);font-weight:400;font-size:0.65rem;">(First &amp; Last required)</span></label>
+<input autocomplete="name" id="signup-fullname" placeholder="First Last" type="text"/>
+</div>
+<div class="auth-field">
+<label>Username</label>
+<input autocomplete="username" id="signup-username" placeholder="e.g. Kyguy" type="text"/>
+</div>
+<div class="auth-field">
+<label>Email</label>
+<input autocomplete="email" id="signup-email" placeholder="you@example.com" type="email"/>
+</div>
+<div class="auth-field">
+<label>Password</label>
+<input autocomplete="new-password" id="signup-password" placeholder="Min 6 characters" type="password"/>
+</div>
+<div class="auth-field">
+<label>Confirm Password</label>
+<input autocomplete="new-password" id="signup-confirm" placeholder="••••••••" type="password"/>
+</div>
+<div class="auth-error" id="signup-error"></div>
+
+<div id="signup-success" style="display:none;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.35);border-radius:6px;padding:0.9rem 1rem;color:#22c55e;font-size:0.85rem;line-height:1.5;text-align:center;"></div>
+<button class="auth-submit" id="signup-submit" style="display:block;" type="submit">Request Access</button>
+</form>
+</div>
+</div>
+
 <div id="main-content">
 
-<!-- NAV -->
 <nav>
-  <a href="#home" class="nav-logo">
-    <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png">
-    <span class="logo-text">KNOW<span>WHERE</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="msg.html">Message</a>
-    <a href="#top-tier">Tier</a>
-    <a href="#games">Games</a>
-    <a href="#sites">Sites</a>
-    <a href="#shop">Shop</a>
-    
-    <a href="#stats">Stats</a>
-    <a href="#staff">Outcasts</a>
-  </div>
-  <div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
-  <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()" aria-label="Toggle menu">
-    <span></span><span></span><span></span>
-  </button>
+<a class="nav-logo" href="#home">
+<img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png"/>
+<span class="logo-text">KNOW<span>WHERE</span></span>
+</a>
+<div class="nav-links">
+<a href="msg.html">Message</a>
+<a href="#top-tier">Tier</a>
+<a href="#games">Games</a>
+<a href="#sites">Sites</a>
+<a href="#shop">Shop</a>
+<a href="#stats">Stats</a>
+<a href="#staff">Outcasts</a>
+</div>
+<div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
+<button aria-label="Toggle menu" class="nav-hamburger" id="nav-hamburger" onclick="toggleMobileNav()">
+<span></span><span></span><span></span>
+</button>
 </nav>
 
-<!-- MOBILE NAV DRAWER -->
 <div class="nav-mobile-drawer" id="nav-mobile-drawer">
-  <a href="msg.html" onclick="closeMobileNav()">Message</a>
-  <a href="#top-tier" onclick="closeMobileNav()">Tier</a>
-  <a href="#games" onclick="closeMobileNav()">Games</a>
-  <a href="#sites" onclick="closeMobileNav()">Sites</a>
-  <a href="#shop" onclick="closeMobileNav()">Shop</a>
-  
-  <a href="#stats" onclick="closeMobileNav()">Stats</a>
-  <a href="#staff" onclick="closeMobileNav()">Outcasts</a>
+<a href="msg.html" onclick="closeMobileNav()">Message</a>
+<a href="#top-tier" onclick="closeMobileNav()">Tier</a>
+<a href="#games" onclick="closeMobileNav()">Games</a>
+<a href="#sites" onclick="closeMobileNav()">Sites</a>
+<a href="#shop" onclick="closeMobileNav()">Shop</a>
+<a href="#stats" onclick="closeMobileNav()">Stats</a>
+<a href="#staff" onclick="closeMobileNav()">Outcasts</a>
 </div>
+<script>function toggleMobileNav(){var btn=document.getElementById('nav-hamburger');var drawer=document.getElementById('nav-mobile-drawer');btn.classList.toggle('open');drawer.classList.toggle('open');}
+function closeMobileNav(){document.getElementById('nav-hamburger').classList.remove('open');document.getElementById('nav-mobile-drawer').classList.remove('open');}
+document.addEventListener('click',function(e){var btn=document.getElementById('nav-hamburger');var drawer=document.getElementById('nav-mobile-drawer');if(btn&&drawer&&!btn.contains(e.target)&&!drawer.contains(e.target)){btn.classList.remove('open');drawer.classList.remove('open');}});</script>
 
-<script>
-function toggleMobileNav() {
-  var btn = document.getElementById('nav-hamburger');
-  var drawer = document.getElementById('nav-mobile-drawer');
-  btn.classList.toggle('open');
-  drawer.classList.toggle('open');
-}
-function closeMobileNav() {
-  document.getElementById('nav-hamburger').classList.remove('open');
-  document.getElementById('nav-mobile-drawer').classList.remove('open');
-}
-document.addEventListener('click', function(e) {
-  var btn = document.getElementById('nav-hamburger');
-  var drawer = document.getElementById('nav-mobile-drawer');
-  if (btn && drawer && !btn.contains(e.target) && !drawer.contains(e.target)) {
-    btn.classList.remove('open');
-    drawer.classList.remove('open');
-  }
-});
-</script>
-
-<!-- home -->
 <section id="home">
-  <div class="home-bg"></div>
-  <div class="home-content">
-    <div class="skull-wrap">
-      <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" alt="KnowWhere icon" />
-      <div class="skull-ring"></div>
-    </div>
-    <h1 class="home-title"><span class="know">KNOW</span><span class="where">WHERE</span></h1>
-    <p class="home-sub" id="home-subtitle"></p>
-    <div class="home-btns">
-      <a href="#games" class="btn-primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m8 21 4-4 4 4"/><path d="M14 9h2"/><path d="M8 9h2"/><path d="M11 9v2"/></svg>
+<div class="home-bg"></div>
+<div class="home-content">
+<div class="skull-wrap">
+<img alt="KnowWhere icon" src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png">
+<div class="skull-ring"></div>
+</img></div>
+<h1 class="home-title"><span class="know">KNOW</span><span class="where">WHERE</span></h1>
+<p class="home-sub" id="home-subtitle"></p>
+<div class="home-btns">
+<a class="btn-primary" href="#games">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18"><rect height="14" rx="2" width="20" x="2" y="3"></rect><path d="m8 21 4-4 4 4"></path><path d="M14 9h2"></path><path d="M8 9h2"></path><path d="M11 9v2"></path></svg>
         Play Now
       </a>
-      <a href="msg.html" class="btn-secondary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<a class="btn-secondary" href="msg.html">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         Messages
       </a>
-    </div>
-  </div>
+</div>
+</div>
 </section>
 
-<!-- NOTICE -->
 <div class="notice-wrap">
-  <div class="notice-inner">
-    <div class="notice-icon">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-    </div>
-    <div>
-      <h3 id="notice-title"></h3>
-      <p id="notice-text"></p>
-    </div>
-  </div>
+<div class="notice-inner">
+<div class="notice-icon">
+<svg fill="none" height="28" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="28"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>
+</div>
+<div>
+<h3 id="notice-title"></h3>
+<p id="notice-text"></p>
+</div>
+</div>
 </div>
 
-
-<!-- TOP TIER -->
-<section id="top-tier" class="section-alt">
-  <div class="container">
-    <div class="section-heading">
-      <h2>Top <span style="color:var(--primary)">Tier</span></h2>
-      <p>The highest rated games on the network right now.</p>
-    </div>
-    <div class="top-tier-grid" id="top-tier-grid"></div>
-  </div>
+<section class="section-alt" id="top-tier">
+<div class="container">
+<div class="section-heading">
+<h2>Top <span style="color:var(--primary)">Tier</span></h2>
+<p>The highest rated games on the network right now.</p>
+</div>
+<div class="top-tier-grid" id="top-tier-grid"></div>
+</div>
 </section>
 
-<!-- Games Section -->
 <section id="games">
-  <div class="container">
-    <div class="section-heading center">
-      <h2>The <span style="color:var(--primary)">Games</span></h2>
-      <p>Full database of available games, sorted A–Z.</p>
-      <p>All Games have a Experimental Blocked Status.</p>
-      <p>Green=Unblocked, Red=Blocked</p>
-    </div>
-
-    <div class="search-wrap">
-      <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input id="search-input" type="text" placeholder="Search games..." autocomplete="off" />
-      <button id="clear-search" aria-label="Clear search">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div id="search-count"></div>
-
-    <div class="archive-grid" id="archive"></div>
-    <div class="no-results" id="no-results">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="m8 21 4-4 4 4"/><path d="M14 9h2"/><path d="M8 9h2"/><path d="M11 9v2"/></svg>
-      <p id="no-results-text">No games found.</p>
-    </div>
-  </div>
+<div class="container">
+<div class="section-heading center">
+<h2>The <span style="color:var(--primary)">Games</span></h2>
+<p>Full database of available games, sorted A–Z.</p>
+<p>All Games have a Experimental Blocked Status.</p>
+<p>Green=Unblocked, Red=Blocked</p>
+</div>
+<div class="search-wrap">
+<svg class="search-icon" fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+<input autocomplete="off" id="search-input" placeholder="Search games..." type="text"/>
+<button aria-label="Clear search" id="clear-search">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="16"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</button>
+</div>
+<div id="search-count"></div>
+<div class="archive-grid" id="archive"></div>
+<div class="no-results" id="no-results">
+<svg fill="none" height="48" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" viewbox="0 0 24 24" width="48"><rect height="14" rx="2" width="20" x="2" y="3"></rect><path d="m8 21 4-4 4 4"></path><path d="M14 9h2"></path><path d="M8 9h2"></path><path d="M11 9v2"></path></svg>
+<p id="no-results-text">No games found.</p>
+</div>
+</div>
 </section>
 
-<!-- Sites -->
-<section id="sites" class="section-alt">
-  <div class="container">
-    <div class="section-heading center">
-      <h2>Sites <span style="color:var(--secondary)">List</span></h2>
-      <p>Approved external networks and utilities.</p>
-    </div>
-    <div class="sites-flex" id="sites-list"></div>
-  </div>
+<section class="section-alt" id="sites">
+<div class="container">
+<div class="section-heading center">
+<h2>Sites <span style="color:var(--secondary)">List</span></h2>
+<p>Approved external networks and utilities.</p>
+</div>
+<div class="sites-flex" id="sites-list"></div>
+</div>
 </section>
 
-<!-- SHOP -->
 <section id="shop">
-  <div class="container">
-    <div class="shop-header-row">
-      <div class="section-heading" style="margin-bottom:0;">
-        <h2>The <span style="color:var(--primary)">Shop</span></h2>
-        <p>Drinks &amp; merch from the hub.</p>
-      </div>
-      <button class="cart-btn" onclick="toggleCart()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+<div class="container">
+<div class="shop-header-row">
+<div class="section-heading" style="margin-bottom:0;">
+<h2>The <span style="color:var(--primary)">Shop</span></h2>
+<p>Drinks &amp; merch from the hub.</p>
+</div>
+<button class="cart-btn" onclick="toggleCart()">
+<svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
         Cart
         <span class="cart-badge" id="cart-badge">0</span>
-      </button>
-    </div>
-    <div id="shop-content"></div>
-  </div>
+</button>
+</div>
+<div id="shop-content"></div>
+</div>
 </section>
 
-<!-- CART OVERLAY -->
 <div id="cart-overlay" onclick="toggleCart()"></div>
 
-<!-- CART DRAWER -->
 <div id="cart-drawer">
-  <div class="cart-drawer-head">
-    <div class="cart-drawer-title">Your Cart</div>
-    <button class="cart-close" onclick="toggleCart()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
-  <div class="cart-list" id="cart-list"></div>
-  <div class="cart-foot">
-    <div class="cart-total-row">
-      <span class="cart-total-label">Total</span>
-      <span class="cart-total-val" id="cart-total">$0.00</span>
-    </div>
-    <button class="cart-checkout-btn" onclick="shopCheckout()">Checkout →</button>
-  </div>
+<div class="cart-drawer-head">
+<div class="cart-drawer-title">Your Cart</div>
+<button class="cart-close" onclick="toggleCart()">
+<svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="13"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</button>
+</div>
+<div class="cart-list" id="cart-list"></div>
+<div class="cart-foot">
+<div class="cart-total-row">
+<span class="cart-total-label">Total</span>
+<span class="cart-total-val" id="cart-total">$0.00</span>
+</div>
+<button class="cart-checkout-btn" onclick="shopCheckout()">Checkout →</button>
+</div>
 </div>
 
-<!-- STATS -->
 <section id="stats">
-  <div class="container">
-    <div class="stats-grid reveal" id="stats-grid"></div>
-  </div>
+<div class="container">
+<div class="stats-grid reveal" id="stats-grid"></div>
+</div>
 </section>
 
-<!-- COMMAND -->
-<section id="staff" class="section-alt">
-  <div class="container">
-    <div class="command-grid">
-      <div>
-        <div class="section-heading">
-          <h2>Com<span style="color:var(--primary)">mand</span></h2>
-          <p>Information and protocol.</p>
-        </div>
-        <div class="command-links" id="command-links"></div>
-      </div>
-
-      <div id="banned">
-        <div class="shame-heading">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+<section class="section-alt" id="staff">
+<div class="container">
+<div class="command-grid">
+<div>
+<div class="section-heading">
+<h2>Com<span style="color:var(--primary)">mand</span></h2>
+<p>Information and protocol.</p>
+</div>
+<div class="command-links" id="command-links"></div>
+</div>
+<div id="banned">
+<div class="shame-heading">
+<svg fill="none" height="32" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="32"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="9" x2="15" y1="12" y2="12"></line></svg>
           Hall of Shame
         </div>
-        <p class="shame-sub">Access revoked permanently for the following borderline people.</p>
-        <div class="shame-divider"></div>
-        <div class="shame-card reveal">
-          <div class="bg-skull">
-            <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" width="140" height="140" alt="" />
-          </div>
-          <div class="banned-grid" id="banned-list"></div>
-        </div>
-      </div>
-    </div>
-  </div>
+<p class="shame-sub">Access revoked permanently for the following borderline people.</p>
+<div class="shame-divider"></div>
+<div class="shame-card reveal">
+<div class="bg-skull">
+<img alt="" height="140" src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" width="140">
+</img></div>
+<div class="banned-grid" id="banned-list"></div>
+</div>
+</div>
+</div>
+</div>
 </section>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo">KNOW<span>WHERE</span></div>
-  <p id="footer-tagline"></p>
+<div class="footer-logo">KNOW<span>WHERE</span></div>
+<p id="footer-tagline"></p>
 </footer>
 
-<!-- USER POPUP -->
 <div id="user-popup">
-  <div class="popup-header">
-    <div class="popup-header-label">Signed in as</div>
-    <div class="popup-header-name" id="popup-display-name"></div>
-    <div id="popup-full-name" style="display:none;font-size:0.78rem;color:var(--primary);margin-top:0.1rem;font-weight:500;"></div>
-    <div class="popup-header-email" id="popup-email"></div>
-  </div>
-  <div class="popup-section" id="admin-popup-section" style="display:none;">
-    <a class="popup-btn" id="admin-popup-btn" href="./edit.html" style="color:var(--primary);display:none;text-decoration:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+<div class="popup-header">
+<div class="popup-header-label">Signed in as</div>
+<div class="popup-header-name" id="popup-display-name"></div>
+<div id="popup-full-name" style="display:none;font-size:0.78rem;color:var(--primary);margin-top:0.1rem;font-weight:500;"></div>
+<div class="popup-header-email" id="popup-email"></div>
+</div>
+<div class="popup-section" id="admin-popup-section" style="display:none;">
+<a class="popup-btn" href="./edit.html" id="admin-popup-btn" style="color:var(--primary);display:none;text-decoration:none;">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
       Edit Site Content
     </a>
-    <a class="popup-btn" id="approvals-popup-btn" href="./user.html" style="color:var(--primary);display:none;text-decoration:none;">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+<a class="popup-btn" href="./user.html" id="approvals-popup-btn" style="color:var(--primary);display:none;text-decoration:none;">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
       User Management
     </a>
-  </div>
-  <div class="popup-section" id="orders-popup-section" style="display:none;">
-    <button class="popup-btn" id="orders-popup-btn" onclick="openOrdersPanel();toggleUserPopup();" style="color:var(--secondary);">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+</div>
+<div class="popup-section" id="orders-popup-section" style="display:none;">
+<button class="popup-btn" id="orders-popup-btn" onclick="openOrdersPanel();toggleUserPopup();" style="color:var(--secondary);">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" x2="21" y1="6" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
       Orders
     </button>
-  </div>
-  <div class="popup-section">
-    <button class="popup-btn" onclick="togglePopupForm('password-form')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+</div>
+<div class="popup-section">
+<button class="popup-btn" onclick="togglePopupForm('password-form')">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><rect height="11" rx="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
       Change Password
     </button>
-    <form class="popup-inline-form" id="password-form" autocomplete="on" onsubmit="savePassword();return false;">
-      <input type="text" id="password-form-username" autocomplete="username" style="display:none;" aria-hidden="true" />
-      <input type="password" id="new-password" placeholder="New password" autocomplete="new-password" />
-      <input type="password" id="confirm-password" placeholder="Confirm new password" autocomplete="new-password" />
-      <div class="popup-msg" id="password-msg"></div>
-      <div class="popup-inline-form-row">
-        <button class="popup-save-btn" type="submit">Save</button>
-        <button class="popup-cancel-btn" type="button" onclick="togglePopupForm('password-form')">Cancel</button>
-      </div>
-    </form>
-  </div>
-  <div class="popup-section">
-    <button class="popup-btn danger" onclick="handleSignOut()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+<form autocomplete="on" class="popup-inline-form" id="password-form" onsubmit="savePassword();return false;">
+<input aria-hidden="true" autocomplete="username" id="password-form-username" style="display:none;" type="text"/>
+<input autocomplete="new-password" id="new-password" placeholder="New password" type="password"/>
+<input autocomplete="new-password" id="confirm-password" placeholder="Confirm new password" type="password"/>
+<div class="popup-msg" id="password-msg"></div>
+<div class="popup-inline-form-row">
+<button class="popup-save-btn" type="submit">Save</button>
+<button class="popup-cancel-btn" onclick="togglePopupForm('password-form')" type="button">Cancel</button>
+</div>
+</form>
+</div>
+<div class="popup-section">
+<button class="popup-btn danger" onclick="handleSignOut()">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
       Sign Out
     </button>
-  </div>
 </div>
-
-</div><!-- end #main-content -->
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword }
-    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-  const FIREBASE_API_KEY = "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ";
-
-  const firebaseConfig = {
-    apiKey: FIREBASE_API_KEY,
-    authDomain: "knowwhere1.firebaseapp.com",
-    projectId: "knowwhere1",
-    storageBucket: "knowwhere1.firebasestorage.app",
-    messagingSenderId: "747448090609",
-    appId: "1:747448090609:web:e3af5b2c8ffa8fb3a9ce50",
-    measurementId: "G-DV44FGDQ2N"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
-  // Save a shop order to Firestore under the user's email doc
-  window._saveOrder = async function(orderData) {
-    const user = auth.currentUser;
-    if (!user) throw new Error('Not logged in');
-    const snap = await getDoc(doc(db, 'users', user.email));
-    const snapData = snap.exists() ? snap.data() : {};
-    const username = snapData.username || user.email;
-    const fullName = snapData.fullName || snapData.username || user.email;
-    // Generate a unique 6-digit order number (100000–999999), retrying on collision
-    let orderNumber;
-    const existingOrders = await getDocs(collection(db, 'orders'));
-    const usedNumbers = new Set(existingOrders.docs.map(d => d.data().orderNumber).filter(Boolean));
-    do {
-      orderNumber = Math.floor(100000 + Math.random() * 900000);
-    } while (usedNumbers.has(orderNumber));
-    const orderDoc = {
-      email: user.email,
-      username,
-      fullName,
-      items: orderData.items,
-      total: orderData.total,
-      orderNumber,
-      placedAt: new Date().toISOString()
-    };
-    // Store under users/{email}/orders/{timestamp}
-    const orderId = 'order_' + Date.now();
-    await setDoc(doc(db, 'users', user.email, 'orders', orderId), orderDoc);
-    // Also store a flat copy in top-level 'orders' collection for the orders panel
-    await setDoc(doc(db, 'orders', orderId), orderDoc);
-    return { orderNumber, fullName };
-  };
-
-  // Fetch all orders (orders: true / admin users only)
-  window._fetchAllOrders = async function() {
-    const snap = await getDocs(collection(db, 'orders'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.placedAt.localeCompare(a.placedAt));
-  };
-
-  // Fetch only the current user's orders
-  window._fetchMyOrders = async function() {
-    const user = auth.currentUser;
-    if (!user) return [];
-    const snap = await getDocs(collection(db, 'users', user.email, 'orders'));
-    return snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => b.placedAt.localeCompare(a.placedAt));
-  };
-
-  // Expose current user email for panel scoping
-  Object.defineProperty(window, '_currentUserEmail', {
-    get: () => auth.currentUser ? auth.currentUser.email : null,
-    configurable: true
-  });
-
-  // Mark an order as completed (writes to top-level 'orders' doc AND user subcollection)
-  window._markOrderCompleted = async function(orderId) {
-    const completedAt = new Date().toISOString();
-    const patch = { completed: true, completedAt };
-    // Update top-level orders collection
-    await updateDoc(doc(db, 'orders', orderId), patch);
-    // Also update the user's own subcollection so _fetchMyOrders reflects the change
-    try {
-      const topSnap = await getDoc(doc(db, 'orders', orderId));
-      if (topSnap.exists()) {
-        const email = topSnap.data().email;
-        if (email) {
-          await updateDoc(doc(db, 'users', email, 'orders', orderId), patch);
-        }
-      }
-    } catch(e) { console.warn('Could not sync completed status to user subcollection:', e); }
-  };
-
-  // Undo: mark a completed order as active again
-  window._markOrderActive = async function(orderId) {
-    const patch = { completed: false, completedAt: null };
-    await updateDoc(doc(db, 'orders', orderId), patch);
-    try {
-      const topSnap = await getDoc(doc(db, 'orders', orderId));
-      if (topSnap.exists()) {
-        const email = topSnap.data().email;
-        if (email) {
-          await updateDoc(doc(db, 'users', email, 'orders', orderId), patch);
-        }
-      }
-    } catch(e) { console.warn('Could not sync active status to user subcollection:', e); }
-  };
-  // ── Tab switching ──
-  window.switchTab = function(tab) {
-    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
-    document.getElementById('login-form-wrap').style.display = tab === 'login' ? 'flex' : 'none';
-    document.getElementById('signup-form-wrap').style.display = tab === 'signup' ? 'flex' : 'none';
-    document.getElementById('auth-error').classList.remove('show');
-    // Clear any active denial countdown when switching tabs
-    if (window._retryCountdownInterval) {
-      clearInterval(window._retryCountdownInterval);
-      window._retryCountdownInterval = null;
-    }
-  };
-
-  // ── Friendly error messages ──
-  function friendlyError(code) {
-    const map = {
-      'auth/invalid-email': 'That email address doesn\'t look right.',
-      'auth/user.html-not-found': 'No account found with that email.',
-      'auth/wrong-password': 'Incorrect password. Try again.',
-      'auth/email-already-in-use': 'An account with that email already exists.',
-      'auth/weak-password': 'Password must be at least 6 characters.',
-      'auth/too-many-requests': 'Too many attempts. Try again later.',
-      'auth/invalid-credential': 'Email or password is incorrect.',
-    };
-    return map[code] || 'Something went wrong. Please try again.';
-  }
-
-  // ── Handle login ──
-  window.handleAuth = async function() {
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const errEl = document.getElementById('auth-error');
-    const btn = document.getElementById('auth-submit');
-
-    errEl.classList.remove('show');
-    if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return; }
-
-    btn.disabled = true;
-    btn.textContent = 'Logging in...';
-
-    try {
-      const cred = await signInWithEmailAndPassword(auth, email, password);
-      const user = cred.user;
-      // Use updateDoc (not setDoc) so we never touch active/admin flags on login.
-      // Falls back to setDoc only if the document doesn't exist yet (first-ever login).
-      // No lastLogin tracking — nothing to write on login
-    } catch (err) {
-      errEl.textContent = friendlyError(err.code);
-      errEl.classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'Login';
-    }
-  };
-
-  // ── Handle sign-up request (pending admin approval) ──
-  window.handleSignupRequest = async function() {
-    const fullName = document.getElementById('signup-fullname').value.trim();
-    const username = document.getElementById('signup-username').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    const confirm = document.getElementById('signup-confirm').value;
-    const errEl = document.getElementById('signup-error');
-    const successEl = document.getElementById('signup-success');
-    const btn = document.getElementById('signup-submit');
-
-    errEl.classList.remove('show');
-    successEl.style.display = 'none';
-
-    if (!fullName || !email || !password || !confirm) {
-      errEl.textContent = 'Please fill in all fields.';
-      errEl.classList.add('show');
-      return;
-    }
-    // Require at least first and last name (two words)
-    const nameParts = fullName.split(/\s+/).filter(Boolean);
-    if (nameParts.length < 2) {
-      errEl.textContent = 'Please enter your full name (first and last).';
-      errEl.classList.add('show');
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errEl.textContent = 'Please enter a valid email address.';
-      errEl.classList.add('show');
-      return;
-    }
-    if (password.length < 6) {
-      errEl.textContent = 'Password must be at least 6 characters.';
-      errEl.classList.add('show');
-      return;
-    }
-    if (password !== confirm) {
-      errEl.textContent = 'Passwords do not match.';
-      errEl.classList.add('show');
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Sending request...';
-
-    try {
-      const RETRY_MS = 60 * 60 * 1000; // 1 hour
-      const finalUsername = username || fullName.split(/\s+/)[0];
-      const usernameLower = finalUsername.toLowerCase();
-
-      // ── Check 1: email already has an active account in users collection ──
-      const usersSnap = await getDocs(collection(db, 'users'));
-      for (const d of usersSnap.docs) {
-        if (d.id.toLowerCase() === email.toLowerCase()) {
-          errEl.textContent = 'An account with that email already exists. Try logging in instead.';
-          errEl.classList.add('show');
-          btn.disabled = false;
-          btn.textContent = 'Request Access';
-          return;
-        }
-        const uData = d.data();
-        if (uData.username && uData.username.toLowerCase() === usernameLower) {
-          errEl.textContent = 'That username is already taken. Please choose a different one.';
-          errEl.classList.add('show');
-          btn.disabled = false;
-          btn.textContent = 'Request Access';
-          return;
-        }
-      }
-
-      // ── Check 2: existing signup requests (pending/approved/denied) ──
-      const existing = await getDocs(collection(db, 'signupRequests'));
-
-      for (const d of existing.docs) {
-        const data = d.data();
-
-        // Username clash in requests (pending or approved)
-        if (data.username && data.username.toLowerCase() === usernameLower &&
-            (data.status === 'pending' || data.status === 'approved')) {
-          errEl.textContent = 'That username is already taken. Please choose a different one.';
-          errEl.classList.add('show');
-          btn.disabled = false;
-          btn.textContent = 'Request Access';
-          return;
-        }
-
-        if (data.email !== email) continue;
-
-        if (data.status === 'pending' || data.status === 'approved') {
-          errEl.textContent = 'A request for this email has already been submitted.';
-          errEl.classList.add('show');
-          btn.disabled = false;
-          btn.textContent = 'Request Access';
-          return;
-        }
-
-        if (data.status === 'denied') {
-          const deniedAt = data.deniedAt ? new Date(data.deniedAt).getTime() : 0;
-          const elapsed = Date.now() - deniedAt;
-          if (elapsed < RETRY_MS) {
-            const remaining = RETRY_MS - elapsed;
-            btn.disabled = false;
-            btn.textContent = 'Request Access';
-            // Show live countdown in error message
-            function formatCountdown(ms) {
-              const totalSec = Math.ceil(ms / 1000);
-              const m = Math.floor(totalSec / 60);
-              const s = totalSec % 60;
-              return `${m}m ${s.toString().padStart(2,'0')}s`;
-            }
-            let countdownMs = remaining;
-            errEl.innerHTML = `Your signup request was denied. You can retry in <strong id="retry-countdown">${formatCountdown(countdownMs)}</strong>.`;
-            errEl.classList.add('show');
-            btn.disabled = true;
-            btn.textContent = 'Try Again Later';
-            // Clear any previous interval
-            if (window._retryCountdownInterval) clearInterval(window._retryCountdownInterval);
-            window._retryCountdownInterval = setInterval(() => {
-              countdownMs -= 1000;
-              if (countdownMs <= 0) {
-                clearInterval(window._retryCountdownInterval);
-                errEl.classList.remove('show');
-                btn.disabled = false;
-                btn.textContent = 'Request Access';
-              } else {
-                const el = document.getElementById('retry-countdown');
-                if (el) el.textContent = formatCountdown(countdownMs);
-              }
-            }, 1000);
-            return;
-          }
-          // Past the 1-hour window — allow resubmit (fall through)
-        }
-      }
-
-      // Store the request in Firestore (password stored to create the account on approval)
-      const requestId = email.replace(/[^a-zA-Z0-9]/g, '_') + '_' + Date.now();
-      await setDoc(doc(db, 'signupRequests', requestId), {
-        email,
-        fullName,
-        username: finalUsername,
-        password,
-        status: 'pending',
-        requestedAt: new Date().toISOString()
-      });
-
-      // Show success, hide button
-      successEl.textContent = '✓ Request submitted! An admin will review your application. You\'ll be able to log in once approved.';
-      successEl.style.display = 'block';
-      btn.style.display = 'none';
-      document.getElementById('signup-fullname').value = '';
-      document.getElementById('signup-username').value = '';
-      document.getElementById('signup-email').value = '';
-      document.getElementById('signup-password').value = '';
-      document.getElementById('signup-confirm').value = '';
-
-    } catch(e) {
-      errEl.textContent = e.message || 'Failed to submit request. Try again.';
-      errEl.classList.add('show');
-      btn.disabled = false;
-      btn.textContent = 'Request Access';
-    }
-  };
-
-  // ── Sign out ──
-  window.handleSignOut = async function() {
-    await signOut(auth);
-  };
-
-  // ── User popup ──
-  window.toggleUserPopup = function() {
-    const popup = document.getElementById('user-popup');
-    popup.classList.toggle('open');
-    document.querySelectorAll('.popup-inline-form').forEach(f => f.classList.remove('open'));
-    document.querySelectorAll('.popup-msg').forEach(m => { m.className = 'popup-msg'; });
-  };
-
-  window.togglePopupForm = function(id) {
-    const form = document.getElementById(id);
-    const isOpen = form.classList.contains('open');
-    document.querySelectorAll('.popup-inline-form').forEach(f => f.classList.remove('open'));
-    document.querySelectorAll('.popup-msg').forEach(m => { m.className = 'popup-msg'; });
-    if (!isOpen) {
-      form.classList.add('open');
-      if (id === 'password-form') {
-        const emailField = document.getElementById('password-form-username');
-        if (emailField && auth.currentUser) emailField.value = auth.currentUser.email;
-      }
-    }
-  };
-
-  document.addEventListener('click', (e) => {
-    const popup = document.getElementById('user-popup');
-    const badge = document.getElementById('nav-user-badge');
-    if (popup && popup.classList.contains('open') && !popup.contains(e.target) && !badge.contains(e.target)) {
-      popup.classList.remove('open');
-    }
-  });
-
-  window.savePassword = async function() {
-    const pw = document.getElementById('new-password').value;
-    const cpw = document.getElementById('confirm-password').value;
-    const msg = document.getElementById('password-msg');
-    msg.className = 'popup-msg';
-    if (!pw) { msg.textContent = 'Please enter a password.'; msg.className = 'popup-msg err'; return; }
-    if (pw.length < 6) { msg.textContent = 'Password must be at least 6 characters.'; msg.className = 'popup-msg err'; return; }
-    if (pw !== cpw) { msg.textContent = 'Passwords do not match.'; msg.className = 'popup-msg err'; return; }
-    try {
-      await updatePassword(auth.currentUser, pw);
-      try {
-        await setDoc(doc(db, 'users', auth.currentUser.email), { password: pw }, { merge: true });
-      } catch(fe) { console.warn('Could not save password to Firestore:', fe); }
-      document.getElementById('new-password').value = '';
-      document.getElementById('confirm-password').value = '';
-      msg.textContent = 'Password updated!';
-      msg.className = 'popup-msg ok';
-      setTimeout(() => { msg.className = 'popup-msg'; togglePopupForm('password-form'); }, 1500);
-    } catch(e) {
-      if (e.code === 'auth/requires-recent-login') {
-        msg.textContent = 'Please sign out and sign in again first.';
-      } else {
-        msg.textContent = 'Failed to update password.';
-      }
-      msg.className = 'popup-msg err';
-    }
-  };
-
-  // ── Auth state listener ──
-  // Sentinel: when we force-signout a disabled account we don't want the
-  // subsequent user=null callback to wipe the error or re-show the clean login form.
-  let _forcedSignout = false;
-
-  onAuthStateChanged(auth, async (user) => {
-    const wall = document.getElementById('auth-wall');
-    const main = document.getElementById('main-content');
-    const badge = document.getElementById('nav-user-badge');
-
-    // Forced sign-out callback — show disabled message and stop
-    if (!user && _forcedSignout) {
-      _forcedSignout = false;
-      wall.classList.remove('hidden');
-      main.classList.remove('visible');
-      if (badge) badge.innerHTML = '';
-      const errEl = document.getElementById('auth-error');
-      if (errEl) {
-        errEl.textContent = 'Your account has been disabled. Contact an admin for help.';
-        errEl.classList.add('show');
-      }
-      return;
-    }
-
-    if (user) {
-      // ── FIRST: check active flag BEFORE revealing any content ──
-      // Admins (admin === true) are always allowed through.
-      try {
-        const activeSnap = await getDoc(doc(db, 'users', user.email));
-        if (activeSnap.exists()) {
-          const d = activeSnap.data();
-          if (d.active === false && d.admin !== true) {
-            _forcedSignout = true;
-            await signOut(auth);
-            // The listener will re-fire with user=null — sentinel above handles UI.
-            return;
-          }
-        }
-      } catch(e) {
-        // On read failure, sign out rather than silently allowing through.
-        // This prevents a Firestore hiccup from bypassing the disabled-account check.
-        console.warn('Could not verify account status — signing out for safety:', e);
-        _forcedSignout = true;
-        await signOut(auth);
-        return;
-      }
-
-      // ── Account is active — reveal the site ──
-      wall.classList.add('hidden');
-      main.classList.add('visible');
-
-      // Always fetch username + fullName from Firestore so admin changes reflect immediately
-      let username = user.email;
-      let fullName = '';
-      try {
-        const snap = await getDoc(doc(db, 'users', user.email));
-        if (snap.exists()) {
-          const snapData = snap.data();
-          if (snapData.username) {
-            username = snapData.username;
-            if (user.displayName !== username) {
-              await updateProfile(user, { displayName: username });
-            }
-          } else {
-            username = user.displayName || user.email;
-          }
-          fullName = snapData.fullName || '';
-        } else {
-          username = user.displayName || user.email;
-        }
-      } catch(e) {
-        username = user.displayName || user.email;
-      }
-
-      if (badge) {
-        badge.innerHTML = `
+</div>
+</div>
+<script type="module">import{initializeApp}from"https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";import{getAnalytics}from"https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut,updateProfile,updatePassword}
+from"https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";import{getFirestore,doc,setDoc,getDoc,updateDoc,collection,getDocs}from"https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";const FIREBASE_API_KEY="AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ";const firebaseConfig={apiKey:FIREBASE_API_KEY,authDomain:"knowwhere1.firebaseapp.com",projectId:"knowwhere1",storageBucket:"knowwhere1.firebasestorage.app",messagingSenderId:"747448090609",appId:"1:747448090609:web:e3af5b2c8ffa8fb3a9ce50",measurementId:"G-DV44FGDQ2N"};const app=initializeApp(firebaseConfig);const analytics=getAnalytics(app);const auth=getAuth(app);const db=getFirestore(app);window._saveOrder=async function(orderData){const user=auth.currentUser;if(!user)throw new Error('Not logged in');const snap=await getDoc(doc(db,'users',user.email));const snapData=snap.exists()?snap.data():{};const username=snapData.username||user.email;const fullName=snapData.fullName||snapData.username||user.email;let orderNumber;const existingOrders=await getDocs(collection(db,'orders'));const usedNumbers=new Set(existingOrders.docs.map(d=>d.data().orderNumber).filter(Boolean));do{orderNumber=Math.floor(100000+Math.random()*900000);}while(usedNumbers.has(orderNumber));const orderDoc={email:user.email,username,fullName,items:orderData.items,total:orderData.total,orderNumber,placedAt:new Date().toISOString()};const orderId='order_'+Date.now();await setDoc(doc(db,'users',user.email,'orders',orderId),orderDoc);await setDoc(doc(db,'orders',orderId),orderDoc);return{orderNumber,fullName};};window._fetchAllOrders=async function(){const snap=await getDocs(collection(db,'orders'));return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.placedAt.localeCompare(a.placedAt));};window._fetchMyOrders=async function(){const user=auth.currentUser;if(!user)return[];const snap=await getDocs(collection(db,'users',user.email,'orders'));return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>b.placedAt.localeCompare(a.placedAt));};Object.defineProperty(window,'_currentUserEmail',{get:()=>auth.currentUser?auth.currentUser.email:null,configurable:true});window._markOrderCompleted=async function(orderId){const completedAt=new Date().toISOString();const patch={completed:true,completedAt};await updateDoc(doc(db,'orders',orderId),patch);try{const topSnap=await getDoc(doc(db,'orders',orderId));if(topSnap.exists()){const email=topSnap.data().email;if(email){await updateDoc(doc(db,'users',email,'orders',orderId),patch);}}}catch(e){console.warn('Could not sync completed status to user subcollection:',e);}};window._markOrderActive=async function(orderId){const patch={completed:false,completedAt:null};await updateDoc(doc(db,'orders',orderId),patch);try{const topSnap=await getDoc(doc(db,'orders',orderId));if(topSnap.exists()){const email=topSnap.data().email;if(email){await updateDoc(doc(db,'users',email,'orders',orderId),patch);}}}catch(e){console.warn('Could not sync active status to user subcollection:',e);}};window.switchTab=function(tab){document.getElementById('tab-login').classList.toggle('active',tab==='login');document.getElementById('tab-signup').classList.toggle('active',tab==='signup');document.getElementById('login-form-wrap').style.display=tab==='login'?'flex':'none';document.getElementById('signup-form-wrap').style.display=tab==='signup'?'flex':'none';document.getElementById('auth-error').classList.remove('show');if(window._retryCountdownInterval){clearInterval(window._retryCountdownInterval);window._retryCountdownInterval=null;}};function friendlyError(code){const map={'auth/invalid-email':'That email address doesn\'t look right.','auth/user.html-not-found':'No account found with that email.','auth/wrong-password':'Incorrect password. Try again.','auth/email-already-in-use':'An account with that email already exists.','auth/weak-password':'Password must be at least 6 characters.','auth/too-many-requests':'Too many attempts. Try again later.','auth/invalid-credential':'Email or password is incorrect.',};return map[code]||'Something went wrong. Please try again.';}
+window.handleAuth=async function(){const email=document.getElementById('auth-email').value.trim();const password=document.getElementById('auth-password').value;const errEl=document.getElementById('auth-error');const btn=document.getElementById('auth-submit');errEl.classList.remove('show');if(!email||!password){errEl.textContent='Please fill in all fields.';errEl.classList.add('show');return;}
+btn.disabled=true;btn.textContent='Logging in...';try{const cred=await signInWithEmailAndPassword(auth,email,password);const user=cred.user;}catch(err){errEl.textContent=friendlyError(err.code);errEl.classList.add('show');btn.disabled=false;btn.textContent='Login';}};window.handleSignupRequest=async function(){const fullName=document.getElementById('signup-fullname').value.trim();const username=document.getElementById('signup-username').value.trim();const email=document.getElementById('signup-email').value.trim();const password=document.getElementById('signup-password').value;const confirm=document.getElementById('signup-confirm').value;const errEl=document.getElementById('signup-error');const successEl=document.getElementById('signup-success');const btn=document.getElementById('signup-submit');errEl.classList.remove('show');successEl.style.display='none';if(!fullName||!email||!password||!confirm){errEl.textContent='Please fill in all fields.';errEl.classList.add('show');return;}
+const nameParts=fullName.split(/\s+/).filter(Boolean);if(nameParts.length<2){errEl.textContent='Please enter your full name (first and last).';errEl.classList.add('show');return;}
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Please enter a valid email address.';errEl.classList.add('show');return;}
+if(password.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.classList.add('show');return;}
+if(password!==confirm){errEl.textContent='Passwords do not match.';errEl.classList.add('show');return;}
+btn.disabled=true;btn.textContent='Sending request...';try{const RETRY_MS=60*60*1000;const finalUsername=username||fullName.split(/\s+/)[0];const usernameLower=finalUsername.toLowerCase();const usersSnap=await getDocs(collection(db,'users'));for(const d of usersSnap.docs){if(d.id.toLowerCase()===email.toLowerCase()){errEl.textContent='An account with that email already exists. Try logging in instead.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Request Access';return;}
+const uData=d.data();if(uData.username&&uData.username.toLowerCase()===usernameLower){errEl.textContent='That username is already taken. Please choose a different one.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Request Access';return;}}
+const existing=await getDocs(collection(db,'signupRequests'));for(const d of existing.docs){const data=d.data();if(data.username&&data.username.toLowerCase()===usernameLower&&(data.status==='pending'||data.status==='approved')){errEl.textContent='That username is already taken. Please choose a different one.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Request Access';return;}
+if(data.email!==email)continue;if(data.status==='pending'||data.status==='approved'){errEl.textContent='A request for this email has already been submitted.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Request Access';return;}
+if(data.status==='denied'){const deniedAt=data.deniedAt?new Date(data.deniedAt).getTime():0;const elapsed=Date.now()-deniedAt;if(elapsed<RETRY_MS){const remaining=RETRY_MS-elapsed;btn.disabled=false;btn.textContent='Request Access';function formatCountdown(ms){const totalSec=Math.ceil(ms/1000);const m=Math.floor(totalSec/60);const s=totalSec%60;return`${m}m ${s.toString().padStart(2,'0')}s`;}
+let countdownMs=remaining;errEl.innerHTML=`Your signup request was denied. You can retry in <strong id="retry-countdown">${formatCountdown(countdownMs)}</strong>.`;errEl.classList.add('show');btn.disabled=true;btn.textContent='Try Again Later';if(window._retryCountdownInterval)clearInterval(window._retryCountdownInterval);window._retryCountdownInterval=setInterval(()=>{countdownMs-=1000;if(countdownMs<=0){clearInterval(window._retryCountdownInterval);errEl.classList.remove('show');btn.disabled=false;btn.textContent='Request Access';}else{const el=document.getElementById('retry-countdown');if(el)el.textContent=formatCountdown(countdownMs);}},1000);return;}
+}}
+const requestId=email.replace(/[^a-zA-Z0-9]/g,'_')+'_'+Date.now();await setDoc(doc(db,'signupRequests',requestId),{email,fullName,username:finalUsername,password,status:'pending',requestedAt:new Date().toISOString()});successEl.textContent='✓ Request submitted! An admin will review your application. You\'ll be able to log in once approved.';successEl.style.display='block';btn.style.display='none';document.getElementById('signup-fullname').value='';document.getElementById('signup-username').value='';document.getElementById('signup-email').value='';document.getElementById('signup-password').value='';document.getElementById('signup-confirm').value='';}catch(e){errEl.textContent=e.message||'Failed to submit request. Try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Request Access';}};window.handleSignOut=async function(){await signOut(auth);};window.toggleUserPopup=function(){const popup=document.getElementById('user-popup');popup.classList.toggle('open');document.querySelectorAll('.popup-inline-form').forEach(f=>f.classList.remove('open'));document.querySelectorAll('.popup-msg').forEach(m=>{m.className='popup-msg';});};window.togglePopupForm=function(id){const form=document.getElementById(id);const isOpen=form.classList.contains('open');document.querySelectorAll('.popup-inline-form').forEach(f=>f.classList.remove('open'));document.querySelectorAll('.popup-msg').forEach(m=>{m.className='popup-msg';});if(!isOpen){form.classList.add('open');if(id==='password-form'){const emailField=document.getElementById('password-form-username');if(emailField&&auth.currentUser)emailField.value=auth.currentUser.email;}}};document.addEventListener('click',(e)=>{const popup=document.getElementById('user-popup');const badge=document.getElementById('nav-user-badge');if(popup&&popup.classList.contains('open')&&!popup.contains(e.target)&&!badge.contains(e.target)){popup.classList.remove('open');}});window.savePassword=async function(){const pw=document.getElementById('new-password').value;const cpw=document.getElementById('confirm-password').value;const msg=document.getElementById('password-msg');msg.className='popup-msg';if(!pw){msg.textContent='Please enter a password.';msg.className='popup-msg err';return;}
+if(pw.length<6){msg.textContent='Password must be at least 6 characters.';msg.className='popup-msg err';return;}
+if(pw!==cpw){msg.textContent='Passwords do not match.';msg.className='popup-msg err';return;}
+try{await updatePassword(auth.currentUser,pw);try{await setDoc(doc(db,'users',auth.currentUser.email),{password:pw},{merge:true});}catch(fe){console.warn('Could not save password to Firestore:',fe);}
+document.getElementById('new-password').value='';document.getElementById('confirm-password').value='';msg.textContent='Password updated!';msg.className='popup-msg ok';setTimeout(()=>{msg.className='popup-msg';togglePopupForm('password-form');},1500);}catch(e){if(e.code==='auth/requires-recent-login'){msg.textContent='Please sign out and sign in again first.';}else{msg.textContent='Failed to update password.';}
+msg.className='popup-msg err';}};let _forcedSignout=false;onAuthStateChanged(auth,async(user)=>{const wall=document.getElementById('auth-wall');const main=document.getElementById('main-content');const badge=document.getElementById('nav-user-badge');if(!user&&_forcedSignout){_forcedSignout=false;wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';const errEl=document.getElementById('auth-error');if(errEl){errEl.textContent='Your account has been disabled. Contact an admin for help.';errEl.classList.add('show');}
+return;}
+if(user){try{const activeSnap=await getDoc(doc(db,'users',user.email));if(activeSnap.exists()){const d=activeSnap.data();if(d.active===false&&d.admin!==true){_forcedSignout=true;await signOut(auth);return;}}}catch(e){console.warn('Could not verify account status — signing out for safety:',e);_forcedSignout=true;await signOut(auth);return;}
+wall.classList.add('hidden');main.classList.add('visible');let username=user.email;let fullName='';try{const snap=await getDoc(doc(db,'users',user.email));if(snap.exists()){const snapData=snap.data();if(snapData.username){username=snapData.username;if(user.displayName!==username){await updateProfile(user,{displayName:username});}}else{username=user.displayName||user.email;}
+fullName=snapData.fullName||'';}else{username=user.displayName||user.email;}}catch(e){username=user.displayName||user.email;}
+if(badge){badge.innerHTML=`
           <button class="auth-user-name" onclick="toggleUserPopup()">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             ${username || fullName}
-          </button>`;
-        document.getElementById('popup-display-name').textContent = username;
-        document.getElementById('popup-email').textContent = user.email;
-        const fullNameEl = document.getElementById('popup-full-name');
-        if (fullNameEl) {
-          fullNameEl.textContent = fullName;
-          fullNameEl.style.display = fullName ? 'block' : 'none';
-        }
-      }
-      const adminBtn = document.getElementById('admin-popup-btn');
-      const adminSection = document.getElementById('admin-popup-section');
-      const approvalsBtn = document.getElementById('approvals-popup-btn');
-      const ordersSection = document.getElementById('orders-popup-section');
-      if (adminBtn) adminBtn.style.display = 'none';
-      if (adminSection) adminSection.style.display = 'none';
-      if (approvalsBtn) approvalsBtn.style.display = 'none';
-      if (ordersSection) ordersSection.style.display = 'block';
-
-      // Load site content from Firestore (protected — logged-in users only)
-      try {
-        const contentSnap = await getDoc(doc(db, 'siteContent', 'main'));
-        if (contentSnap.exists()) {
-          window._siteData = contentSnap.data();
-          populatePage(window._siteData);
-        }
-      } catch (e) {
-        console.error('Failed to load site content:', e);
-      }
-
-      // Check order access permissions
-      try {
-        const userSnap = await getDoc(doc(db, 'users', user.email));
-        const userData = userSnap.exists() ? userSnap.data() : {};
-        const isAdmin = userData.admin === true;
-        const isEditor = userData.editor === true;
-        if (isAdmin || isEditor) {
-          if (adminBtn) adminBtn.style.display = 'flex';
-          if (adminSection) adminSection.style.display = 'block';
-          if (isAdmin) {
-            if (approvalsBtn) approvalsBtn.style.display = 'flex';
-          }
-        }
-        // Store privilege flags for orders panel scoping
-        window._canSeeAllOrders = (userData.orders === true || userData.admin === true);
-      } catch(e) {
-        console.warn('Could not check order permissions:', e);
-      }
-
-    } else {
-      wall.classList.remove('hidden');
-      main.classList.remove('visible');
-      if (badge) badge.innerHTML = '';
-      const popup = document.getElementById('user-popup');
-      if (popup) popup.classList.remove('open');
-      // Reset login form
-      document.getElementById('auth-email').value = '';
-      document.getElementById('auth-password').value = '';
-      document.getElementById('auth-error').classList.remove('show');
-      // Reset signup form
-      document.getElementById('signup-fullname').value = '';
-      document.getElementById('signup-username').value = '';
-      document.getElementById('signup-email').value = '';
-      document.getElementById('signup-password').value = '';
-      document.getElementById('signup-confirm').value = '';
-      document.getElementById('signup-error').classList.remove('show');
-      document.getElementById('signup-success').style.display = 'none';
-      document.getElementById('signup-submit').style.display = 'block';
-      document.getElementById('signup-submit').disabled = false;
-      document.getElementById('signup-submit').textContent = 'Request Access';
-      switchTab('login');
-    }
-  });
-
-  // ── Allow Enter key to submit ──
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !document.getElementById('auth-wall').classList.contains('hidden')) {
-      const loginVisible = document.getElementById('login-form-wrap').style.display !== 'none';
-      if (loginVisible) handleAuth();
-    }
-  });
-</script>
-
-<script>
-  const GAMEPAD_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 9v2"/><path d="M6 10h2"/></svg>`;
-  const EXT_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;
-  const STAR_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`;
-  const ARROW_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;
-
-  let GAMES = {};
-
-  // Animated counters
-  function animateCounter(el) {
-    const target = parseInt(el.dataset.target);
-    const suffix = el.dataset.suffix || '';
-    const duration = 1800;
-    const start = performance.now();
-    function step(now) {
-      const t = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - t, 3);
-      el.textContent = Math.round(ease * target) + suffix;
-      if (t < 1) requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-  }
-
-  // Scroll reveal + counter trigger
-  const countersStarted = new Set();
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        entry.target.querySelectorAll('.stat-num[data-target]').forEach(el => {
-          if (!countersStarted.has(el)) {
-            countersStarted.add(el);
-            animateCounter(el);
-          }
-        });
-      }
-    });
-  }, { threshold: 0.15 });
-
-  // Build archive
-  function buildArchive(filter) {
-    const archive = document.getElementById('archive');
-    const noResults = document.getElementById('no-results');
-    const searchCount = document.getElementById('search-count');
-    const q = (filter || '').toLowerCase().trim();
-    let totalMatches = 0;
-    let html = '';
-
-    for (const [letter, games] of Object.entries(GAMES).sort(([a],[b]) => a.localeCompare(b))) {
-      const matched = q ? games.filter(g => {
-          if (g.name.toLowerCase().includes(q)) return true;
-          if ((g.alias || '').toLowerCase().includes(q)) return true;
-          try {
-            const host = new URL(g.url).hostname.replace(/^www\./, '').toLowerCase();
-            return host.includes(q) || host.replace(/\.[^.]+$/, '').includes(q);
-          } catch { return false; }
-        }) : games;
-      if (matched.length === 0) continue;
-      totalMatches += matched.length;
-      const cards = matched.map(g => {
-        const safeUrl = (g.url || '')
-          .replace(/&/g, '&amp;')
-          .replace(/"/g, '&quot;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-        const safeScreenshot = (g.screenshot || '')
-          .replace(/&/g, '&amp;')
-          .replace(/"/g, '&quot;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;');
-        return `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-card" data-screenshot="${safeScreenshot}" data-url="${safeUrl}">${GAMEPAD_SVG}<span>${g.name}</span><span class="block-dot block-dot-tooltip" data-status="checking" data-url="${safeUrl}" data-label="Checking\u2026"></span></a>`;
-      }).join('');
-      html += `<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;
-    }
-
-    archive.innerHTML = html;
-
-    if (totalMatches === 0 && q) {
-      noResults.style.display = 'block';
-      archive.style.display = 'none';
-      document.getElementById('no-results-text').textContent = `No games match "${filter}"`;
-      searchCount.textContent = '';
-    } else {
-      noResults.style.display = 'none';
-      archive.style.display = 'flex';
-      searchCount.textContent = q ? `${totalMatches} game${totalMatches !== 1 ? 's' : ''} found` : '';
-    }
-    scheduleBlockChecks();
-  }
-
-  // Populate page from content data
-  function populatePage(data) {
-    // home
-    document.getElementById('home-subtitle').textContent = data.home.subtitle;
-
-    // home buttons
-    // Inside populatePage(data)
-const homeBtns = document.querySelector('.home-btns');
-if (homeBtns && data.home) {
-    const btnPrimary = homeBtns.querySelector('a.btn-primary');
-    const btnSecondary = homeBtns.querySelector('a.btn-secondary');
-
-    // Match your specific Firebase field names
-    if (btnPrimary) {
-        btnPrimary.href = data.home.primary_btn_href || '#games';
-        // This targets the text node after the icon
-        btnPrimary.childNodes[btnPrimary.childNodes.length - 1].textContent = 
-            data.home.primary_btn_label || 'Play Now';
-    }
-
-    if (btnSecondary) {
-        btnSecondary.href = data.home.secondary_btn_href || 'msg.html';
-        btnSecondary.textContent = data.home.secondary_btn_label || 'Messages';
-    }
-}
-
-    // Notice
-    document.getElementById('notice-title').textContent = data.notice.title;
-    document.getElementById('notice-text').innerHTML = data.notice.text;
-
-    // Announcement (now lives inside Command section)
-
-    // Top Tier
-    const topTierGrid = document.getElementById('top-tier-grid');
-    topTierGrid.innerHTML = data.topTier.map(g => {
-      const bgStyle = g.backgroundImage
-        ? `style="background-image:url('${g.backgroundImage}');background-size:cover;background-position:center;"`
-        : '';
-      return `<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-feature reveal">
+          </button>`;document.getElementById('popup-display-name').textContent=username;document.getElementById('popup-email').textContent=user.email;const fullNameEl=document.getElementById('popup-full-name');if(fullNameEl){fullNameEl.textContent=fullName;fullNameEl.style.display=fullName?'block':'none';}}
+const adminBtn=document.getElementById('admin-popup-btn');const adminSection=document.getElementById('admin-popup-section');const approvalsBtn=document.getElementById('approvals-popup-btn');const ordersSection=document.getElementById('orders-popup-section');if(adminBtn)adminBtn.style.display='none';if(adminSection)adminSection.style.display='none';if(approvalsBtn)approvalsBtn.style.display='none';if(ordersSection)ordersSection.style.display='block';try{const contentSnap=await getDoc(doc(db,'siteContent','main'));if(contentSnap.exists()){window._siteData=contentSnap.data();populatePage(window._siteData);}}catch(e){console.error('Failed to load site content:',e);}
+try{const userSnap=await getDoc(doc(db,'users',user.email));const userData=userSnap.exists()?userSnap.data():{};const isAdmin=userData.admin===true;const isEditor=userData.editor===true;if(isAdmin||isEditor){if(adminBtn)adminBtn.style.display='flex';if(adminSection)adminSection.style.display='block';if(isAdmin){if(approvalsBtn)approvalsBtn.style.display='flex';}}
+window._canSeeAllOrders=(userData.orders===true||userData.admin===true);}catch(e){console.warn('Could not check order permissions:',e);}}else{wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';const popup=document.getElementById('user-popup');if(popup)popup.classList.remove('open');document.getElementById('auth-email').value='';document.getElementById('auth-password').value='';document.getElementById('auth-error').classList.remove('show');document.getElementById('signup-fullname').value='';document.getElementById('signup-username').value='';document.getElementById('signup-email').value='';document.getElementById('signup-password').value='';document.getElementById('signup-confirm').value='';document.getElementById('signup-error').classList.remove('show');document.getElementById('signup-success').style.display='none';document.getElementById('signup-submit').style.display='block';document.getElementById('signup-submit').disabled=false;document.getElementById('signup-submit').textContent='Request Access';switchTab('login');}});document.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!document.getElementById('auth-wall').classList.contains('hidden')){const loginVisible=document.getElementById('login-form-wrap').style.display!=='none';if(loginVisible)handleAuth();}});</script>
+<script>const GAMEPAD_SVG=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 9v2"/><path d="M6 10h2"/></svg>`;const EXT_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;const STAR_SVG=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`;const ARROW_SVG=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;let GAMES={};function animateCounter(el){const target=parseInt(el.dataset.target);const suffix=el.dataset.suffix||'';const duration=1800;const start=performance.now();function step(now){const t=Math.min((now-start)/duration,1);const ease=1-Math.pow(1-t,3);el.textContent=Math.round(ease*target)+suffix;if(t<1)requestAnimationFrame(step);}
+requestAnimationFrame(step);}
+const countersStarted=new Set();const observer=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');entry.target.querySelectorAll('.stat-num[data-target]').forEach(el=>{if(!countersStarted.has(el)){countersStarted.add(el);animateCounter(el);}});}});},{threshold:0.15});function buildArchive(filter){const archive=document.getElementById('archive');const noResults=document.getElementById('no-results');const searchCount=document.getElementById('search-count');const q=(filter||'').toLowerCase().trim();let totalMatches=0;let html='';for(const[letter,games]of Object.entries(GAMES).sort(([a],[b])=>a.localeCompare(b))){const matched=q?games.filter(g=>{if(g.name.toLowerCase().includes(q))return true;if((g.alias||'').toLowerCase().includes(q))return true;try{const host=new URL(g.url).hostname.replace(/^www\./,'').toLowerCase();return host.includes(q)||host.replace(/\.[^.]+$/,'').includes(q);}catch{return false;}}):games;if(matched.length===0)continue;totalMatches+=matched.length;const cards=matched.map(g=>{const safeUrl=(g.url||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');const safeScreenshot=(g.screenshot||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return`<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-card" data-screenshot="${safeScreenshot}" data-url="${safeUrl}">${GAMEPAD_SVG}<span>${g.name}</span><span class="block-dot block-dot-tooltip" data-status="checking" data-url="${safeUrl}" data-label="Checking\u2026"></span></a>`;}).join('');html+=`<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;}
+archive.innerHTML=html;if(totalMatches===0&&q){noResults.style.display='block';archive.style.display='none';document.getElementById('no-results-text').textContent=`No games match "${filter}"`;searchCount.textContent='';}else{noResults.style.display='none';archive.style.display='flex';searchCount.textContent=q?`${totalMatches} game${totalMatches !== 1 ? 's' : ''} found`:'';}
+scheduleBlockChecks();}
+function populatePage(data){document.getElementById('home-subtitle').textContent=data.home.subtitle;const homeBtns=document.querySelector('.home-btns');if(homeBtns&&data.home){const btnPrimary=homeBtns.querySelector('a.btn-primary');const btnSecondary=homeBtns.querySelector('a.btn-secondary');if(btnPrimary){btnPrimary.href=data.home.primary_btn_href||'#games';btnPrimary.childNodes[btnPrimary.childNodes.length-1].textContent=data.home.primary_btn_label||'Play Now';}
+if(btnSecondary){btnSecondary.href=data.home.secondary_btn_href||'msg.html';btnSecondary.textContent=data.home.secondary_btn_label||'Messages';}}
+document.getElementById('notice-title').textContent=data.notice.title;document.getElementById('notice-text').innerHTML=data.notice.text;const topTierGrid=document.getElementById('top-tier-grid');topTierGrid.innerHTML=data.topTier.map(g=>{const bgStyle=g.backgroundImage?`style="background-image:url('${g.backgroundImage}');background-size:cover;background-position:center;"`:'';return`<a href="${g.url}" target="_blank" rel="noopener noreferrer" class="game-feature reveal">
         <div class="game-feature-bg" ${bgStyle}></div>
         <div class="game-feature-overlay"></div>
         <div class="game-feature-content">
@@ -2587,129 +1836,30 @@ if (homeBtns && data.home) {
           <span class="hover-btn">Open Game →</span>
         </div>
         <div class="game-feature-border"></div>
-      </a>`;
-    }).join('');
-
-    // Games archive
-    GAMES = data.games;
-    buildArchive('');
-    scheduleBlockChecks();
-
-    // Sites
-    const sitesList = document.getElementById('sites-list');
-    sitesList.innerHTML = data.sites.map(s => {
-      const safeUrl = (s.url || '')
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-      return `<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="site-pill" data-url="${safeUrl}">${s.name}${EXT_SVG}<span class="block-dot block-dot-tooltip site-block-dot" data-status="checking" data-url="${safeUrl}" data-label="Checking…"></span></a>`;
-    }).join('');
-    scheduleBlockChecks();
-
-    // Shop
-    renderShop(data.shop || []);
-
-    // Stats — auto-calculated from the data
-    const totalGames = Object.values(data.games).reduce((sum, arr) => sum + arr.length, 0);
-    const totalSites = data.sites.length;
-    const totalBanned = data.banned.length;
-    const statsGrid = document.getElementById('stats-grid');
-    statsGrid.innerHTML = [
-      { value: totalGames,  label: 'Total Games' },
-      { value: totalSites,  label: 'Approved Sites' },
-      { value: totalBanned, label: 'Banned Users' }
-    ].map(s =>
-      `<div class="stat-item">
+      </a>`;}).join('');GAMES=data.games;buildArchive('');scheduleBlockChecks();const sitesList=document.getElementById('sites-list');sitesList.innerHTML=data.sites.map(s=>{const safeUrl=(s.url||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return`<a href="${s.url}" target="_blank" rel="noopener noreferrer" class="site-pill" data-url="${safeUrl}">${s.name}${EXT_SVG}<span class="block-dot block-dot-tooltip site-block-dot" data-status="checking" data-url="${safeUrl}" data-label="Checking…"></span></a>`;}).join('');scheduleBlockChecks();renderShop(data.shop||[]);const totalGames=Object.values(data.games).reduce((sum,arr)=>sum+arr.length,0);const totalSites=data.sites.length;const totalBanned=data.banned.length;const statsGrid=document.getElementById('stats-grid');statsGrid.innerHTML=[{value:totalGames,label:'Total Games'},{value:totalSites,label:'Approved Sites'},{value:totalBanned,label:'Banned Users'}].map(s=>`<div class="stat-item">
         <span class="stat-num" data-target="${s.value}">0</span>
         <span class="stat-label">${s.label}</span>
-      </div>`
-    ).join('');
-
-    // Command links
-    const commandLinks = document.getElementById('command-links');
-    const hiring = data.command.hiring;
-    let hiringHTML = '';
-    if (hiring && hiring.active) {
-      hiringHTML = `<a href="${hiring.url}" target="_blank" rel="noopener noreferrer" class="command-link reveal">
+      </div>`).join('');const commandLinks=document.getElementById('command-links');const hiring=data.command.hiring;let hiringHTML='';if(hiring&&hiring.active){hiringHTML=`<a href="${hiring.url}" target="_blank" rel="noopener noreferrer" class="command-link reveal">
         <div>
           <h4>${hiring.title}</h4>
           <p>${hiring.description}</p>
         </div>
         <span class="badge-pulse" style="font-size:0.6rem;padding:0.2rem 0.75rem;margin-bottom:0;">${hiring.badge}</span>
-      </a>`;
-    }
-    commandLinks.innerHTML = hiringHTML + data.command.links.map(link => {
-      const hasUrl = link.url && link.url.trim() !== '';
-      const right = link.status === 'soon'
-        ? `<span class="coming-soon">Soon</span>`
-        : `${ARROW_SVG}`;
-      const tag = hasUrl ? 'a' : 'div';
-      const href = hasUrl ? ` href="${link.url}" target="_blank" rel="noopener noreferrer"` : '';
-      return `<${tag}${href} class="command-link reveal">
+      </a>`;}
+commandLinks.innerHTML=hiringHTML+data.command.links.map(link=>{const hasUrl=link.url&&link.url.trim()!=='';const right=link.status==='soon'?`<span class="coming-soon">Soon</span>`:`${ARROW_SVG}`;const tag=hasUrl?'a':'div';const href=hasUrl?` href="${link.url}" target="_blank" rel="noopener noreferrer"`:'';return`<${tag}${href} class="command-link reveal">
         <div>
           <h4>${link.title}</h4>
           <p>${link.description}</p>
         </div>
         ${right}
-      </${tag}>`;
-    }).join('');
-
-    // Banned
-    const bannedList = document.getElementById('banned-list');
-    bannedList.innerHTML = data.banned.map(u =>
-      `<div class="banned-item"><span class="banned-dot"></span><span>${u}</span></div>`
-    ).join('');
-
-    // Footer
-    document.getElementById('footer-tagline').textContent = data.footer.tagline;
-    // Attach scroll reveal observer to all .reveal elements (including newly created ones)
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    document.querySelectorAll('.stats-grid').forEach(el => observer.observe(el));
-  }
-
-  // Search
-  const searchInput = document.getElementById('search-input');
-  const clearBtn = document.getElementById('clear-search');
-
-  searchInput.addEventListener('input', () => {
-    const q = searchInput.value;
-    clearBtn.style.display = q ? 'block' : 'none';
-    buildArchive(q);
-  });
-  clearBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    clearBtn.style.display = 'none';
-    buildArchive('');
-    searchInput.focus();
-  });
-
-  // Content loaded from Firestore after login.
-</script>
-
-
-<script>
-// ══════════════════════════════════════
-//  SHOP — Drinks Shelf
-// ══════════════════════════════════════
-
-let shopCart = {}; // { id: { item, qty } }
-
-// ── Render the public-facing shelf ──
-function renderShop(items) {
-  const wrap = document.getElementById('shop-content');
-  if (!wrap) return;
-
-  if (!items || !items.length) {
-    wrap.innerHTML = `
+      </${tag}>`;}).join('');const bannedList=document.getElementById('banned-list');bannedList.innerHTML=data.banned.map(u=>`<div class="banned-item"><span class="banned-dot"></span><span>${u}</span></div>`).join('');document.getElementById('footer-tagline').textContent=data.footer.tagline;document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));document.querySelectorAll('.stats-grid').forEach(el=>observer.observe(el));}
+const searchInput=document.getElementById('search-input');const clearBtn=document.getElementById('clear-search');searchInput.addEventListener('input',()=>{const q=searchInput.value;clearBtn.style.display=q?'block':'none';buildArchive(q);});clearBtn.addEventListener('click',()=>{searchInput.value='';clearBtn.style.display='none';buildArchive('');searchInput.focus();});</script>
+<script>let shopCart={};function renderShop(items){const wrap=document.getElementById('shop-content');if(!wrap)return;if(!items||!items.length){wrap.innerHTML=`
       <div class="shop-empty">
         <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2h8l2 4H6L8 2z"/><rect x="3" y="6" width="18" height="16" rx="2"/><line x1="12" y1="10" x2="12" y2="16"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
         No drinks in the shop yet.
-      </div>`;
-    return;
-  }
-
-  wrap.innerHTML = `
+      </div>`;return;}
+wrap.innerHTML=`
     <div class="shelf-unit">
       <div class="shelf-label">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2h8l2 4H6L8 2z"/><rect x="3" y="6" width="18" height="16" rx="2"/></svg>
@@ -2718,15 +1868,7 @@ function renderShop(items) {
       <div class="shelf-plank">
         <div class="shelf-products" id="shelf-products-inner"></div>
       </div>
-    </div>`;
-
-  const grid = document.getElementById('shelf-products-inner');
-  items.forEach((item, i) => {
-    const id = 'item_' + i;
-    const card = document.createElement('div');
-    card.className = 'product-card';
-    card.dataset.id = id;
-    card.innerHTML = `
+    </div>`;const grid=document.getElementById('shelf-products-inner');items.forEach((item,i)=>{const id='item_'+i;const card=document.createElement('div');card.className='product-card';card.dataset.id=id;card.innerHTML=`
       <div class="product-added-flash" id="flash-${id}">+ Added!</div>
       <div class="product-img-wrap">
         <img class="product-img" src="${escHtml(item.img)}" alt="${escHtml(item.name)}"
@@ -2737,71 +1879,15 @@ function renderShop(items) {
         <div class="product-name">${escHtml(item.name)}</div>
         <div class="product-price">${item.price ? '$' + parseFloat(item.price).toFixed(2) : 'Free'}</div>
         <button class="product-add-btn" onclick="shopAdd('${id}','${escHtml(item.name)}','${escHtml(item.img)}',${parseFloat(item.price)||0},event)">Add to Cart</button>
-      </div>`;
-    grid.appendChild(card);
-  });
-}
-
-function escHtml(s) {
-  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-
-// ── Add to cart ──
-window.shopAdd = function(id, name, img, price, e) {
-  if (e) e.stopPropagation();
-  if (!shopCart[id]) shopCart[id] = { id, name, img, price, qty: 0 };
-  shopCart[id].qty++;
-
-  // flash
-  const flash = document.getElementById('flash-' + id);
-  if (flash) {
-    flash.classList.remove('pop');
-    void flash.offsetWidth;
-    flash.classList.add('pop');
-  }
-  renderCart();
-};
-
-window.shopChangeQty = function(id, delta) {
-  if (!shopCart[id]) return;
-  shopCart[id].qty += delta;
-  if (shopCart[id].qty <= 0) delete shopCart[id];
-  renderCart();
-};
-
-window.shopRemove = function(id) {
-  delete shopCart[id];
-  renderCart();
-};
-
-function renderCart() {
-  const list   = document.getElementById('cart-list');
-  const badge  = document.getElementById('cart-badge');
-  const total  = document.getElementById('cart-total');
-  if (!list) return;
-
-  const items     = Object.values(shopCart);
-  const totalQty  = items.reduce((s, i) => s + i.qty, 0);
-  const totalPrice= items.reduce((s, i) => s + i.qty * i.price, 0);
-
-  badge.textContent = totalQty;
-  badge.classList.toggle('show', totalQty > 0);
-  total.textContent = '$' + totalPrice.toFixed(2);
-
-  if (!items.length) {
-    list.innerHTML = `
+      </div>`;grid.appendChild(card);});}
+function escHtml(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+window.shopAdd=function(id,name,img,price,e){if(e)e.stopPropagation();if(!shopCart[id])shopCart[id]={id,name,img,price,qty:0};shopCart[id].qty++;const flash=document.getElementById('flash-'+id);if(flash){flash.classList.remove('pop');void flash.offsetWidth;flash.classList.add('pop');}
+renderCart();};window.shopChangeQty=function(id,delta){if(!shopCart[id])return;shopCart[id].qty+=delta;if(shopCart[id].qty<=0)delete shopCart[id];renderCart();};window.shopRemove=function(id){delete shopCart[id];renderCart();};function renderCart(){const list=document.getElementById('cart-list');const badge=document.getElementById('cart-badge');const total=document.getElementById('cart-total');if(!list)return;const items=Object.values(shopCart);const totalQty=items.reduce((s,i)=>s+i.qty,0);const totalPrice=items.reduce((s,i)=>s+i.qty*i.price,0);badge.textContent=totalQty;badge.classList.toggle('show',totalQty>0);total.textContent='$'+totalPrice.toFixed(2);if(!items.length){list.innerHTML=`
       <div class="cart-empty-state">
         <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
         Your cart is empty.
-      </div>`;
-    return;
-  }
-
-  list.innerHTML = '';
-  items.forEach(item => {
-    const row = document.createElement('div');
-    row.className = 'cart-row';
-    row.innerHTML = `
+      </div>`;return;}
+list.innerHTML='';items.forEach(item=>{const row=document.createElement('div');row.className='cart-row';row.innerHTML=`
       <img class="cart-row-img" src="${escHtml(item.img)}" alt="${escHtml(item.name)}"
            onerror="this.style.opacity='0.25'" />
       <div class="cart-row-info">
@@ -2815,171 +1901,79 @@ function renderCart() {
       </div>
       <button class="cart-row-remove" onclick="shopRemove('${item.id}')" title="Remove">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>`;
-    list.appendChild(row);
-  });
-}
+      </button>`;list.appendChild(row);});}
+window.toggleCart=function(){document.getElementById('cart-drawer').classList.toggle('open');document.getElementById('cart-overlay').classList.toggle('open');};window.shopCheckout=async function(){const items=Object.values(shopCart);if(!items.length){alert('Your cart is empty!');return;}
+const total=items.reduce((s,i)=>s+i.qty*i.price,0);const btn=document.querySelector('.cart-checkout-btn');if(btn){btn.disabled=true;btn.textContent='Placing order...';}
+try{const result=await window._saveOrder({items:items.map(i=>({name:i.name,qty:i.qty,price:i.price,img:i.img})),total:parseFloat(total.toFixed(2))});shopCart={};renderCart();toggleCart();showOrderConfirmation(result.orderNumber,result.fullName);}catch(e){alert('Failed to place order: '+e.message);}finally{if(btn){btn.disabled=false;btn.textContent='Checkout \u2192';}}};window.showOrderConfirmation=function(orderNumber,fullName){document.getElementById('order-confirm-number').textContent='#'+orderNumber;const copyText='Order #'+orderNumber+' by '+(fullName||'');const copyBtn=document.getElementById('order-confirm-copy-btn');copyBtn.dataset.copy=copyText;const preview=document.getElementById('order-confirm-copy-preview');if(preview)preview.textContent=copyText;document.getElementById('order-confirm-modal').style.display='flex';};window.closeOrderConfirmation=function(){document.getElementById('order-confirm-modal').style.display='none';};renderCart();</script>
 
-window.toggleCart = function() {
-  document.getElementById('cart-drawer').classList.toggle('open');
-  document.getElementById('cart-overlay').classList.toggle('open');
-};
-
-window.shopCheckout = async function() {
-  const items = Object.values(shopCart);
-  if (!items.length) { alert('Your cart is empty!'); return; }
-
-  const total = items.reduce((s, i) => s + i.qty * i.price, 0);
-  const btn = document.querySelector('.cart-checkout-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Placing order...'; }
-
-  try {
-    const result = await window._saveOrder({
-      items: items.map(i => ({ name: i.name, qty: i.qty, price: i.price, img: i.img })),
-      total: parseFloat(total.toFixed(2))
-    });
-
-    shopCart = {};
-    renderCart();
-    toggleCart();
-    showOrderConfirmation(result.orderNumber, result.fullName);
-  } catch(e) {
-    alert('Failed to place order: ' + e.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Checkout \u2192'; }
-  }
-};
-
-window.showOrderConfirmation = function(orderNumber, fullName) {
-  document.getElementById('order-confirm-number').textContent = '#' + orderNumber;
-  // Store copy text for the copy button
-  const copyText = 'Order #' + orderNumber + ' by ' + (fullName || '');
-  const copyBtn = document.getElementById('order-confirm-copy-btn');
-  copyBtn.dataset.copy = copyText;
-  const preview = document.getElementById('order-confirm-copy-preview');
-  if (preview) preview.textContent = copyText;
-  document.getElementById('order-confirm-modal').style.display = 'flex';
-};
-
-window.closeOrderConfirmation = function() {
-  document.getElementById('order-confirm-modal').style.display = 'none';
-};
-
-// init empty cart on load
-renderCart();
-</script>
-
-<!-- ORDER CONFIRMATION MODAL -->
-<div id="order-confirm-modal" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;" onclick="if(event.target===this)closeOrderConfirmation()">
-  <div style="background:var(--card);border:1px solid rgba(168,85,247,0.45);border-radius:16px;width:100%;max-width:460px;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;gap:1.25rem;box-shadow:0 0 60px rgba(168,85,247,0.18);text-align:center;animation:popIn 0.2s ease;">
-    <div style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;">
-      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div>
-      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;letter-spacing:0.05em;color:#22c55e;margin-bottom:0.3rem;">ORDER PLACED!</div>
-      <div style="font-size:0.85rem;color:var(--muted);">Your order has been received. Here is your order number:</div>
-    </div>
-    <div style="background:var(--bg);border:2px solid var(--primary);border-radius:10px;padding:0.9rem 2rem;width:100%;">
-      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">Your Order Number</div>
-      <div id="order-confirm-number" style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--primary);text-shadow:0 0 20px rgba(168,85,247,0.6);letter-spacing:0.05em;">#------</div>
-    </div>
-    <div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1.1rem 1.25rem;width:100%;text-align:left;display:flex;flex-direction:column;gap:0.75rem;">
-      <div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--secondary);">Next Step &mdash; Contact Us</div>
-      <p style="font-size:0.87rem;color:var(--text);line-height:1.6;">Please text or email us with your order info so we can fulfill your order:</p>
-      <div style="display:flex;flex-direction:column;gap:0.5rem;">
-        <a href="sms:3855129648" style="display:flex;align-items:center;gap:0.6rem;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.35);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.2)'" onmouseout="this.style.background='rgba(168,85,247,0.1)'">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 10 19.79 19.79 0 0 1 1.69 1.4 2 2 0 0 1 3.68 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          <span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--primary);">TEXT: 385-512-9648</span>
-        </a>
-        <a href="/cdn-cgi/l/email-protection#f2999c9d85859a97809795939f9b9c959a8790b2959f939b9edc919d9f" style="display:flex;align-items:center;gap:0.6rem;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.3);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;" onmouseover="this.style.background='rgba(34,211,238,0.16)'" onmouseout="this.style.background='rgba(34,211,238,0.08)'">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          <span style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.05em;color:var(--secondary);"><span class="__cf_email__" data-cfemail="9ef5f0f1e9e9f6fbecfbf9fff3f7f0f9f6ebfcdef9f3fff7f2b0fdf1f3">[email&#160;protected]</span></span>
-        </a>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.4rem;">
-        <div style="font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Send this message:</div>
-        <button id="order-confirm-copy-btn" data-copy="" onclick="(function(btn){const txt=btn.dataset.copy;function showCopied(){const orig=btn.innerHTML;btn.innerHTML='<svg width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><polyline points=\'20 6 9 17 4 12\'/></svg> Copied!';btn.style.background='rgba(34,197,94,0.15)';btn.style.borderColor='rgba(34,197,94,0.5)';btn.style.color='#22c55e';setTimeout(()=>{btn.innerHTML=orig;btn.style.background='';btn.style.borderColor='';btn.style.color='';},2000);}function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');showCopied();}catch(e){alert(t);}document.body.removeChild(ta);}if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(showCopied).catch(()=>fallbackCopy(txt));}else{fallbackCopy(txt);}})(this)" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.4);border-radius:8px;padding:0.75rem 1rem;cursor:pointer;text-align:left;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.15)'" onmouseout="this.style.background='rgba(168,85,247,0.08)'">
-          <span id="order-confirm-copy-preview" style="font-family:var(--font-display);font-size:0.78rem;font-weight:700;letter-spacing:0.04em;color:var(--primary);flex:1;text-align:left;word-break:break-all;"></span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-      </div>
-    </div>
-    <button onclick="closeOrderConfirmation()" style="width:100%;padding:0.85rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 20px rgba(168,85,247,0.35);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 0 32px rgba(168,85,247,0.6)'" onmouseout="this.style.transform='';this.style.boxShadow='0 0 20px rgba(168,85,247,0.35)'">Got It!</button>
-  </div>
+<div id="order-confirm-modal" onclick="if(event.target===this)closeOrderConfirmation()" style="display:none;position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,0.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;">
+<div style="background:var(--card);border:1px solid rgba(168,85,247,0.45);border-radius:16px;width:100%;max-width:460px;padding:2.5rem 2rem;display:flex;flex-direction:column;align-items:center;gap:1.25rem;box-shadow:0 0 60px rgba(168,85,247,0.18);text-align:center;animation:popIn 0.2s ease;">
+<div style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.4);border-radius:50%;width:64px;height:64px;display:flex;align-items:center;justify-content:center;">
+<svg fill="none" height="30" stroke="#22c55e" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="30"><polyline points="20 6 9 17 4 12"></polyline></svg>
+</div>
+<div>
+<div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;letter-spacing:0.05em;color:#22c55e;margin-bottom:0.3rem;">ORDER PLACED!</div>
+<div style="font-size:0.85rem;color:var(--muted);">Your order has been received. Here is your order number:</div>
+</div>
+<div style="background:var(--bg);border:2px solid var(--primary);border-radius:10px;padding:0.9rem 2rem;width:100%;">
+<div style="font-size:0.65rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;">Your Order Number</div>
+<div id="order-confirm-number" style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--primary);text-shadow:0 0 20px rgba(168,85,247,0.6);letter-spacing:0.05em;">#------</div>
+</div>
+<div style="background:rgba(34,211,238,0.06);border:1px solid rgba(34,211,238,0.25);border-radius:10px;padding:1.1rem 1.25rem;width:100%;text-align:left;display:flex;flex-direction:column;gap:0.75rem;">
+<div style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--secondary);">Next Step — Contact Us</div>
+<p style="font-size:0.87rem;color:var(--text);line-height:1.6;">Please text or email us with your order info so we can fulfill your order:</p>
+<div style="display:flex;flex-direction:column;gap:0.5rem;">
+<a href="sms:3855129648" onmouseout="this.style.background='rgba(168,85,247,0.1)'" onmouseover="this.style.background='rgba(168,85,247,0.2)'" style="display:flex;align-items:center;gap:0.6rem;background:rgba(168,85,247,0.1);border:1px solid rgba(168,85,247,0.35);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;">
+<svg fill="none" height="15" stroke="var(--primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 10 19.79 19.79 0 0 1 1.69 1.4 2 2 0 0 1 3.68 0h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 7.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--primary);">TEXT: 385-512-9648</span>
+</a>
+<a href="/cdn-cgi/l/email-protection#f2999c9d85859a97809795939f9b9c959a8790b2959f939b9edc919d9f" onmouseout="this.style.background='rgba(34,211,238,0.08)'" onmouseover="this.style.background='rgba(34,211,238,0.16)'" style="display:flex;align-items:center;gap:0.6rem;background:rgba(34,211,238,0.08);border:1px solid rgba(34,211,238,0.3);border-radius:8px;padding:0.65rem 1rem;text-decoration:none;transition:background 0.2s;">
+<svg fill="none" height="15" stroke="var(--secondary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+<span style="font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.05em;color:var(--secondary);"><span class="__cf_email__" data-cfemail="9ef5f0f1e9e9f6fbecfbf9fff3f7f0f9f6ebfcdef9f3fff7f2b0fdf1f3">[email protected]</span></span>
+</a>
+</div>
+<div style="display:flex;flex-direction:column;gap:0.4rem;">
+<div style="font-size:0.7rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);">Send this message:</div>
+<button data-copy="" id="order-confirm-copy-btn" onclick="(function(btn){const txt=btn.dataset.copy;function showCopied(){const orig=btn.innerHTML;btn.innerHTML='&lt;svg width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2.5\' stroke-linecap=\'round\' stroke-linejoin=\'round\'&gt;&lt;polyline points=\'20 6 9 17 4 12\'/&gt;&lt;/svg&gt; Copied!';btn.style.background='rgba(34,197,94,0.15)';btn.style.borderColor='rgba(34,197,94,0.5)';btn.style.color='#22c55e';setTimeout(()=&gt;{btn.innerHTML=orig;btn.style.background='';btn.style.borderColor='';btn.style.color='';},2000);}function fallbackCopy(t){const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');showCopied();}catch(e){alert(t);}document.body.removeChild(ta);}if(navigator.clipboard&amp;&amp;navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(showCopied).catch(()=&gt;fallbackCopy(txt));}else{fallbackCopy(txt);}})(this)" onmouseout="this.style.background='rgba(168,85,247,0.08)'" onmouseover="this.style.background='rgba(168,85,247,0.15)'" style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.4);border-radius:8px;padding:0.75rem 1rem;cursor:pointer;text-align:left;transition:background 0.2s,border-color 0.2s;">
+<span id="order-confirm-copy-preview" style="font-family:var(--font-display);font-size:0.78rem;font-weight:700;letter-spacing:0.04em;color:var(--primary);flex:1;text-align:left;word-break:break-all;"></span>
+<svg fill="none" height="14" stroke="var(--primary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" style="flex-shrink:0;" viewbox="0 0 24 24" width="14"><rect height="13" rx="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+</button>
+</div>
+</div>
+<button onclick="closeOrderConfirmation()" onmouseout="this.style.transform='';this.style.boxShadow='0 0 20px rgba(168,85,247,0.35)'" onmouseover="this.style.transform='scale(1.02)';this.style.boxShadow='0 0 32px rgba(168,85,247,0.6)'" style="width:100%;padding:0.85rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;box-shadow:0 0 20px rgba(168,85,247,0.35);transition:transform 0.15s,box-shadow 0.15s;">Got It!</button>
+</div>
 </div>
 
-<!-- ORDERS PANEL -->
 <div id="orders-panel" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1.5rem;">
-  <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(34,211,238,0.08);">
-    <!-- header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
-      <div style="display:flex;align-items:center;gap:0.6rem;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-        <span id="orders-panel-title" style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--secondary);">ORDERS</span>
-      </div>
-      <button onclick="closeOrdersPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <!-- summary -->
-    <div id="orders-summary" style="padding:0.6rem 1.5rem;font-size:0.72rem;color:var(--muted);border-bottom:1px solid var(--border);"></div>
-    <!-- list -->
-    <div id="orders-list" style="flex:1;overflow-y:auto;padding:1rem 1.5rem;display:flex;flex-direction:column;gap:0.65rem;scrollbar-width:thin;scrollbar-color:rgba(34,211,238,0.2) transparent;">
-      <div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading orders...</div>
-    </div>
-  </div>
+<div style="background:var(--card);border:1px solid var(--border);border-radius:14px;width:100%;max-width:680px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 0 60px rgba(34,211,238,0.08);">
+
+<div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);">
+<div style="display:flex;align-items:center;gap:0.6rem;">
+<svg fill="none" height="15" stroke="var(--secondary)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" x2="21" y1="6" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+<span id="orders-panel-title" style="font-family:var(--font-display);font-size:0.8rem;font-weight:700;letter-spacing:0.15em;color:var(--secondary);">ORDERS</span>
+</div>
+<button onclick="closeOrdersPanel()" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;transition:border-color 0.2s,color 0.2s;">
+<svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="13"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg>
+</button>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-window.openOrdersPanel = function() {
-  const panel = document.getElementById('orders-panel');
-  panel.style.display = 'flex';
-  loadOrders();
-};
+<div id="orders-summary" style="padding:0.6rem 1.5rem;font-size:0.72rem;color:var(--muted);border-bottom:1px solid var(--border);"></div>
 
-window.closeOrdersPanel = function() {
-  document.getElementById('orders-panel').style.display = 'none';
-};
-
-// Close on backdrop click
-document.getElementById('orders-panel').addEventListener('click', function(e) {
-  if (e.target === this) closeOrdersPanel();
-});
-
-function _buildOrderCard(o, isCompleted, showUser) {
-  const date = new Date(o.placedAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
-  const completedDate = o.completedAt ? new Date(o.completedAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
-  const orderNumDisplay = o.orderNumber ? `<span style="font-size:0.65rem;color:var(--secondary);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;opacity:0.85;">ORDER-${o.orderNumber}</span>` : '';
-  const itemLines = (o.items || []).map(i =>
-    `<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);padding:0.2rem 0;">
+<div id="orders-list" style="flex:1;overflow-y:auto;padding:1rem 1.5rem;display:flex;flex-direction:column;gap:0.65rem;scrollbar-width:thin;scrollbar-color:rgba(34,211,238,0.2) transparent;">
+<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading orders...</div>
+</div>
+</div>
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>window.openOrdersPanel=function(){const panel=document.getElementById('orders-panel');panel.style.display='flex';loadOrders();};window.closeOrdersPanel=function(){document.getElementById('orders-panel').style.display='none';};document.getElementById('orders-panel').addEventListener('click',function(e){if(e.target===this)closeOrdersPanel();});function _buildOrderCard(o,isCompleted,showUser){const date=new Date(o.placedAt).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});const completedDate=o.completedAt?new Date(o.completedAt).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';const orderNumDisplay=o.orderNumber?`<span style="font-size:0.65rem;color:var(--secondary);font-family:var(--font-display);font-weight:700;letter-spacing:0.08em;opacity:0.85;">ORDER-${o.orderNumber}</span>`:'';const itemLines=(o.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:var(--muted);padding:0.2rem 0;">
       <span style="display:flex;align-items:center;gap:0.4rem;">
-        ${i.img ? `<img src="${escHtml(i.img)}" style="width:22px;height:22px;object-fit:contain;opacity:0.8;" onerror="this.style.display='none'" />` : ''}
+        ${i.img ? `<img src="${escHtml(i.img)}"style="width:22px;height:22px;object-fit:contain;opacity:0.8;"onerror="this.style.display='none'"/>` : ''}
         ${escHtml(i.name)} <span style="color:var(--border)">×${i.qty}</span>
       </span>
       <span style="color:var(--text);font-weight:600;">$${(i.qty * i.price).toFixed(2)}</span>
-    </div>`
-  ).join('');
-
-  const safeId = (o.id || '').replace(/'/g, "\\'");
-
-  // Normal users don't get complete/undo buttons
-  let actionBtn = '';
-  if (window._canSeeAllOrders) {
-    actionBtn = isCompleted
-      ? `<button onclick="undoOrderComplete('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(100,116,139,0.12);border:1px solid rgba(100,116,139,0.35);border-radius:6px;color:var(--muted);font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(100,116,139,0.22)'" onmouseout="this.style.background='rgba(100,116,139,0.12)'">↩ Undo</button>`
-      : `<button onclick="completeOrder('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:6px;color:#ef4444;font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.22)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">✓ Complete</button>`;
-  }
-
-  const borderColor = isCompleted ? 'rgba(100,116,139,0.25)' : 'var(--border)';
-  const opacity = isCompleted ? '0.7' : '1';
-
-  const userLine = showUser
-    ? `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${escHtml(o.fullName || o.username || o.email)}</span>
-       <span style="font-size:0.68rem;color:var(--muted);">${escHtml(o.email)} · ${date}</span>`
-    : `<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">Your Order</span>
-       <span style="font-size:0.68rem;color:var(--muted);">${date}</span>`;
-
-  return `<div data-order-id="${escHtml(o.id)}" style="background:var(--bg);border:1px solid ${borderColor};border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.5rem;opacity:${opacity};">
+    </div>`).join('');const safeId=(o.id||'').replace(/'/g,"\\'");let actionBtn='';if(window._canSeeAllOrders){actionBtn=isCompleted?`<button onclick="undoOrderComplete('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(100,116,139,0.12);border:1px solid rgba(100,116,139,0.35);border-radius:6px;color:var(--muted);font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(100,116,139,0.22)'" onmouseout="this.style.background='rgba(100,116,139,0.12)'">↩ Undo</button>`:`<button onclick="completeOrder('${safeId}',this)" style="padding:0.28rem 0.75rem;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.4);border-radius:6px;color:#ef4444;font-family:var(--font-display);font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;flex-shrink:0;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.22)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">✓ Complete</button>`;}
+const borderColor=isCompleted?'rgba(100,116,139,0.25)':'var(--border)';const opacity=isCompleted?'0.7':'1';const userLine=showUser?`<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">${escHtml(o.fullName || o.username || o.email)}</span>
+       <span style="font-size:0.68rem;color:var(--muted);">${escHtml(o.email)} · ${date}</span>`:`<span style="font-family:var(--font-display);font-size:0.72rem;font-weight:700;letter-spacing:0.08em;color:var(--text);">Your Order</span>
+       <span style="font-size:0.68rem;color:var(--muted);">${date}</span>`;return`<div data-order-id="${escHtml(o.id)}" style="background:var(--bg);border:1px solid ${borderColor};border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.5rem;opacity:${opacity};">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.4rem;">
       <div style="display:flex;flex-direction:column;gap:0.05rem;flex:1;min-width:0;">
         ${userLine}
@@ -2994,43 +1988,9 @@ function _buildOrderCard(o, isCompleted, showUser) {
     <div style="border-top:1px solid var(--border);padding-top:0.4rem;display:flex;flex-direction:column;gap:0.1rem;">
       ${itemLines}
     </div>
-  </div>`;
-}
-
-async function loadOrders() {
-  const list    = document.getElementById('orders-list');
-  const summary = document.getElementById('orders-summary');
-  const titleEl = document.getElementById('orders-panel-title');
-  list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading...</div>';
-  summary.textContent = '';
-
-  const canSeeAll = !!window._canSeeAllOrders;
-  if (titleEl) titleEl.textContent = canSeeAll ? 'ALL ORDERS' : 'MY ORDERS';
-
-  try {
-    const orders = canSeeAll
-      ? await window._fetchAllOrders()
-      : await window._fetchMyOrders();
-    const active    = orders.filter(o => !o.completed);
-    const completed = orders.filter(o => o.completed);
-
-    summary.textContent = `${active.length} active · ${completed.length} completed · ${orders.length} total`;
-
-    if (!orders.length) {
-      list.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;opacity:0.5;">No orders yet.</div>';
-      return;
-    }
-
-    const activeHtml = active.length
-      ? active.map(o => _buildOrderCard(o, false, canSeeAll)).join('')
-      : '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:1rem 0;opacity:0.5;">No active orders.</div>';
-
-    // Completed Orders collapsible dropdown
-    const completedHtml = completed.length
-      ? completed.map(o => _buildOrderCard(o, true, canSeeAll)).join('')
-      : '<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:0.75rem 0;opacity:0.5;">No completed orders yet.</div>';
-
-    const completedSection = `
+  </div>`;}
+async function loadOrders(){const list=document.getElementById('orders-list');const summary=document.getElementById('orders-summary');const titleEl=document.getElementById('orders-panel-title');list.innerHTML='<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;">Loading...</div>';summary.textContent='';const canSeeAll=!!window._canSeeAllOrders;if(titleEl)titleEl.textContent=canSeeAll?'ALL ORDERS':'MY ORDERS';try{const orders=canSeeAll?await window._fetchAllOrders():await window._fetchMyOrders();const active=orders.filter(o=>!o.completed);const completed=orders.filter(o=>o.completed);summary.textContent=`${active.length} active · ${completed.length} completed · ${orders.length} total`;if(!orders.length){list.innerHTML='<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:2rem 0;opacity:0.5;">No orders yet.</div>';return;}
+const activeHtml=active.length?active.map(o=>_buildOrderCard(o,false,canSeeAll)).join(''):'<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:1rem 0;opacity:0.5;">No active orders.</div>';const completedHtml=completed.length?completed.map(o=>_buildOrderCard(o,true,canSeeAll)).join(''):'<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:0.75rem 0;opacity:0.5;">No completed orders yet.</div>';const completedSection=`
       <div style="margin-top:0.25rem;">
         <button onclick="toggleCompletedOrders(this)" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:rgba(100,116,139,0.06);border:1px solid rgba(100,116,139,0.25);border-radius:8px;padding:0.65rem 1rem;cursor:pointer;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;transition:background 0.2s,border-color 0.2s;" onmouseover="this.style.background='rgba(100,116,139,0.12)'" onmouseout="this.style.background='rgba(100,116,139,0.06)'">
           <span style="display:flex;align-items:center;gap:0.5rem;">
@@ -3043,440 +2003,50 @@ async function loadOrders() {
         <div class="completed-orders-body" style="display:none;padding-top:0.5rem;display:flex;flex-direction:column;gap:0.5rem;">
           ${completedHtml}
         </div>
-      </div>`;
+      </div>`;list.innerHTML=activeHtml+completedSection;list.querySelector('.completed-orders-body').style.display='none';}catch(e){list.innerHTML=`<div style="color:var(--danger);font-size:0.82rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;}}
+window.toggleCompletedOrders=function(btn){const body=btn.nextElementSibling;const chevron=btn.querySelector('.completed-chevron');const isOpen=body.style.display!=='none';body.style.display=isOpen?'none':'flex';body.style.flexDirection='column';body.style.gap='0.5rem';chevron.style.transform=isOpen?'':'rotate(180deg)';};window.completeOrder=async function(orderId,btn){btn.disabled=true;btn.textContent='...';try{await window._markOrderCompleted(orderId);await loadOrders();}catch(e){btn.disabled=false;btn.textContent='✓ Complete';alert('Failed to mark complete: '+e.message);}};window.undoOrderComplete=async function(orderId,btn){btn.disabled=true;btn.textContent='...';try{await window._markOrderActive(orderId);await loadOrders();}catch(e){btn.disabled=false;btn.textContent='↩ Undo';alert('Failed to undo: '+e.message);}};</script>
 
-    list.innerHTML = activeHtml + completedSection;
-    // Start collapsed
-    list.querySelector('.completed-orders-body').style.display = 'none';
-
-  } catch(e) {
-    list.innerHTML = `<div style="color:var(--danger);font-size:0.82rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;
-  }
-}
-
-window.toggleCompletedOrders = function(btn) {
-  const body = btn.nextElementSibling;
-  const chevron = btn.querySelector('.completed-chevron');
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'flex';
-  body.style.flexDirection = 'column';
-  body.style.gap = '0.5rem';
-  chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
-};
-
-window.completeOrder = async function(orderId, btn) {
-  btn.disabled = true;
-  btn.textContent = '...';
-  try {
-    await window._markOrderCompleted(orderId);
-    await loadOrders();
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = '✓ Complete';
-    alert('Failed to mark complete: ' + e.message);
-  }
-};
-
-window.undoOrderComplete = async function(orderId, btn) {
-  btn.disabled = true;
-  btn.textContent = '...';
-  try {
-    await window._markOrderActive(orderId);
-    await loadOrders();
-  } catch(e) {
-    btn.disabled = false;
-    btn.textContent = '↩ Undo';
-    alert('Failed to undo: ' + e.message);
-  }
-};
-</script>
-<!-- GAME PREVIEW TOOLTIP -->
-<div id="game-preview-tooltip" class="game-preview-tooltip" aria-hidden="true">
-  <div class="game-preview-loading" id="game-preview-loading">
-    <div class="game-preview-spinner"></div>
-    <span>Loading preview…</span>
-  </div>
-  <img id="game-preview-img" src="" alt="" style="display:none;" />
-  <div class="game-preview-tooltip-label">
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M7 9v2"/><path d="M6 10h2"/><path d="M17 12h.01"/><path d="M12 12h.01"/></svg>
-    <span id="game-preview-name"></span>
-  </div>
+<div aria-hidden="true" class="game-preview-tooltip" id="game-preview-tooltip">
+<div class="game-preview-loading" id="game-preview-loading">
+<div class="game-preview-spinner"></div>
+<span>Loading preview…</span>
 </div>
-
-<script>
-(function() {
-  const tooltip  = document.getElementById('game-preview-tooltip');
-  const img      = document.getElementById('game-preview-img');
-  const loading  = document.getElementById('game-preview-loading');
-  const nameEl   = document.getElementById('game-preview-name');
-  const PAD      = 14; // gap from cursor
-  const PREVIEW_DEFAULT = { width: 240, height: 140 };
-  const PREVIEW_MIN = { width: 190, height: 110 };
-  const PREVIEW_MAX = { width: 260, height: 170 };
-  let  hideTimer = null;
-  let  current   = null;
-  const cache    = {};
-
-  function setPreviewSize(width, height) {
-    const safeWidth = Math.max(1, width || PREVIEW_DEFAULT.width);
-    const safeHeight = Math.max(1, height || PREVIEW_DEFAULT.height);
-    const scale = Math.min(PREVIEW_MAX.width / safeWidth, PREVIEW_MAX.height / safeHeight);
-    let finalWidth = Math.round(safeWidth * scale);
-    let finalHeight = Math.round(safeHeight * scale);
-
-    if (finalWidth < PREVIEW_MIN.width) {
-      const ratio = PREVIEW_MIN.width / finalWidth;
-      finalWidth = Math.round(finalWidth * ratio);
-      finalHeight = Math.round(finalHeight * ratio);
-    }
-    if (finalHeight < PREVIEW_MIN.height) {
-      const ratio = PREVIEW_MIN.height / finalHeight;
-      finalWidth = Math.round(finalWidth * ratio);
-      finalHeight = Math.round(finalHeight * ratio);
-    }
-    if (finalWidth > PREVIEW_MAX.width) {
-      const ratio = PREVIEW_MAX.width / finalWidth;
-      finalWidth = Math.round(finalWidth * ratio);
-      finalHeight = Math.round(finalHeight * ratio);
-    }
-    if (finalHeight > PREVIEW_MAX.height) {
-      const ratio = PREVIEW_MAX.height / finalHeight;
-      finalWidth = Math.round(finalWidth * ratio);
-      finalHeight = Math.round(finalHeight * ratio);
-    }
-
-    tooltip.style.setProperty('--preview-width', `${finalWidth}px`);
-    tooltip.style.setProperty('--preview-height', `${finalHeight}px`);
-  }
-
-  function resetPreviewSize() {
-    setPreviewSize(PREVIEW_DEFAULT.width, PREVIEW_DEFAULT.height);
-  }
-
-  function showTooltip(target) {
-    const url  = target.getAttribute('href');
-    const screenshot = target.dataset.screenshot || '';
-    const name = target.querySelector('span') ? target.querySelector('span').textContent : target.textContent.trim();
-    const cacheKey = `${url}::${screenshot}`;
-    if (!url || current === cacheKey) return;
-    current = cacheKey;
-    clearTimeout(hideTimer);
-
-    nameEl.textContent = name;
-    resetPreviewSize();
-    img.style.display  = 'none';
-    loading.style.display = 'flex';
-    loading.innerHTML = screenshot
-      ? '<div class="game-preview-spinner"></div><span>Loading preview…</span>'
-      : '<span style="color:var(--muted);font-size:0.72rem;">No preview added</span>';
-    tooltip.classList.remove('visible');
-
-    positionTooltip(target._lastMouseEvent || { clientX: 0, clientY: 0 });
-
-    tooltip._showTimer = setTimeout(() => {
-      tooltip.classList.add('visible');
-      if (!screenshot) return;
-      if (cache[screenshot]) {
-        showImg(cache[screenshot]);
-      } else {
-        const preload = new Image();
-        preload.onload = () => {
-          if (preload.naturalWidth < 10 || preload.naturalHeight < 10) {
-            if (current === cacheKey) {
-              loading.style.display = 'flex';
-              img.style.display = 'none';
-              loading.innerHTML = '<span style="color:var(--muted);font-size:0.72rem;">Preview image is invalid</span>';
-            }
-            return;
-          }
-          cache[screenshot] = {
-            src: screenshot,
-            width: preload.naturalWidth,
-            height: preload.naturalHeight
-          };
-          if (current === cacheKey) showImg(cache[screenshot]);
-        };
-        preload.onerror = () => {
-          if (current === cacheKey) {
-            loading.style.display = 'flex';
-            img.style.display = 'none';
-            loading.innerHTML = '<span style="color:var(--muted);font-size:0.72rem;">Preview image failed to load</span>';
-          }
-        };
-        preload.src = screenshot;
-      }
-    }, 120);
-  }
-
-  function showImg(preview) {
-    const previewData = typeof preview === 'string'
-      ? { src: preview, width: PREVIEW_DEFAULT.width, height: PREVIEW_DEFAULT.height }
-      : preview;
-    setPreviewSize(previewData.width, previewData.height);
-    img.src = previewData.src;
-    img.style.display = 'block';
-    loading.style.display = 'none';
-    loading.innerHTML = '<div class="game-preview-spinner"></div><span>Loading preview…</span>';
-  }
-
-  function hideTooltip() {
-    clearTimeout(tooltip._showTimer);
-    current = null;
-    hideTimer = setTimeout(() => {
-      tooltip.classList.remove('visible');
-    }, 80);
-  }
-
-  function positionTooltip(e) {
-    const tw = tooltip.offsetWidth  || 240;
-    const th = tooltip.offsetHeight || 190;
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    let x = e.clientX + PAD;
-    let y = e.clientY + PAD;
-    if (x + tw > vw - 8) x = e.clientX - tw - PAD;
-    if (y + th > vh - 8) y = e.clientY - th - PAD;
-    if (x < 8) x = 8;
-    if (y < 8) y = 8;
-    tooltip.style.left = x + 'px';
-    tooltip.style.top  = y + 'px';
-  }
-
-  // Delegate events on #archive (re-rendered on search)
-  document.addEventListener('mouseover', (e) => {
-    const card = e.target.closest('#archive .game-card');
-    if (card) {
-      card._lastMouseEvent = e;
-      showTooltip(card);
-    }
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    const card = e.target.closest('#archive .game-card');
-    if (card) {
-      card._lastMouseEvent = e;
-      positionTooltip(e);
-    }
-  });
-
-  document.addEventListener('mouseout', (e) => {
-    const card = e.target.closest('#archive .game-card');
-    if (card && !card.contains(e.relatedTarget)) {
-      hideTooltip();
-    }
-  });
-})();
-</script>
-
-<script>
-// ═══════════════════════════════════════════
-//  BLOCK STATUS CHECKER  v2
-//  – One check per domain (all URLs sharing
-//    the same hostname share the result).
-//  – Improved accuracy: no false-positive from
-//    opaque iframe loads.
-//  – Works for both game cards AND site pills.
-// ═══════════════════════════════════════════
-(function() {
-  const BLOCKED_HOST    = 'ckf02.alpinedistrict.org';
-  const CHECK_TIMEOUT_MS = 7000;   // 7 s per domain
-  const CONCURRENCY      = 5;      // parallel domain checks
-
-  // domain → 'ok' | 'blocked'
-  const domainCache = {};
-  // domain → Promise (in-flight check)
-  const domainInflight = {};
-
-  function getHostname(url) {
-    try { return new URL(url).hostname.toLowerCase(); }
-    catch(_) { return null; }
-  }
-
-  // Returns a representative URL to test for a given hostname.
-  // We test the origin (scheme + host) — no path — so it's
-  // the same request regardless of which game on that domain we pick.
-  function getOriginUrl(url) {
-    try { const u = new URL(url); return u.origin; }
-    catch(_) { return url; }
-  }
-
-  // ── Core check (per domain origin) ──────────────────────────
-  // Strategy:
-  //   1. fetch() HEAD with redirect:follow — catches CORS-open hosts
-  //      and redirect-to-blocker accurately.
-  //   2. fetch() no-cors — if step 1 was a CORS TypeError, try no-cors.
-  //      An opaque response means the server replied → ok.
-  //      A network error means the host is unreachable → blocked.
-  //   3. Timeout of either fetch → blocked.
-  //
-  // We deliberately do NOT use iframes because:
-  //   • iframe.onload fires even when the blocker redirect page loads,
-  //     causing false "ok" results.
-  //   • Cross-origin iframes can't reveal the final URL, so we can't
-  //     distinguish game-site load from blocker-redirect load.
-
-  function checkDomain(originUrl) {
-    return new Promise((resolve) => {
-      let done = false;
-      function finish(status) {
-        if (done) return;
-        done = true;
-        resolve(status);
-      }
-
-      const globalTimer = setTimeout(() => finish('blocked'), CHECK_TIMEOUT_MS);
-
-      // Step 1 — HEAD with redirect:follow
-      (async () => {
-        try {
-          const ctrl = new AbortController();
-          const t = setTimeout(() => ctrl.abort(), CHECK_TIMEOUT_MS - 500);
-          const resp = await fetch(originUrl, {
-            method: 'HEAD',
-            redirect: 'follow',
-            signal: ctrl.signal,
-            cache: 'no-store',
-            mode: 'cors'
-          });
-          clearTimeout(t);
-          // Explicit redirect to blocker → blocked
-          const finalHost = resp.url ? new URL(resp.url).hostname : '';
-          if (finalHost === BLOCKED_HOST) {
-            clearTimeout(globalTimer);
-            finish('blocked');
-            return;
-          }
-          // Got a real response → ok
-          clearTimeout(globalTimer);
-          finish('ok');
-        } catch (e1) {
-          if (e1 && e1.name === 'AbortError') {
-            clearTimeout(globalTimer);
-            finish('blocked');
-            return;
-          }
-          // CORS TypeError — try no-cors fallback
-          try {
-            const ctrl2 = new AbortController();
-            const t2 = setTimeout(() => ctrl2.abort(), CHECK_TIMEOUT_MS - 1000);
-            await fetch(originUrl, {
-              method: 'GET',
-              redirect: 'follow',
-              signal: ctrl2.signal,
-              cache: 'no-store',
-              mode: 'no-cors'
-            });
-            clearTimeout(t2);
-            // Opaque response received — host is reachable → ok
-            clearTimeout(globalTimer);
-            finish('ok');
-          } catch (e2) {
-            clearTimeout(globalTimer);
-            // AbortError = timeout = blocked; NetworkError = unreachable = blocked
-            finish('blocked');
-          }
-        }
-      })();
-    });
-  }
-
-  // Returns (or starts) a deduped promise for a domain
-  function checkForDomain(domain, representativeUrl) {
-    if (domainCache[domain] !== undefined) {
-      return Promise.resolve(domainCache[domain]);
-    }
-    if (domainInflight[domain]) return domainInflight[domain];
-    const originUrl = getOriginUrl(representativeUrl);
-    const p = checkDomain(originUrl).then(status => {
-      domainCache[domain] = status;
-      delete domainInflight[domain];
-      return status;
-    });
-    domainInflight[domain] = p;
-    return p;
-  }
-
-  // ── Dot helpers ──────────────────────────────────────────────
-  function setDotStatus(dot, status) {
-    dot.dataset.status  = status;
-    dot.dataset.label   = status === 'ok' ? 'Accessible' : 'Blocked';
-  }
-
-  // ── Queue-based concurrency runner ───────────────────────────
-  let queue   = [];   // { domain, representativeUrl, dots[] }
-  let running = 0;
-
-  function runNext() {
-    while (running < CONCURRENCY && queue.length > 0) {
-      const { domain, representativeUrl, dots } = queue.shift();
-      running++;
-      checkForDomain(domain, representativeUrl).then(status => {
-        dots.forEach(d => setDotStatus(d, status));
-        running--;
-        runNext();
-      }).catch(() => {
-        dots.forEach(d => setDotStatus(d, 'blocked'));
-        running--;
-        runNext();
-      });
-    }
-  }
-
-  // ── Public: call after rendering any dots ────────────────────
-  window.scheduleBlockChecks = function() {
-    // Gather dots from both games archive AND sites list
-    const allDots = document.querySelectorAll('.block-dot[data-url]');
-
-    // Group by DOMAIN (not full URL) — this is the key dedup step
-    const domainMap = {}; // domain → { representativeUrl, dots[] }
-
-    allDots.forEach(dot => {
-      const url = dot.dataset.url;
-      if (!url) return;
-      const domain = getHostname(url);
-      if (!domain) return;
-
-      // Already have a cached domain result → apply immediately
-      if (domainCache[domain] !== undefined) {
-        setDotStatus(dot, domainCache[domain]);
-        return;
-      }
-
-      // Mark as checking
-      dot.dataset.status = 'checking';
-      dot.dataset.label  = 'Checking\u2026';
-
-      if (!domainMap[domain]) domainMap[domain] = { representativeUrl: url, dots: [] };
-      domainMap[domain].dots.push(dot);
-    });
-
-    // Enqueue domains not already in-flight or queued
-    const queuedDomains = new Set(queue.map(i => i.domain));
-    for (const [domain, { representativeUrl, dots }] of Object.entries(domainMap)) {
-      if (domainInflight[domain]) {
-        // Already checking — hook dots onto the existing promise
-        domainInflight[domain].then(status => dots.forEach(d => setDotStatus(d, status)));
-        continue;
-      }
-      if (queuedDomains.has(domain)) continue;
-      queue.push({ domain, representativeUrl, dots });
-    }
-    runNext();
-  };
-})();
-</script>
-
-<script>
-// Prevent pinch zoom on iOS
-document.addEventListener("touchmove", function(e) {
-  if (e.touches.length > 1) { e.preventDefault(); }
-}, { passive: false });
-var lastTouch = 0;
-document.addEventListener("touchend", function(e) {
-  var now = Date.now();
-  if (now - lastTouch < 300) { e.preventDefault(); }
-  lastTouch = now;
-}, false);
-</script>
+<img alt="" id="game-preview-img" src="" style="display:none;"/>
+<div class="game-preview-tooltip-label">
+<svg fill="none" height="10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="10"><rect height="12" rx="2" width="20" x="2" y="6"></rect><path d="M7 9v2"></path><path d="M6 10h2"></path><path d="M17 12h.01"></path><path d="M12 12h.01"></path></svg>
+<span id="game-preview-name"></span>
+</div>
+</div>
+<script>(function(){const tooltip=document.getElementById('game-preview-tooltip');const img=document.getElementById('game-preview-img');const loading=document.getElementById('game-preview-loading');const nameEl=document.getElementById('game-preview-name');const PAD=14;const PREVIEW_DEFAULT={width:240,height:140};const PREVIEW_MIN={width:190,height:110};const PREVIEW_MAX={width:260,height:170};let hideTimer=null;let current=null;const cache={};function setPreviewSize(width,height){const safeWidth=Math.max(1,width||PREVIEW_DEFAULT.width);const safeHeight=Math.max(1,height||PREVIEW_DEFAULT.height);const scale=Math.min(PREVIEW_MAX.width/safeWidth,PREVIEW_MAX.height/safeHeight);let finalWidth=Math.round(safeWidth*scale);let finalHeight=Math.round(safeHeight*scale);if(finalWidth<PREVIEW_MIN.width){const ratio=PREVIEW_MIN.width/finalWidth;finalWidth=Math.round(finalWidth*ratio);finalHeight=Math.round(finalHeight*ratio);}
+if(finalHeight<PREVIEW_MIN.height){const ratio=PREVIEW_MIN.height/finalHeight;finalWidth=Math.round(finalWidth*ratio);finalHeight=Math.round(finalHeight*ratio);}
+if(finalWidth>PREVIEW_MAX.width){const ratio=PREVIEW_MAX.width/finalWidth;finalWidth=Math.round(finalWidth*ratio);finalHeight=Math.round(finalHeight*ratio);}
+if(finalHeight>PREVIEW_MAX.height){const ratio=PREVIEW_MAX.height/finalHeight;finalWidth=Math.round(finalWidth*ratio);finalHeight=Math.round(finalHeight*ratio);}
+tooltip.style.setProperty('--preview-width',`${finalWidth}px`);tooltip.style.setProperty('--preview-height',`${finalHeight}px`);}
+function resetPreviewSize(){setPreviewSize(PREVIEW_DEFAULT.width,PREVIEW_DEFAULT.height);}
+function showTooltip(target){const url=target.getAttribute('href');const screenshot=target.dataset.screenshot||'';const name=target.querySelector('span')?target.querySelector('span').textContent:target.textContent.trim();const cacheKey=`${url}::${screenshot}`;if(!url||current===cacheKey)return;current=cacheKey;clearTimeout(hideTimer);nameEl.textContent=name;resetPreviewSize();img.style.display='none';loading.style.display='flex';loading.innerHTML=screenshot?'<div class="game-preview-spinner"></div><span>Loading preview…</span>':'<span style="color:var(--muted);font-size:0.72rem;">No preview added</span>';tooltip.classList.remove('visible');positionTooltip(target._lastMouseEvent||{clientX:0,clientY:0});tooltip._showTimer=setTimeout(()=>{tooltip.classList.add('visible');if(!screenshot)return;if(cache[screenshot]){showImg(cache[screenshot]);}else{const preload=new Image();preload.onload=()=>{if(preload.naturalWidth<10||preload.naturalHeight<10){if(current===cacheKey){loading.style.display='flex';img.style.display='none';loading.innerHTML='<span style="color:var(--muted);font-size:0.72rem;">Preview image is invalid</span>';}
+return;}
+cache[screenshot]={src:screenshot,width:preload.naturalWidth,height:preload.naturalHeight};if(current===cacheKey)showImg(cache[screenshot]);};preload.onerror=()=>{if(current===cacheKey){loading.style.display='flex';img.style.display='none';loading.innerHTML='<span style="color:var(--muted);font-size:0.72rem;">Preview image failed to load</span>';}};preload.src=screenshot;}},120);}
+function showImg(preview){const previewData=typeof preview==='string'?{src:preview,width:PREVIEW_DEFAULT.width,height:PREVIEW_DEFAULT.height}:preview;setPreviewSize(previewData.width,previewData.height);img.src=previewData.src;img.style.display='block';loading.style.display='none';loading.innerHTML='<div class="game-preview-spinner"></div><span>Loading preview…</span>';}
+function hideTooltip(){clearTimeout(tooltip._showTimer);current=null;hideTimer=setTimeout(()=>{tooltip.classList.remove('visible');},80);}
+function positionTooltip(e){const tw=tooltip.offsetWidth||240;const th=tooltip.offsetHeight||190;const vw=window.innerWidth;const vh=window.innerHeight;let x=e.clientX+PAD;let y=e.clientY+PAD;if(x+tw>vw-8)x=e.clientX-tw-PAD;if(y+th>vh-8)y=e.clientY-th-PAD;if(x<8)x=8;if(y<8)y=8;tooltip.style.left=x+'px';tooltip.style.top=y+'px';}
+document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archive .game-card');if(card){card._lastMouseEvent=e;showTooltip(card);}});document.addEventListener('mousemove',(e)=>{const card=e.target.closest('#archive .game-card');if(card){card._lastMouseEvent=e;positionTooltip(e);}});document.addEventListener('mouseout',(e)=>{const card=e.target.closest('#archive .game-card');if(card&&!card.contains(e.relatedTarget)){hideTooltip();}});})();</script>
+<script>(function(){const BLOCKED_HOST='ckf02.alpinedistrict.org';const CHECK_TIMEOUT_MS=7000;const CONCURRENCY=5;const domainCache={};const domainInflight={};function getHostname(url){try{return new URL(url).hostname.toLowerCase();}
+catch(_){return null;}}
+function getOriginUrl(url){try{const u=new URL(url);return u.origin;}
+catch(_){return url;}}
+function checkDomain(originUrl){return new Promise((resolve)=>{let done=false;function finish(status){if(done)return;done=true;resolve(status);}
+const globalTimer=setTimeout(()=>finish('blocked'),CHECK_TIMEOUT_MS);(async()=>{try{const ctrl=new AbortController();const t=setTimeout(()=>ctrl.abort(),CHECK_TIMEOUT_MS-500);const resp=await fetch(originUrl,{method:'HEAD',redirect:'follow',signal:ctrl.signal,cache:'no-store',mode:'cors'});clearTimeout(t);const finalHost=resp.url?new URL(resp.url).hostname:'';if(finalHost===BLOCKED_HOST){clearTimeout(globalTimer);finish('blocked');return;}
+clearTimeout(globalTimer);finish('ok');}catch(e1){if(e1&&e1.name==='AbortError'){clearTimeout(globalTimer);finish('blocked');return;}
+try{const ctrl2=new AbortController();const t2=setTimeout(()=>ctrl2.abort(),CHECK_TIMEOUT_MS-1000);await fetch(originUrl,{method:'GET',redirect:'follow',signal:ctrl2.signal,cache:'no-store',mode:'no-cors'});clearTimeout(t2);clearTimeout(globalTimer);finish('ok');}catch(e2){clearTimeout(globalTimer);finish('blocked');}}})();});}
+function checkForDomain(domain,representativeUrl){if(domainCache[domain]!==undefined){return Promise.resolve(domainCache[domain]);}
+if(domainInflight[domain])return domainInflight[domain];const originUrl=getOriginUrl(representativeUrl);const p=checkDomain(originUrl).then(status=>{domainCache[domain]=status;delete domainInflight[domain];return status;});domainInflight[domain]=p;return p;}
+function setDotStatus(dot,status){dot.dataset.status=status;dot.dataset.label=status==='ok'?'Accessible':'Blocked';}
+let queue=[];let running=0;function runNext(){while(running<CONCURRENCY&&queue.length>0){const{domain,representativeUrl,dots}=queue.shift();running++;checkForDomain(domain,representativeUrl).then(status=>{dots.forEach(d=>setDotStatus(d,status));running--;runNext();}).catch(()=>{dots.forEach(d=>setDotStatus(d,'blocked'));running--;runNext();});}}
+window.scheduleBlockChecks=function(){const allDots=document.querySelectorAll('.block-dot[data-url]');const domainMap={};allDots.forEach(dot=>{const url=dot.dataset.url;if(!url)return;const domain=getHostname(url);if(!domain)return;if(domainCache[domain]!==undefined){setDotStatus(dot,domainCache[domain]);return;}
+dot.dataset.status='checking';dot.dataset.label='Checking\u2026';if(!domainMap[domain])domainMap[domain]={representativeUrl:url,dots:[]};domainMap[domain].dots.push(dot);});const queuedDomains=new Set(queue.map(i=>i.domain));for(const[domain,{representativeUrl,dots}]of Object.entries(domainMap)){if(domainInflight[domain]){domainInflight[domain].then(status=>dots.forEach(d=>setDotStatus(d,status)));continue;}
+if(queuedDomains.has(domain))continue;queue.push({domain,representativeUrl,dots});}
+runNext();};})();</script>
+<script>document.addEventListener("touchmove",function(e){if(e.touches.length>1){e.preventDefault();}},{passive:false});var lastTouch=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-lastTouch<300){e.preventDefault();}
+lastTouch=now;},false);</script>
 </body>
 </html>

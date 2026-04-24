@@ -1,89 +1,21 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<script>
-  // ── About:Blank Cloak ──
-  // Triggered by user interaction to avoid popup blockers.
-  (function () {
-    // Only run if we're the top-level page (not already inside an iframe cloak)
-    if (window.self !== window.top) return;
-
-    // Build a tiny entry page that sits at about:blank and iframes the real content
-    var currentUrl = window.location.href;
-
-    function launchCloak() {
-      var blank = window.open('about:blank', '_blank');
-      if (!blank) return; // popup was blocked — do nothing
-      var iframeStyle = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;';
-      var bodyStyle   = 'margin:0;padding:0;overflow:hidden;background:#0a0a0f;';
-      blank.document.open();
-      blank.document.write(
-        '<!DOCTYPE html><html><head><title> </title></head>' +
-        '<body style="' + bodyStyle + '">' +
-        '<iframe src="' + currentUrl + '" style="' + iframeStyle + '" allowfullscreen></iframe>' +
-        '</body></html>'
-      );
-      blank.document.close();
-      window.close(); // close the original tab
-    }
-
-    // Show a full-screen "Enter" overlay so the open() is tied to a click
-    var overlay = document.createElement('div');
-    overlay.id = 'cloak-entry';
-    overlay.style.cssText = [
-      'position:fixed', 'inset:0', 'z-index:999999',
-      'background:#0a0a0f',
-      'display:flex', 'flex-direction:column',
-      'align-items:center', 'justify-content:center', 'gap:1.5rem',
-      'font-family:sans-serif'
-    ].join(';');
-
-    var logo = document.createElement('div');
-    logo.style.cssText = 'font-size:1.1rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;';
-    logo.textContent = 'KNOWWHERE';
-
-    var btn = document.createElement('button');
-    btn.textContent = 'Enter';
-    btn.style.cssText = [
-      'padding:0.85rem 3rem',
-      'background:#a855f7',
-      'color:#fff',
-      'border:none',
-      'border-radius:6px',
-      'font-size:0.85rem',
-      'font-weight:700',
-      'letter-spacing:0.15em',
-      'text-transform:uppercase',
-      'cursor:pointer',
-      'box-shadow:0 0 24px rgba(168,85,247,0.5)'
-    ].join(';');
-    btn.onclick = launchCloak;
-
-    overlay.appendChild(logo);
-    overlay.appendChild(btn);
-
-    // Insert overlay as soon as <body> is available
-    function attach() {
-      if (document.body) {
-        document.body.appendChild(overlay);
-      } else {
-        document.addEventListener('DOMContentLoaded', function () {
-          document.body.appendChild(overlay);
-        });
-      }
-    }
-    attach();
-  })();
-</script>
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms of Service · KnowWhere</title>
-  <link rel="icon" href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" type="image/x-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
+<script>(function(){if(window.self!==window.top)return;var currentUrl=window.location.href;function launchCloak(){var blank=window.open('about:blank','_blank');if(!blank)return;var iframeStyle='position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;';var bodyStyle='margin:0;padding:0;overflow:hidden;background:#0a0a0f;';blank.document.open();blank.document.write('<!DOCTYPE html><html><head><title> </title></head>'+
+'<body style="'+bodyStyle+'">'+
+'<iframe src="'+currentUrl+'" style="'+iframeStyle+'" allowfullscreen></iframe>'+
+'</body></html>');blank.document.close();window.close();}
+var overlay=document.createElement('div');overlay.id='cloak-entry';overlay.style.cssText=['position:fixed','inset:0','z-index:999999','background:#0a0a0f','display:flex','flex-direction:column','align-items:center','justify-content:center','gap:1.5rem','font-family:sans-serif'].join(';');var logo=document.createElement('div');logo.style.cssText='font-size:1.1rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;';logo.textContent='KNOWWHERE';var btn=document.createElement('button');btn.textContent='Enter';btn.style.cssText=['padding:0.85rem 3rem','background:#a855f7','color:#fff','border:none','border-radius:6px','font-size:0.85rem','font-weight:700','letter-spacing:0.15em','text-transform:uppercase','cursor:pointer','box-shadow:0 0 24px rgba(168,85,247,0.5)'].join(';');btn.onclick=launchCloak;overlay.appendChild(logo);overlay.appendChild(btn);function attach(){if(document.body){document.body.appendChild(overlay);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(overlay);});}}
+attach();})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Terms of Service · KnowWhere</title>
+<link href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -463,333 +395,312 @@
   </style>
 </head>
 <body>
-
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 
-<!-- NAV -->
 <nav>
-  <a class="nav-logo" href="index.html">
-    <img src="https://knowwherestorage.s3.us-east-1.amazonaws.com/KnowWhere-Logo-Trans.png" alt="KnowWhere">
-    <span class="nav-logo-text">Know<span>Where</span></span>
-  </a>
-  <span class="nav-badge">Terms of Service</span>
+<a class="nav-logo" href="index.html">
+<img alt="KnowWhere" src="https://knowwherestorage.s3.us-east-1.amazonaws.com/KnowWhere-Logo-Trans.png"/>
+<span class="nav-logo-text">Know<span>Where</span></span>
+</a>
+<span class="nav-badge">Terms of Service</span>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
-  <h1>Terms of Service &amp;<br>Participation Agreement</h1>
-  <p class="hero-sub">These terms establish the rules, expectations, and operational standards governing all KnowWhere activities.</p>
-  <span class="hero-date">
-    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+<h1>Terms of Service &amp;<br/>Participation Agreement</h1>
+<p class="hero-sub">These terms establish the rules, expectations, and operational standards governing all KnowWhere activities.</p>
+<span class="hero-date">
+<svg fill="none" height="10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="10"><rect height="18" rx="2" width="18" x="3" y="4"></rect><line x1="16" x2="16" y1="2" y2="6"></line><line x1="8" x2="8" y1="2" y2="6"></line><line x1="3" x2="21" y1="10" y2="10"></line></svg>
     Last Updated: Sometime in 2026
   </span>
 </div>
 
-<!-- TABLE OF CONTENTS -->
 <div class="toc-wrap">
-  <div class="toc">
-    <div class="toc-title">Table of Contents</div>
-    <a href="#intro">Introduction</a>
-    <a href="#definitions">Definitions</a>
-    <a href="#acceptance">Acceptance of Terms</a>
-    <a href="#conduct">Conduct &amp; Community Standards</a>
-    <a href="#bounties">Bounties &amp; Reward System</a>
-    <a href="#authority">Organizer Authority</a>
-    <a href="#violations">Violations &amp; Consequences</a>
-    <a href="#appeals">Investigations &amp; Appeals</a>
-    <a href="#privacy">Data &amp; Privacy</a>
-    <a href="#disclaimers">Disclaimers &amp; Warnings</a>
-    <a href="#ip">Intellectual Property</a>
-    <a href="#external">School &amp; External Environments</a>
-    <a href="#final">Final Agreement</a>
-  </div>
+<div class="toc">
+<div class="toc-title">Table of Contents</div>
+<a href="#intro">Introduction</a>
+<a href="#definitions">Definitions</a>
+<a href="#acceptance">Acceptance of Terms</a>
+<a href="#conduct">Conduct &amp; Community Standards</a>
+<a href="#bounties">Bounties &amp; Reward System</a>
+<a href="#authority">Organizer Authority</a>
+<a href="#violations">Violations &amp; Consequences</a>
+<a href="#appeals">Investigations &amp; Appeals</a>
+<a href="#privacy">Data &amp; Privacy</a>
+<a href="#disclaimers">Disclaimers &amp; Warnings</a>
+<a href="#ip">Intellectual Property</a>
+<a href="#external">School &amp; External Environments</a>
+<a href="#final">Final Agreement</a>
+</div>
 </div>
 
-<!-- CONTENT -->
 <div class="content">
 
-  <!-- INTRODUCTION -->
-  <div class="section" id="intro">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <span class="section-title">Introduction</span>
-      <span class="section-num">01</span>
-    </div>
-    <div class="section-body">
-      <p>These Terms of Service establish the rules, expectations, and operational standards governing all activities associated with KnowWhere — a multifaceted, organized system that may include games, challenges, informational systems, bounty tasks, competitions, collaborative activities, educational programs, digital and in-person events, community discussions, and other structured experiences created or managed under the KnowWhere name.</p>
-      <p>The purpose of these Terms is to ensure that all participants operate within a fair, organized, safe, and respectful environment where activities can occur without disruption, dishonesty, or unfair advantage. KnowWhere is designed to encourage creativity, problem-solving, collaboration, and ethical competition while protecting the integrity of the platform and the experience of all participants.</p>
-      <div class="callout">Participation in KnowWhere is entirely voluntary. By choosing to participate, individuals agree to comply with the rules and standards described herein. Individuals who do not agree to these Terms must refrain from participating in KnowWhere activities.</div>
-      <p>This agreement applies to all participants, contributors, collaborators, moderators, administrators, and individuals who interact with KnowWhere in any capacity. KnowWhere organizers reserve the right to interpret these Terms at their sole discretion and may update, expand, or clarify them as needed.</p>
-    </div>
-  </div>
-
-  <!-- DEFINITIONS -->
-  <div class="section" id="definitions">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-      </div>
-      <span class="section-title">Definitions</span>
-      <span class="section-num">02</span>
-    </div>
-    <div class="section-body">
-      <ul>
-        <li><strong style="color:var(--text)">KnowWhere</strong> — The full collection of games, challenges, informational systems, bounty programs, competitions, educational initiatives, and organizational structures associated with the KnowWhere name.</li>
-        <li><strong style="color:var(--text)">Organizers</strong> — Individuals or teams responsible for creating, managing, moderating, and enforcing the rules of KnowWhere, including administrators, moderators, technical staff, and appointed coordinators.</li>
-        <li><strong style="color:var(--text)">Participants</strong> — Any individual or group that engages with KnowWhere activities, including challenges, bounties, competitions, collaborative projects, and community events.</li>
-        <li><strong style="color:var(--text)">Bounties</strong> — Structured tasks, challenges, missions, or objectives that may offer rewards, recognition, or benefits upon successful completion.</li>
-        <li><strong style="color:var(--text)">Rewards</strong> — Any form of incentive provided by KnowWhere, including points, recognition, prizes, digital badges, certificates, monetary compensation, or other benefits.</li>
-        <li><strong style="color:var(--text)">Community</strong> — The collective body of all participants, organizers, contributors, and observers who engage with KnowWhere activities.</li>
-        <li><strong style="color:var(--text)">Platform</strong> — Any digital interface, website, mobile application, or communication system through which KnowWhere activities are delivered or coordinated.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- ACCEPTANCE -->
-  <div class="section" id="acceptance">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      </div>
-      <span class="section-title">Acceptance of Terms</span>
-      <span class="section-num">03</span>
-    </div>
-    <div class="section-body">
-      <p>Participation in any KnowWhere activity constitutes full acceptance of these Terms of Service. Participants acknowledge and agree that:</p>
-      <ul>
-        <li>KnowWhere operates under structured rules and failure to follow these rules may result in penalties, including disqualification, suspension, or permanent removal.</li>
-        <li>Organizers retain full authority over the interpretation, enforcement, and modification of rules, including clarifying ambiguities and resolving disputes.</li>
-        <li>Continued participation after any update to these Terms constitutes acceptance of the new Terms. Participants are responsible for reviewing updates regularly.</li>
-        <li>Participants are expected to act ethically, safely, and respectfully at all times, both online and offline.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- CONDUCT -->
-  <div class="section" id="conduct">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      </div>
-      <span class="section-title">Conduct &amp; Community Standards</span>
-      <span class="section-num">04</span>
-    </div>
-    <div class="section-body">
-      <p>Participants are expected to uphold high standards of behavior at all times.</p>
-      <div class="sub-label">Required Standards</div>
-      <ul>
-        <li><strong style="color:var(--text)">Integrity</strong> — Do not cheat, manipulate systems, falsify information, misrepresent your identity, or attempt to exploit loopholes.</li>
-        <li><strong style="color:var(--text)">Respect</strong> — Treat all participants, organizers, and community members with courtesy. Harassment, threats, intimidation, bullying, or discriminatory behavior will not be tolerated.</li>
-        <li><strong style="color:var(--text)">Collaboration</strong> — When participating in collaborative challenges, contribute meaningfully and respect the contributions of others.</li>
-        <li><strong style="color:var(--text)">Safety</strong> — Avoid behavior that may put yourself or others at risk, including physical, emotional, or digital harm.</li>
-        <li><strong style="color:var(--text)">Compliance</strong> — Follow all school, local, state, and federal regulations when engaging in KnowWhere activities.</li>
-      </ul>
-      <div class="sub-label">Prohibited Conduct</div>
-      <ul>
-        <li>Using multiple accounts to gain unfair advantage.</li>
-        <li>Sharing solutions or bounty answers in ways that violate challenge rules.</li>
-        <li>Engaging in cyberbullying, harassment, or trolling.</li>
-        <li>Attempting to hack, disrupt, or damage platform systems or other participants' accounts.</li>
-        <li>Falsely claiming rewards or misrepresenting the completion of tasks.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- BOUNTIES -->
-  <div class="section" id="bounties">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-      </div>
-      <span class="section-title">Bounties &amp; Reward System</span>
-      <span class="section-num">05</span>
-    </div>
-    <div class="section-body">
-      <ul>
-        <li><strong style="color:var(--text)">Task Completion</strong> — Participants must complete all tasks in accordance with the rules specified by organizers. Partial or incomplete submissions may not be accepted.</li>
-        <li><strong style="color:var(--text)">Reward Eligibility</strong> — Rewards are contingent upon compliance with rules. Organizers may void rewards if rules are violated, evidence of misconduct is found, or results are misrepresented.</li>
-        <li><strong style="color:var(--text)">Types of Rewards</strong> — Rewards may include points, digital recognition, certificates, physical prizes, monetary compensation, opportunities for advancement, or exclusive access to future challenges.</li>
-        <li><strong style="color:var(--text)">Discretionary Decisions</strong> — Organizers retain discretion to review submissions, award points, and determine the validity of completed tasks. Decisions are final unless evidence of error or bias is presented.</li>
-        <li><strong style="color:var(--text)">Reward Disputes</strong> — Participants may appeal reward-related decisions by submitting a detailed explanation and evidence to the organizers. Appeals will be reviewed within a reasonable time frame.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- AUTHORITY -->
-  <div class="section" id="authority">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      </div>
-      <span class="section-title">Organizer Authority</span>
-      <span class="section-num">06</span>
-    </div>
-    <div class="section-body">
-      <p>Organizers maintain the authority to:</p>
-      <ul>
-        <li>Define and modify challenge rules and reward structures.</li>
-        <li>Enforce compliance with these Terms.</li>
-        <li>Resolve disputes between participants or teams.</li>
-        <li>Suspend, warn, or disqualify participants in cases of misconduct.</li>
-        <li>Update the system to maintain fairness, including revoking rewards or modifying point allocations if necessary.</li>
-        <li>Remove paying privileges and employment at any time for any reason.</li>
-      </ul>
-      <div class="callout">Participants agree to respect the authority of organizers and to comply with instructions provided during any challenge, event, or activity.</div>
-    </div>
-  </div>
-
-  <!-- VIOLATIONS -->
-  <div class="section" id="violations">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      </div>
-      <span class="section-title">Violations &amp; Consequences</span>
-      <span class="section-num">07</span>
-    </div>
-    <div class="section-body">
-      <div class="sub-label">Violations Include</div>
-      <ul>
-        <li>Cheating, manipulating systems, or attempting to gain an unfair advantage.</li>
-        <li>Harassment, threats, or bullying of other participants or organizers.</li>
-        <li>Misrepresentation of work or falsifying results.</li>
-        <li>Ignoring instructions or challenge rules.</li>
-      </ul>
-      <div class="sub-label">Consequences</div>
-      <ul>
-        <li>Warnings or probationary periods.</li>
-        <li>Temporary suspension from participation.</li>
-        <li>Forfeiture of rewards or points.</li>
-        <li>Permanent disqualification from future activities.</li>
-        <li>Reporting to school or legal authorities if required.</li>
-        <li>Complete removal from KnowWhere entirely.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- APPEALS -->
-  <div class="section" id="appeals">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      </div>
-      <span class="section-title">Investigations &amp; Appeals</span>
-      <span class="section-num">08</span>
-    </div>
-    <div class="section-body">
-      <ul>
-        <li>Organizers may conduct formal or informal investigations if misconduct is suspected.</li>
-        <li>Evidence may include challenge submissions, communications, activity logs, or witness statements.</li>
-        <li>Participants are expected to cooperate fully with the review process.</li>
-        <li>Appeals must be submitted in writing within a specified timeframe, including supporting evidence.</li>
-        <li>Organizers will provide a decision after review; all decisions are final unless procedural errors are identified.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- PRIVACY -->
-  <div class="section" id="privacy">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      </div>
-      <span class="section-title">Data &amp; Privacy</span>
-      <span class="section-num">09</span>
-    </div>
-    <div class="section-body">
-      <ul>
-        <li><strong style="color:var(--text)">Data Collection</strong> — KnowWhere may collect information including name, email, activity logs, challenge submissions, and reward history for administrative purposes.</li>
-        <li><strong style="color:var(--text)">Data Usage</strong> — Information may be used to administer challenges, provide rewards, improve the platform, and ensure safety.</li>
-        <li><strong style="color:var(--text)">Content Ownership</strong> — Participants retain ownership of original content they create but grant KnowWhere a license to use submissions for promotional or educational purposes.</li>
-        <li><strong style="color:var(--text)">Privacy Expectations</strong> — Participants must respect the privacy of others and avoid sharing personal information without consent.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- DISCLAIMERS -->
-  <div class="section" id="disclaimers">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </div>
-      <span class="section-title">Disclaimers &amp; Warnings</span>
-      <span class="section-num">10</span>
-    </div>
-    <div class="section-body">
-      <div class="callout warn">If you have been offered or successfully entered KnowWhere as a representative and/or employee, choosing to leave at any time will place you on the ban list and you will NOT be able to use KnowWhere as a participant.</div>
-      <ul>
-        <li><strong style="color:var(--text)">Freedom and Rights</strong> — You are able to lie to customers and other people, but if you lie to anybody inside of KnowWhere, we will review what was said and why. If deemed appropriate, we will begin removing you from all friend groups associated with KnowWhere.</li>
-        <li><strong style="color:var(--text)">Content Ownership</strong> — Participants retain ownership of original content they create but grant KnowWhere a license to use submissions for promotional or educational purposes.</li>
-        <li><strong style="color:var(--text)">Privacy Expectations</strong> — Participants must respect the privacy of others and avoid sharing personal information without consent.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- IP -->
-  <div class="section" id="ip">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      </div>
-      <span class="section-title">Intellectual Property</span>
-      <span class="section-num">11</span>
-    </div>
-    <div class="section-body">
-      <ul>
-        <li>Participants must respect copyright and intellectual property rights.</li>
-        <li>Unauthorized use of copyrighted material in challenges or submissions may result in disqualification.</li>
-        <li>KnowWhere may use participant-created content for non-commercial educational, promotional, or organizational purposes, with attribution when feasible.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- SCHOOL -->
-  <div class="section" id="external">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      </div>
-      <span class="section-title">School &amp; External Environments</span>
-      <span class="section-num">12</span>
-    </div>
-    <div class="section-body">
-      <ul>
-        <li>Activities may occur in school or community settings. Participants must comply with applicable rules and regulations.</li>
-        <li>Serious misconduct may be reported to school officials or other authorities if required to maintain safety.</li>
-        <li>Organizers aim to ensure all activities remain age-appropriate, inclusive, and safe.</li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- FINAL -->
-  <div class="section" id="final">
-    <div class="section-header">
-      <div class="section-icon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-      </div>
-      <span class="section-title">Final Agreement</span>
-      <span class="section-num">13</span>
-    </div>
-    <div class="section-body">
-      <div class="callout">By participating in KnowWhere activities, each participant confirms they have read, understood, and accepted these Terms of Service. Participants acknowledge that compliance with rules, respect for organizers, and fair engagement are essential to the integrity, safety, and enjoyment of the KnowWhere system.</div>
-      <p>These Terms protect the integrity of KnowWhere, ensure fair competition, encourage ethical participation, and maintain an organized, enjoyable, and safe environment for all participants.</p>
-      <p>KnowWhere may update or expand these Terms at any time. Participants are responsible for reviewing updated Terms. Continued participation indicates acceptance of any changes. KnowWhere is not liable for indirect damages, losses, or claims arising from participation in challenges or activities. Participants participate at their own risk and assume responsibility for personal safety and compliance with all applicable laws.</p>
-    </div>
-  </div>
-
+<div class="section" id="intro">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+</div>
+<span class="section-title">Introduction</span>
+<span class="section-num">01</span>
+</div>
+<div class="section-body">
+<p>These Terms of Service establish the rules, expectations, and operational standards governing all activities associated with KnowWhere — a multifaceted, organized system that may include games, challenges, informational systems, bounty tasks, competitions, collaborative activities, educational programs, digital and in-person events, community discussions, and other structured experiences created or managed under the KnowWhere name.</p>
+<p>The purpose of these Terms is to ensure that all participants operate within a fair, organized, safe, and respectful environment where activities can occur without disruption, dishonesty, or unfair advantage. KnowWhere is designed to encourage creativity, problem-solving, collaboration, and ethical competition while protecting the integrity of the platform and the experience of all participants.</p>
+<div class="callout">Participation in KnowWhere is entirely voluntary. By choosing to participate, individuals agree to comply with the rules and standards described herein. Individuals who do not agree to these Terms must refrain from participating in KnowWhere activities.</div>
+<p>This agreement applies to all participants, contributors, collaborators, moderators, administrators, and individuals who interact with KnowWhere in any capacity. KnowWhere organizers reserve the right to interpret these Terms at their sole discretion and may update, expand, or clarify them as needed.</p>
+</div>
 </div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-logo">
-    <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" alt="KnowWhere">
-    <span>Know<b>Where</b></span>
-  </div>
-  <p>© KnowWhere · Terms of Service &amp; Participation Agreement</p>
-</footer>
+<div class="section" id="definitions">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+</div>
+<span class="section-title">Definitions</span>
+<span class="section-num">02</span>
+</div>
+<div class="section-body">
+<ul>
+<li><strong style="color:var(--text)">KnowWhere</strong> — The full collection of games, challenges, informational systems, bounty programs, competitions, educational initiatives, and organizational structures associated with the KnowWhere name.</li>
+<li><strong style="color:var(--text)">Organizers</strong> — Individuals or teams responsible for creating, managing, moderating, and enforcing the rules of KnowWhere, including administrators, moderators, technical staff, and appointed coordinators.</li>
+<li><strong style="color:var(--text)">Participants</strong> — Any individual or group that engages with KnowWhere activities, including challenges, bounties, competitions, collaborative projects, and community events.</li>
+<li><strong style="color:var(--text)">Bounties</strong> — Structured tasks, challenges, missions, or objectives that may offer rewards, recognition, or benefits upon successful completion.</li>
+<li><strong style="color:var(--text)">Rewards</strong> — Any form of incentive provided by KnowWhere, including points, recognition, prizes, digital badges, certificates, monetary compensation, or other benefits.</li>
+<li><strong style="color:var(--text)">Community</strong> — The collective body of all participants, organizers, contributors, and observers who engage with KnowWhere activities.</li>
+<li><strong style="color:var(--text)">Platform</strong> — Any digital interface, website, mobile application, or communication system through which KnowWhere activities are delivered or coordinated.</li>
+</ul>
+</div>
+</div>
 
+<div class="section" id="acceptance">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><polyline points="20 6 9 17 4 12"></polyline></svg>
+</div>
+<span class="section-title">Acceptance of Terms</span>
+<span class="section-num">03</span>
+</div>
+<div class="section-body">
+<p>Participation in any KnowWhere activity constitutes full acceptance of these Terms of Service. Participants acknowledge and agree that:</p>
+<ul>
+<li>KnowWhere operates under structured rules and failure to follow these rules may result in penalties, including disqualification, suspension, or permanent removal.</li>
+<li>Organizers retain full authority over the interpretation, enforcement, and modification of rules, including clarifying ambiguities and resolving disputes.</li>
+<li>Continued participation after any update to these Terms constitutes acceptance of the new Terms. Participants are responsible for reviewing updates regularly.</li>
+<li>Participants are expected to act ethically, safely, and respectfully at all times, both online and offline.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="conduct">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+</div>
+<span class="section-title">Conduct &amp; Community Standards</span>
+<span class="section-num">04</span>
+</div>
+<div class="section-body">
+<p>Participants are expected to uphold high standards of behavior at all times.</p>
+<div class="sub-label">Required Standards</div>
+<ul>
+<li><strong style="color:var(--text)">Integrity</strong> — Do not cheat, manipulate systems, falsify information, misrepresent your identity, or attempt to exploit loopholes.</li>
+<li><strong style="color:var(--text)">Respect</strong> — Treat all participants, organizers, and community members with courtesy. Harassment, threats, intimidation, bullying, or discriminatory behavior will not be tolerated.</li>
+<li><strong style="color:var(--text)">Collaboration</strong> — When participating in collaborative challenges, contribute meaningfully and respect the contributions of others.</li>
+<li><strong style="color:var(--text)">Safety</strong> — Avoid behavior that may put yourself or others at risk, including physical, emotional, or digital harm.</li>
+<li><strong style="color:var(--text)">Compliance</strong> — Follow all school, local, state, and federal regulations when engaging in KnowWhere activities.</li>
+</ul>
+<div class="sub-label">Prohibited Conduct</div>
+<ul>
+<li>Using multiple accounts to gain unfair advantage.</li>
+<li>Sharing solutions or bounty answers in ways that violate challenge rules.</li>
+<li>Engaging in cyberbullying, harassment, or trolling.</li>
+<li>Attempting to hack, disrupt, or damage platform systems or other participants' accounts.</li>
+<li>Falsely claiming rewards or misrepresenting the completion of tasks.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="bounties">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"></path></svg>
+</div>
+<span class="section-title">Bounties &amp; Reward System</span>
+<span class="section-num">05</span>
+</div>
+<div class="section-body">
+<ul>
+<li><strong style="color:var(--text)">Task Completion</strong> — Participants must complete all tasks in accordance with the rules specified by organizers. Partial or incomplete submissions may not be accepted.</li>
+<li><strong style="color:var(--text)">Reward Eligibility</strong> — Rewards are contingent upon compliance with rules. Organizers may void rewards if rules are violated, evidence of misconduct is found, or results are misrepresented.</li>
+<li><strong style="color:var(--text)">Types of Rewards</strong> — Rewards may include points, digital recognition, certificates, physical prizes, monetary compensation, opportunities for advancement, or exclusive access to future challenges.</li>
+<li><strong style="color:var(--text)">Discretionary Decisions</strong> — Organizers retain discretion to review submissions, award points, and determine the validity of completed tasks. Decisions are final unless evidence of error or bias is presented.</li>
+<li><strong style="color:var(--text)">Reward Disputes</strong> — Participants may appeal reward-related decisions by submitting a detailed explanation and evidence to the organizers. Appeals will be reviewed within a reasonable time frame.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="authority">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+</div>
+<span class="section-title">Organizer Authority</span>
+<span class="section-num">06</span>
+</div>
+<div class="section-body">
+<p>Organizers maintain the authority to:</p>
+<ul>
+<li>Define and modify challenge rules and reward structures.</li>
+<li>Enforce compliance with these Terms.</li>
+<li>Resolve disputes between participants or teams.</li>
+<li>Suspend, warn, or disqualify participants in cases of misconduct.</li>
+<li>Update the system to maintain fairness, including revoking rewards or modifying point allocations if necessary.</li>
+<li>Remove paying privileges and employment at any time for any reason.</li>
+</ul>
+<div class="callout">Participants agree to respect the authority of organizers and to comply with instructions provided during any challenge, event, or activity.</div>
+</div>
+</div>
+
+<div class="section" id="violations">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" x2="12" y1="9" y2="13"></line><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>
+</div>
+<span class="section-title">Violations &amp; Consequences</span>
+<span class="section-num">07</span>
+</div>
+<div class="section-body">
+<div class="sub-label">Violations Include</div>
+<ul>
+<li>Cheating, manipulating systems, or attempting to gain an unfair advantage.</li>
+<li>Harassment, threats, or bullying of other participants or organizers.</li>
+<li>Misrepresentation of work or falsifying results.</li>
+<li>Ignoring instructions or challenge rules.</li>
+</ul>
+<div class="sub-label">Consequences</div>
+<ul>
+<li>Warnings or probationary periods.</li>
+<li>Temporary suspension from participation.</li>
+<li>Forfeiture of rewards or points.</li>
+<li>Permanent disqualification from future activities.</li>
+<li>Reporting to school or legal authorities if required.</li>
+<li>Complete removal from KnowWhere entirely.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="appeals">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+</div>
+<span class="section-title">Investigations &amp; Appeals</span>
+<span class="section-num">08</span>
+</div>
+<div class="section-body">
+<ul>
+<li>Organizers may conduct formal or informal investigations if misconduct is suspected.</li>
+<li>Evidence may include challenge submissions, communications, activity logs, or witness statements.</li>
+<li>Participants are expected to cooperate fully with the review process.</li>
+<li>Appeals must be submitted in writing within a specified timeframe, including supporting evidence.</li>
+<li>Organizers will provide a decision after review; all decisions are final unless procedural errors are identified.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="privacy">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+</div>
+<span class="section-title">Data &amp; Privacy</span>
+<span class="section-num">09</span>
+</div>
+<div class="section-body">
+<ul>
+<li><strong style="color:var(--text)">Data Collection</strong> — KnowWhere may collect information including name, email, activity logs, challenge submissions, and reward history for administrative purposes.</li>
+<li><strong style="color:var(--text)">Data Usage</strong> — Information may be used to administer challenges, provide rewards, improve the platform, and ensure safety.</li>
+<li><strong style="color:var(--text)">Content Ownership</strong> — Participants retain ownership of original content they create but grant KnowWhere a license to use submissions for promotional or educational purposes.</li>
+<li><strong style="color:var(--text)">Privacy Expectations</strong> — Participants must respect the privacy of others and avoid sharing personal information without consent.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="disclaimers">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+</div>
+<span class="section-title">Disclaimers &amp; Warnings</span>
+<span class="section-num">10</span>
+</div>
+<div class="section-body">
+<div class="callout warn">If you have been offered or successfully entered KnowWhere as a representative and/or employee, choosing to leave at any time will place you on the ban list and you will NOT be able to use KnowWhere as a participant.</div>
+<ul>
+<li><strong style="color:var(--text)">Freedom and Rights</strong> — You are able to lie to customers and other people, but if you lie to anybody inside of KnowWhere, we will review what was said and why. If deemed appropriate, we will begin removing you from all friend groups associated with KnowWhere.</li>
+<li><strong style="color:var(--text)">Content Ownership</strong> — Participants retain ownership of original content they create but grant KnowWhere a license to use submissions for promotional or educational purposes.</li>
+<li><strong style="color:var(--text)">Privacy Expectations</strong> — Participants must respect the privacy of others and avoid sharing personal information without consent.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="ip">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" x2="12.01" y1="17" y2="17"></line></svg>
+</div>
+<span class="section-title">Intellectual Property</span>
+<span class="section-num">11</span>
+</div>
+<div class="section-body">
+<ul>
+<li>Participants must respect copyright and intellectual property rights.</li>
+<li>Unauthorized use of copyrighted material in challenges or submissions may result in disqualification.</li>
+<li>KnowWhere may use participant-created content for non-commercial educational, promotional, or organizational purposes, with attribution when feasible.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="external">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+</div>
+<span class="section-title">School &amp; External Environments</span>
+<span class="section-num">12</span>
+</div>
+<div class="section-body">
+<ul>
+<li>Activities may occur in school or community settings. Participants must comply with applicable rules and regulations.</li>
+<li>Serious misconduct may be reported to school officials or other authorities if required to maintain safety.</li>
+<li>Organizers aim to ensure all activities remain age-appropriate, inclusive, and safe.</li>
+</ul>
+</div>
+</div>
+
+<div class="section" id="final">
+<div class="section-header">
+<div class="section-icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" x2="8" y1="13" y2="13"></line><line x1="16" x2="8" y1="17" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+</div>
+<span class="section-title">Final Agreement</span>
+<span class="section-num">13</span>
+</div>
+<div class="section-body">
+<div class="callout">By participating in KnowWhere activities, each participant confirms they have read, understood, and accepted these Terms of Service. Participants acknowledge that compliance with rules, respect for organizers, and fair engagement are essential to the integrity, safety, and enjoyment of the KnowWhere system.</div>
+<p>These Terms protect the integrity of KnowWhere, ensure fair competition, encourage ethical participation, and maintain an organized, enjoyable, and safe environment for all participants.</p>
+<p>KnowWhere may update or expand these Terms at any time. Participants are responsible for reviewing updated Terms. Continued participation indicates acceptance of any changes. KnowWhere is not liable for indirect damages, losses, or claims arising from participation in challenges or activities. Participants participate at their own risk and assume responsibility for personal safety and compliance with all applicable laws.</p>
+</div>
+</div>
+</div>
+
+<footer>
+<div class="footer-logo">
+<img alt="KnowWhere" src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png"/>
+<span>Know<b>Where</b></span>
+</div>
+<p>© KnowWhere · Terms of Service &amp; Participation Agreement</p>
+</footer>
 </body>
 </html>

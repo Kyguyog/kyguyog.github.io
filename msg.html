@@ -1,89 +1,21 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-<script>
-  // ── About:Blank Cloak ──
-  // Triggered by user interaction to avoid popup blockers.
-  (function () {
-    // Only run if we're the top-level page (not already inside an iframe cloak)
-    if (window.self !== window.top) return;
-
-    // Build a tiny entry page that sits at about:blank and iframes the real content
-    var currentUrl = window.location.href;
-
-    function launchCloak() {
-      var blank = window.open('about:blank', '_blank');
-      if (!blank) return; // popup was blocked — do nothing
-      var iframeStyle = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;';
-      var bodyStyle   = 'margin:0;padding:0;overflow:hidden;background:#0a0a0f;';
-      blank.document.open();
-      blank.document.write(
-        '<!DOCTYPE html><html><head><title> </title></head>' +
-        '<body style="' + bodyStyle + '">' +
-        '<iframe src="' + currentUrl + '" style="' + iframeStyle + '" allowfullscreen></iframe>' +
-        '</body></html>'
-      );
-      blank.document.close();
-      window.close(); // close the original tab
-    }
-
-    // Show a full-screen "Enter" overlay so the open() is tied to a click
-    var overlay = document.createElement('div');
-    overlay.id = 'cloak-entry';
-    overlay.style.cssText = [
-      'position:fixed', 'inset:0', 'z-index:999999',
-      'background:#0a0a0f',
-      'display:flex', 'flex-direction:column',
-      'align-items:center', 'justify-content:center', 'gap:1.5rem',
-      'font-family:sans-serif'
-    ].join(';');
-
-    var logo = document.createElement('div');
-    logo.style.cssText = 'font-size:1.1rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;';
-    logo.textContent = 'KNOWWHERE';
-
-    var btn = document.createElement('button');
-    btn.textContent = 'Enter';
-    btn.style.cssText = [
-      'padding:0.85rem 3rem',
-      'background:#a855f7',
-      'color:#fff',
-      'border:none',
-      'border-radius:6px',
-      'font-size:0.85rem',
-      'font-weight:700',
-      'letter-spacing:0.15em',
-      'text-transform:uppercase',
-      'cursor:pointer',
-      'box-shadow:0 0 24px rgba(168,85,247,0.5)'
-    ].join(';');
-    btn.onclick = launchCloak;
-
-    overlay.appendChild(logo);
-    overlay.appendChild(btn);
-
-    // Insert overlay as soon as <body> is available
-    function attach() {
-      if (document.body) {
-        document.body.appendChild(overlay);
-      } else {
-        document.addEventListener('DOMContentLoaded', function () {
-          document.body.appendChild(overlay);
-        });
-      }
-    }
-    attach();
-  })();
-</script>
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Messages · KnowWhere</title>
-  <link rel="icon" href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" type="image/x-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
+<script>(function(){if(window.self!==window.top)return;var currentUrl=window.location.href;function launchCloak(){var blank=window.open('about:blank','_blank');if(!blank)return;var iframeStyle='position:fixed;top:0;left:0;width:100%;height:100%;border:none;margin:0;padding:0;overflow:hidden;';var bodyStyle='margin:0;padding:0;overflow:hidden;background:#0a0a0f;';blank.document.open();blank.document.write('<!DOCTYPE html><html><head><title> </title></head>'+
+'<body style="'+bodyStyle+'">'+
+'<iframe src="'+currentUrl+'" style="'+iframeStyle+'" allowfullscreen></iframe>'+
+'</body></html>');blank.document.close();window.close();}
+var overlay=document.createElement('div');overlay.id='cloak-entry';overlay.style.cssText=['position:fixed','inset:0','z-index:999999','background:#0a0a0f','display:flex','flex-direction:column','align-items:center','justify-content:center','gap:1.5rem','font-family:sans-serif'].join(';');var logo=document.createElement('div');logo.style.cssText='font-size:1.1rem;font-weight:700;letter-spacing:0.2em;color:rgba(255,255,255,0.25);text-transform:uppercase;';logo.textContent='KNOWWHERE';var btn=document.createElement('button');btn.textContent='Enter';btn.style.cssText=['padding:0.85rem 3rem','background:#a855f7','color:#fff','border:none','border-radius:6px','font-size:0.85rem','font-weight:700','letter-spacing:0.15em','text-transform:uppercase','cursor:pointer','box-shadow:0 0 24px rgba(168,85,247,0.5)'].join(';');btn.onclick=launchCloak;overlay.appendChild(logo);overlay.appendChild(btn);function attach(){if(document.body){document.body.appendChild(overlay);}else{document.addEventListener('DOMContentLoaded',function(){document.body.appendChild(overlay);});}}
+attach();})();</script>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Messages · KnowWhere</title>
+<link href="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf5ebd49158a7811ff.png" rel="icon" type="image/x-icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -1065,583 +997,210 @@
 </head>
 <body>
 
-<!-- AUTH WALL -->
 <div id="auth-wall">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" alt="KnowWhere Logo">
-      <div class="auth-logo-name">KNOW<span>WHERE</span></div>
-    </div>
-    <div style="font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.2em;color:var(--secondary);text-transform:uppercase;margin-bottom:0.5rem;">Messages</div>
-    <div class="auth-field">
-      <label>Email</label>
-      <input type="email" id="auth-email" placeholder="your@email.com" />
-    </div>
-    <div class="auth-field">
-      <label>Password</label>
-      <input type="password" id="auth-password" placeholder="••••••••" />
-    </div>
-    <div class="auth-error" id="auth-error"></div>
-    <button class="auth-submit" id="auth-submit" onclick="handleAuth()">Login</button>
-    <a href="index.html" class="auth-back">← Back to main site</a>
-  </div>
+<div class="auth-box">
+<div class="auth-logo">
+<img alt="KnowWhere Logo" src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png"/>
+<div class="auth-logo-name">KNOW<span>WHERE</span></div>
+</div>
+<div style="font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.2em;color:var(--secondary);text-transform:uppercase;margin-bottom:0.5rem;">Messages</div>
+<div class="auth-field">
+<label>Email</label>
+<input id="auth-email" placeholder="your@email.com" type="email"/>
+</div>
+<div class="auth-field">
+<label>Password</label>
+<input id="auth-password" placeholder="••••••••" type="password"/>
+</div>
+<div class="auth-error" id="auth-error"></div>
+<button class="auth-submit" id="auth-submit" onclick="handleAuth()">Login</button>
+<a class="auth-back" href="index.html">← Back to main site</a>
+</div>
 </div>
 
-<!-- NAV -->
 <nav>
-  <a href="index.html" class="nav-logo">
-    <img src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png" alt="Logo">
-    <span class="logo-text"><span class="know-text">KNOW</span><span>WHERE</span></span>
-  </a>
-  <div class="nav-title">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+<a class="nav-logo" href="index.html">
+<img alt="Logo" src="https://assets.cdn.filesafe.space/LiVJbIgv34a0ebVd0Lef/media/69c5fbcf9619ac2fc59a966f.png"/>
+<span class="logo-text"><span class="know-text">KNOW</span><span>WHERE</span></span>
+</a>
+<div class="nav-title">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
     Messages
   </div>
-  <div class="nav-right">
-    <span class="nav-user-chip" id="nav-username" onclick="copyUsername()" title="Copy Your Link" style="cursor:pointer;"></span>
-  </div>
+<div class="nav-right">
+<span class="nav-user-chip" id="nav-username" onclick="copyUsername()" style="cursor:pointer;" title="Copy Your Link"></span>
+</div>
 </nav>
 
-<!-- MAIN APP -->
 <div id="app">
-  <!-- SIDEBAR -->
-  <div class="sidebar" id="sidebar">
-    <div class="sidebar-head">
-      <span class="sidebar-head-label">Conversations</span>
-      <button class="new-msg-btn" onclick="openNewConvModal()">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+
+<div class="sidebar" id="sidebar">
+<div class="sidebar-head">
+<span class="sidebar-head-label">Conversations</span>
+<button class="new-msg-btn" onclick="openNewConvModal()">
+<svg fill="none" height="10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="10"><line x1="12" x2="12" y1="5" y2="19"></line><line x1="5" x2="19" y1="12" y2="12"></line></svg>
         New
       </button>
-    </div>
-    <div class="sidebar-search">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input type="text" id="conv-search" placeholder="Search conversations..." oninput="filterConvs(this.value)" />
-    </div>
-    <div class="ai-divider">✦ AI Assistant</div>
-    <div id="ai-conv-item" class="conv-item ai-agent" onclick="openAiConversation()" style="display:none;">
-      <div class="conv-avatar">✦</div>
-      <div class="conv-info">
-        <div class="conv-name" id="ai-conv-name">KnowWhere AI</div>
-        <div class="conv-preview" id="ai-conv-preview">Ask me anything...</div>
-      </div>
-    </div>
-    <div class="ai-divider" style="margin-top:0.25rem;">Conversations</div>
-    <div class="conv-list" id="conv-list">
-      <div class="loading-spinner"><div class="spinner"></div> Loading...</div>
-    </div>
-  </div>
-
-  <!-- CHAT PANE -->
-  <div class="chat-pane" id="chat-pane">
-    <div class="chat-pane-empty" id="chat-empty">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <p>Select a conversation or start a new one</p>
-      <strong>← New Message</strong>
-    </div>
-
-    <div id="active-chat" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none;">
-      <div class="chat-header" id="chat-header">
-        <button class="back-btn" id="back-btn" onclick="closeChatMobile()" aria-label="Back to conversations">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        </button>
-        <div class="chat-header-avatar" id="chat-header-avatar"></div>
-        <div style="flex:1;">
-          <div class="chat-header-name" id="chat-header-name"></div>
-          <div class="chat-header-sub" id="chat-header-sub"></div>
-        </div>
-        <button class="nav-settings-btn" id="copy-link-btn" onclick="copyConvLink()" title="Copy link to this Person" style="display:none;margin-left:auto;">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-        </button>
-        <button class="nav-settings-btn" id="chat-settings-btn" onclick="openSettingsModal()" title="AI Settings" style="display:none;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-      </div>
-      <div class="messages-area" id="messages-area"></div>
-      <div class="msg-input-area">
-        <textarea id="msg-input" placeholder="Type a message..." rows="1" onkeydown="handleMsgKey(event)" oninput="autoResizeTextarea(this)"></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-        </button>
-      </div>
-    </div>
-  </div>
+</div>
+<div class="sidebar-search">
+<svg fill="none" height="13" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="13"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+<input id="conv-search" oninput="filterConvs(this.value)" placeholder="Search conversations..." type="text"/>
+</div>
+<div class="ai-divider">✦ AI Assistant</div>
+<div class="conv-item ai-agent" id="ai-conv-item" onclick="openAiConversation()" style="display:none;">
+<div class="conv-avatar">✦</div>
+<div class="conv-info">
+<div class="conv-name" id="ai-conv-name">KnowWhere AI</div>
+<div class="conv-preview" id="ai-conv-preview">Ask me anything...</div>
+</div>
+</div>
+<div class="ai-divider" style="margin-top:0.25rem;">Conversations</div>
+<div class="conv-list" id="conv-list">
+<div class="loading-spinner"><div class="spinner"></div> Loading...</div>
+</div>
 </div>
 
-<!-- NEW CONVERSATION MODAL -->
+<div class="chat-pane" id="chat-pane">
+<div class="chat-pane-empty" id="chat-empty">
+<svg fill="none" height="64" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" viewbox="0 0 24 24" width="64"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+<p>Select a conversation or start a new one</p>
+<strong>← New Message</strong>
+</div>
+<div id="active-chat" style="display:none;flex:1;flex-direction:column;overflow:hidden;display:none;">
+<div class="chat-header" id="chat-header">
+<button aria-label="Back to conversations" class="back-btn" id="back-btn" onclick="closeChatMobile()">
+<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="18"><polyline points="15 18 9 12 15 6"></polyline></svg>
+</button>
+<div class="chat-header-avatar" id="chat-header-avatar"></div>
+<div style="flex:1;">
+<div class="chat-header-name" id="chat-header-name"></div>
+<div class="chat-header-sub" id="chat-header-sub"></div>
+</div>
+<button class="nav-settings-btn" id="copy-link-btn" onclick="copyConvLink()" style="display:none;margin-left:auto;" title="Copy link to this Person">
+<svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+</button>
+<button class="nav-settings-btn" id="chat-settings-btn" onclick="openSettingsModal()" style="display:none;" title="AI Settings">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+</button>
+</div>
+<div class="messages-area" id="messages-area"></div>
+<div class="msg-input-area">
+<textarea id="msg-input" oninput="autoResizeTextarea(this)" onkeydown="handleMsgKey(event)" placeholder="Type a message..." rows="1"></textarea>
+<button class="send-btn" id="send-btn" onclick="sendMessage()">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="16"><line x1="22" x2="11" y1="2" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+</button>
+</div>
+</div>
+</div>
+</div>
+
 <div class="modal-overlay" id="new-conv-modal">
-  <div class="modal-box">
-    <div class="modal-title">New Message</div>
-    <input class="modal-input" type="text" id="user-search-input" placeholder="Search by username or email..." oninput="searchUsers(this.value)" />
-    <div class="modal-error" id="modal-error"></div>
-    <div class="user-results" id="user-results">
-      <div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">Start typing to find users...</div>
-    </div>
-    <div class="modal-actions">
-      <button class="modal-cancel-btn" onclick="closeNewConvModal()">Cancel</button>
-    </div>
-  </div>
+<div class="modal-box">
+<div class="modal-title">New Message</div>
+<input class="modal-input" id="user-search-input" oninput="searchUsers(this.value)" placeholder="Search by username or email..." type="text"/>
+<div class="modal-error" id="modal-error"></div>
+<div class="user-results" id="user-results">
+<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">Start typing to find users...</div>
+</div>
+<div class="modal-actions">
+<button class="modal-cancel-btn" onclick="closeNewConvModal()">Cancel</button>
+</div>
+</div>
 </div>
 
-<!-- ADMIN SETTINGS MODAL -->
 <div class="modal-overlay" id="settings-modal">
-  <div class="modal-box" style="max-width:520px;max-height:90vh;overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div class="modal-title" style="display:flex;align-items:center;gap:0.5rem;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+<div class="modal-box" style="max-width:520px;max-height:90vh;overflow-y:auto;">
+<div style="display:flex;align-items:center;justify-content:space-between;">
+<div class="modal-title" style="display:flex;align-items:center;gap:0.5rem;">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         Admin Settings
       </div>
-      <button onclick="closeSettingsModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:0.25rem;line-height:1;font-size:1.2rem;" title="Close">&times;</button>
-    </div>
-
-    <!-- AI Enabled toggle -->
-    <div class="settings-section">
-      <div class="settings-section-title">AI Assistant</div>
-      <div class="settings-row">
-        <label class="settings-label">Enable AI Assistant</label>
-        <label class="settings-toggle">
-          <input type="checkbox" id="s-ai-enabled" />
-          <span class="settings-toggle-track"></span>
-        </label>
-      </div>
-    </div>
-
-    <!-- Model -->
-    <div class="settings-section">
-      <div class="settings-section-title">Model</div>
-      <div style="position:relative;">
-        <div id="s-model-display" class="modal-input" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;" onclick="toggleModelDropdown()">
-          <span id="s-model-label" style="font-family:monospace;font-size:0.85rem;color:var(--text);">Click to select a model...</span>
-          <span id="s-model-arrow" style="color:var(--muted);font-size:0.7rem;transition:transform 0.2s;">▼</span>
-        </div>
-        <input type="hidden" id="s-model" />
-        <div id="s-model-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;">
-          <div id="s-model-list" style="max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,85,247,0.2) transparent;">
-            <div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;">
-              <div class="spinner" style="width:12px;height:12px;"></div> Loading models...
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- System Prompt -->
-    <div class="settings-section">
-      <div class="settings-section-title">System Prompt</div>
-      <textarea class="modal-input" id="s-system-prompt" rows="4" placeholder="Enter system prompt..." style="resize:vertical;line-height:1.5;"></textarea>
-    </div>
-
-    <!-- API Keys -->
-    <div class="settings-section">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
-        <div class="settings-section-title" style="margin-bottom:0;">API Keys</div>
-        <button class="settings-add-btn" onclick="addApiKeyField()">+ Add Key</button>
-      </div>
-      <div id="s-api-keys-list" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
-    </div>
-
-    <div id="settings-error" style="font-size:0.78rem;color:var(--danger);display:none;"></div>
-    <div id="settings-success" style="font-size:0.78rem;color:#22c55e;display:none;"></div>
-
-    <div class="modal-actions" style="margin-top:0.5rem;">
-      <button class="modal-cancel-btn" onclick="closeSettingsModal()">Cancel</button>
-      <button class="auth-submit" style="flex:1;padding:0.65rem;font-size:0.6rem;" onclick="saveSettings()">Save Changes</button>
-    </div>
-  </div>
+<button onclick="closeSettingsModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:0.25rem;line-height:1;font-size:1.2rem;" title="Close">×</button>
 </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-  import {
-    getAuth,
-    signInWithEmailAndPassword,
-    onAuthStateChanged,
-    signOut
-  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc, getDoc, setDoc, updateDoc,
-    collection, getDocs, addDoc,
-    query, where, orderBy, onSnapshot,
-    serverTimestamp, Timestamp
-  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+<div class="settings-section">
+<div class="settings-section-title">AI Assistant</div>
+<div class="settings-row">
+<label class="settings-label">Enable AI Assistant</label>
+<label class="settings-toggle">
+<input id="s-ai-enabled" type="checkbox"/>
+<span class="settings-toggle-track"></span>
+</label>
+</div>
+</div>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ",
-    authDomain: "knowwhere1.firebaseapp.com",
-    projectId: "knowwhere1",
-    storageBucket: "knowwhere1.firebasestorage.app",
-    messagingSenderId: "747448090609",
-    appId: "1:747448090609:web:e3af5b2c8ffa8fb3a9ce50",
-    measurementId: "G-DV44FGDQ2N"
-  };
+<div class="settings-section">
+<div class="settings-section-title">Model</div>
+<div style="position:relative;">
+<div class="modal-input" id="s-model-display" onclick="toggleModelDropdown()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;">
+<span id="s-model-label" style="font-family:monospace;font-size:0.85rem;color:var(--text);">Click to select a model...</span>
+<span id="s-model-arrow" style="color:var(--muted);font-size:0.7rem;transition:transform 0.2s;">▼</span>
+</div>
+<input id="s-model" type="hidden"/>
+<div id="s-model-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:999;background:var(--card);border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,0.5);overflow:hidden;">
+<div id="s-model-list" style="max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:rgba(168,85,247,0.2) transparent;">
+<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;">
+<div class="spinner" style="width:12px;height:12px;"></div> Loading models...
+            </div>
+</div>
+</div>
+</div>
+</div>
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+<div class="settings-section">
+<div class="settings-section-title">System Prompt</div>
+<textarea class="modal-input" id="s-system-prompt" placeholder="Enter system prompt..." rows="4" style="resize:vertical;line-height:1.5;"></textarea>
+</div>
 
-  let currentUser = null;
-  let currentUserData = null;
-  let allConversations = [];
-  let activeConvId = null;
-  let messagesUnsubscribe = null;
-  let convsUnsubscribe = null;
-  let allUsers = [];
-  const userNameCache = {};   // email → display name cache
-
-  // ── AI AGENT STATE ──
-  let aiConfig = null;        // { aiEnabled, apiKey, model, systemPrompt }
-  let aiMessages = [];        // local message history for AI conv
-  let aiConvActive = false;   // is AI conv currently open
-
-  // ── AUTH ──
-  window.handleAuth = async function() {
-    const email = document.getElementById('auth-email').value.trim();
-    const password = document.getElementById('auth-password').value;
-    const errEl = document.getElementById('auth-error');
-    const btn = document.getElementById('auth-submit');
-    errEl.classList.remove('show');
-    if (!email || !password) { errEl.textContent = 'Please fill in all fields.'; errEl.classList.add('show'); return; }
-    btn.disabled = true; btn.textContent = 'Logging in...';
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch(e) {
-      const map = {
-        'auth/invalid-credential': 'Email or password is incorrect.',
-        'auth/user-not-found': 'No account found.',
-        'auth/wrong-password': 'Incorrect password.',
-        'auth/too-many-requests': 'Too many attempts. Try again later.'
-      };
-      errEl.textContent = map[e.code] || 'Login failed.';
-      errEl.classList.add('show');
-      btn.disabled = false; btn.textContent = 'Login';
-    }
-  };
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !document.getElementById('auth-wall').classList.contains('hidden')) {
-      handleAuth();
-    }
-  });
-
-  window.handleSignOut = async function() {
-    if (convsUnsubscribe) convsUnsubscribe();
-    if (messagesUnsubscribe) messagesUnsubscribe();
-    await signOut(auth);
-  };
-
-  // ── AUTH STATE ──
-  onAuthStateChanged(auth, async (user) => {
-    const wall = document.getElementById('auth-wall');
-    const appEl = document.getElementById('app');
-
-    if (user) {
-      currentUser = user;
-      wall.classList.add('hidden');
-      appEl.classList.add('visible');
-
-      // Load user data
-      try {
-        const snap = await getDoc(doc(db, 'users', user.email));
-        currentUserData = snap.exists() ? snap.data() : { email: user.email, username: user.email };
-      } catch(e) {
-        currentUserData = { email: user.email, username: user.email };
-      }
-
-      const displayName = currentUserData.username || user.email;
-      document.getElementById('nav-username').textContent = displayName;
-
-      // Load all users for search
-      loadAllUsers();
-
-      // Load AI config from Firestore
-      loadAiConfig();
-
-      // Subscribe to conversations
-      subscribeToConversations();
-
-    } else {
-      currentUser = null;
-      currentUserData = null;
-      wall.classList.remove('hidden');
-      appEl.classList.remove('visible');
-      document.getElementById('auth-email').value = '';
-      document.getElementById('auth-password').value = '';
-      document.getElementById('auth-error').classList.remove('show');
-    }
-  });
-
-  // ── AI CONFIG ──
-  async function loadAiConfig() {
-    try {
-      const snap = await getDoc(doc(db, 'siteContent', 'main'));
-      if (!snap.exists()) return;
-      const data = snap.data();
-      const ai = data.aiSettings || {};
-
-      // Always show AI section for admins so they can re-enable it
-      const admin = currentUserData?.admin === true;
-      const item = document.getElementById('ai-conv-item');
-
-      if (!ai.aiEnabled) {
-        if (admin && item) {
-          item.style.display = 'flex';
-          item.style.opacity = '0.45';
-          item.title = 'AI is disabled — open settings to re-enable';
-        }
-        return;
-      }
-
-      // Restore full opacity if previously dimmed
-      if (item) { item.style.display = 'flex'; item.style.opacity = ''; item.title = ''; }
-
-      // Pick a random API key from the array
-      const keys = ai.apiKeys || [];
-      if (keys.length === 0) return;
-      const apiKey = keys[Math.floor(Math.random() * keys.length)];
-
-      aiConfig = {
-        aiEnabled: true,
-        apiKey,
-        model: ai.model || 'gemini-2.5-flash-lite',
-        systemPrompt: ai.systemPrompt || 'You are a helpful assistant.'
-      };
-    } catch(e) {
-      console.warn('Could not load AI config:', e);
-    }
-  }
-
-  // ── OPEN AI CONVERSATION ──
-  window.openAiConversation = function() {
-    // If AI is disabled and user is admin, just open settings directly
-    if (!aiConfig?.aiEnabled && currentUserData?.admin === true) {
-      openSettingsModal();
-      return;
-    }
-    if (!aiConfig?.aiEnabled) return;
-
-    if (messagesUnsubscribe) { messagesUnsubscribe(); messagesUnsubscribe = null; }
-    activeConvId = null;
-    aiConvActive = true;
-
-    // Update sidebar active state
-    document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
-    document.getElementById('ai-conv-item').classList.add('active');
-
-    // Populate header
-    const modelLabel = aiConfig?.model || 'AI';
-    document.getElementById('chat-header-avatar').textContent = '✦';
-    document.getElementById('chat-header-avatar').style.color = 'var(--secondary)';
-    document.getElementById('chat-header-name').textContent = 'KnowWhere AI';
-    document.getElementById('chat-header-sub').textContent = modelLabel;
-
-    // Show chat pane
-    document.getElementById('chat-empty').style.display = 'none';
-    const activeChat = document.getElementById('active-chat');
-    activeChat.style.display = 'flex';
-    activeChat.style.flexDirection = 'column';
-    activeChat.style.flex = '1';
-    activeChat.style.overflow = 'hidden';
-
-    openChatMobile();
-    renderAiMessages();
-
-    // Show settings gear for admins in AI conv header; hide copy-link btn
-    const settingsBtn = document.getElementById('chat-settings-btn');
-    if (settingsBtn && currentUserData?.admin === true) settingsBtn.style.display = 'flex';
-    const copyLinkBtn = document.getElementById('copy-link-btn');
-    if (copyLinkBtn) copyLinkBtn.style.display = 'none';
-
-    // Focus input
-    setTimeout(() => document.getElementById('msg-input').focus(), 100);
-  };
-
-  function renderAiMessages() {
-    const area = document.getElementById('messages-area');
-    if (aiMessages.length === 0) {
-      const greeting = aiConfig?.systemPrompt?.includes('KnowWhere')
-        ? 'Hi! I\'m the KnowWhere AI assistant. How can I help you today?'
-        : 'Hi! How can I help you today? I forget everything upon refresh.';
-      area.innerHTML = `<div class="msg-row ai-msg theirs" style="max-width:75%;align-self:flex-start;">
+<div class="settings-section">
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+<div class="settings-section-title" style="margin-bottom:0;">API Keys</div>
+<button class="settings-add-btn" onclick="addApiKeyField()">+ Add Key</button>
+</div>
+<div id="s-api-keys-list" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+</div>
+<div id="settings-error" style="font-size:0.78rem;color:var(--danger);display:none;"></div>
+<div id="settings-success" style="font-size:0.78rem;color:#22c55e;display:none;"></div>
+<div class="modal-actions" style="margin-top:0.5rem;">
+<button class="modal-cancel-btn" onclick="closeSettingsModal()">Cancel</button>
+<button class="auth-submit" onclick="saveSettings()" style="flex:1;padding:0.65rem;font-size:0.6rem;">Save Changes</button>
+</div>
+</div>
+</div>
+<script type="module">import{initializeApp}from"https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";import{getFirestore,doc,getDoc,setDoc,updateDoc,collection,getDocs,addDoc,query,where,orderBy,onSnapshot,serverTimestamp,Timestamp}from"https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";const firebaseConfig={apiKey:"AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ",authDomain:"knowwhere1.firebaseapp.com",projectId:"knowwhere1",storageBucket:"knowwhere1.firebasestorage.app",messagingSenderId:"747448090609",appId:"1:747448090609:web:e3af5b2c8ffa8fb3a9ce50",measurementId:"G-DV44FGDQ2N"};const app=initializeApp(firebaseConfig);const auth=getAuth(app);const db=getFirestore(app);let currentUser=null;let currentUserData=null;let allConversations=[];let activeConvId=null;let messagesUnsubscribe=null;let convsUnsubscribe=null;let allUsers=[];const userNameCache={};let aiConfig=null;let aiMessages=[];let aiConvActive=false;window.handleAuth=async function(){const email=document.getElementById('auth-email').value.trim();const password=document.getElementById('auth-password').value;const errEl=document.getElementById('auth-error');const btn=document.getElementById('auth-submit');errEl.classList.remove('show');if(!email||!password){errEl.textContent='Please fill in all fields.';errEl.classList.add('show');return;}
+btn.disabled=true;btn.textContent='Logging in...';try{await signInWithEmailAndPassword(auth,email,password);}catch(e){const map={'auth/invalid-credential':'Email or password is incorrect.','auth/user-not-found':'No account found.','auth/wrong-password':'Incorrect password.','auth/too-many-requests':'Too many attempts. Try again later.'};errEl.textContent=map[e.code]||'Login failed.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Login';}};document.addEventListener('keydown',e=>{if(e.key==='Enter'&&!document.getElementById('auth-wall').classList.contains('hidden')){handleAuth();}});window.handleSignOut=async function(){if(convsUnsubscribe)convsUnsubscribe();if(messagesUnsubscribe)messagesUnsubscribe();await signOut(auth);};onAuthStateChanged(auth,async(user)=>{const wall=document.getElementById('auth-wall');const appEl=document.getElementById('app');if(user){currentUser=user;wall.classList.add('hidden');appEl.classList.add('visible');try{const snap=await getDoc(doc(db,'users',user.email));currentUserData=snap.exists()?snap.data():{email:user.email,username:user.email};}catch(e){currentUserData={email:user.email,username:user.email};}
+const displayName=currentUserData.username||user.email;document.getElementById('nav-username').textContent=displayName;loadAllUsers();loadAiConfig();subscribeToConversations();}else{currentUser=null;currentUserData=null;wall.classList.remove('hidden');appEl.classList.remove('visible');document.getElementById('auth-email').value='';document.getElementById('auth-password').value='';document.getElementById('auth-error').classList.remove('show');}});async function loadAiConfig(){try{const snap=await getDoc(doc(db,'siteContent','main'));if(!snap.exists())return;const data=snap.data();const ai=data.aiSettings||{};const admin=currentUserData?.admin===true;const item=document.getElementById('ai-conv-item');if(!ai.aiEnabled){if(admin&&item){item.style.display='flex';item.style.opacity='0.45';item.title='AI is disabled — open settings to re-enable';}
+return;}
+if(item){item.style.display='flex';item.style.opacity='';item.title='';}
+const keys=ai.apiKeys||[];if(keys.length===0)return;const apiKey=keys[Math.floor(Math.random()*keys.length)];aiConfig={aiEnabled:true,apiKey,model:ai.model||'gemini-2.5-flash-lite',systemPrompt:ai.systemPrompt||'You are a helpful assistant.'};}catch(e){console.warn('Could not load AI config:',e);}}
+window.openAiConversation=function(){if(!aiConfig?.aiEnabled&&currentUserData?.admin===true){openSettingsModal();return;}
+if(!aiConfig?.aiEnabled)return;if(messagesUnsubscribe){messagesUnsubscribe();messagesUnsubscribe=null;}
+activeConvId=null;aiConvActive=true;document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));document.getElementById('ai-conv-item').classList.add('active');const modelLabel=aiConfig?.model||'AI';document.getElementById('chat-header-avatar').textContent='✦';document.getElementById('chat-header-avatar').style.color='var(--secondary)';document.getElementById('chat-header-name').textContent='KnowWhere AI';document.getElementById('chat-header-sub').textContent=modelLabel;document.getElementById('chat-empty').style.display='none';const activeChat=document.getElementById('active-chat');activeChat.style.display='flex';activeChat.style.flexDirection='column';activeChat.style.flex='1';activeChat.style.overflow='hidden';openChatMobile();renderAiMessages();const settingsBtn=document.getElementById('chat-settings-btn');if(settingsBtn&&currentUserData?.admin===true)settingsBtn.style.display='flex';const copyLinkBtn=document.getElementById('copy-link-btn');if(copyLinkBtn)copyLinkBtn.style.display='none';setTimeout(()=>document.getElementById('msg-input').focus(),100);};function renderAiMessages(){const area=document.getElementById('messages-area');if(aiMessages.length===0){const greeting=aiConfig?.systemPrompt?.includes('KnowWhere')?'Hi! I\'m the KnowWhere AI assistant. How can I help you today?':'Hi! How can I help you today? I forget everything upon refresh.';area.innerHTML=`<div class="msg-row ai-msg theirs" style="max-width:75%;align-self:flex-start;">
         <div class="msg-avatar-sm">✦</div>
         <div><div class="msg-bubble">${escapeHtml(greeting)}<span class="msg-time">now</span></div></div>
-      </div>`;
-      return;
-    }
-
-    let html = '';
-    for (const msg of aiMessages) {
-      const isMine = msg.role === 'user';
-      const timeStr = msg.time || '';
-      if (isMine) {
-        const initial = (currentUserData?.username || currentUser?.email || '?')[0].toUpperCase();
-        html += `<div class="msg-row mine">
+      </div>`;return;}
+let html='';for(const msg of aiMessages){const isMine=msg.role==='user';const timeStr=msg.time||'';if(isMine){const initial=(currentUserData?.username||currentUser?.email||'?')[0].toUpperCase();html+=`<div class="msg-row mine">
           <div><div class="msg-bubble">${escapeHtml(msg.content)}<span class="msg-time">${timeStr}</span></div></div>
           <div class="msg-avatar-sm">${initial}</div>
-        </div>`;
-      } else {
-        html += `<div class="msg-row ai-msg theirs">
+        </div>`;}else{html+=`<div class="msg-row ai-msg theirs">
           <div class="msg-avatar-sm">✦</div>
           <div><div class="msg-bubble">${escapeHtml(msg.content)}<span class="msg-time">${timeStr}</span></div></div>
-        </div>`;
-      }
-    }
-    area.innerHTML = html;
-    area.scrollTop = area.scrollHeight;
-  }
-
-  function showAiTyping() {
-    const area = document.getElementById('messages-area');
-    const div = document.createElement('div');
-    div.id = 'ai-typing-indicator';
-    div.className = 'msg-row ai-msg theirs';
-    div.style.maxWidth = '75%';
-    div.style.alignSelf = 'flex-start';
-    div.innerHTML = `<div class="msg-avatar-sm">✦</div>
-      <div><div class="msg-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div></div>`;
-    area.appendChild(div);
-    area.scrollTop = area.scrollHeight;
-  }
-
-  function hideAiTyping() {
-    const el = document.getElementById('ai-typing-indicator');
-    if (el) el.remove();
-  }
-
-  async function sendAiMessage(text) {
-    if (!aiConfig?.aiEnabled) return;
-
-    const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    aiMessages.push({ role: 'user', content: text, time: now });
-    renderAiMessages();
-    showAiTyping();
-
-    // Build Gemini API request
-    const contents = aiMessages
-      .filter(m => m.role === 'user' || m.role === 'model')
-      .map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.content }] }));
-
-    const payload = {
-      system_instruction: { parts: [{ text: aiConfig.systemPrompt }] },
-      contents
-    };
-
-    try {
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${aiConfig.model}:generateContent?key=${aiConfig.apiKey}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }
-      );
-      const data = await res.json();
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I couldn\'t generate a response.';
-      const replyTime = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      aiMessages.push({ role: 'model', content: reply, time: replyTime });
-
-      // Update sidebar preview
-      document.getElementById('ai-conv-preview').textContent = reply.slice(0, 40) + (reply.length > 40 ? '…' : '');
-    } catch(e) {
-      aiMessages.push({ role: 'model', content: 'Sorry, something went wrong connecting to the AI.', time: now });
-    }
-
-    hideAiTyping();
-    renderAiMessages();
-  }
-
-  // ── LOAD ALL USERS ──
-  async function loadAllUsers() {
-    try {
-      const snap = await getDocs(collection(db, 'users'));
-      allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-        .filter(u => u.email !== currentUser.email);
-    } catch(e) {
-      console.warn('Could not load users:', e);
-    }
-    // After users load, check for a deep-link username in the URL (?Username)
-    handleDeepLink();
-  }
-
-  // ── DEEP LINK: msg.html?Username ──
-  async function handleDeepLink() {
-    const raw = window.location.search; // e.g. "?Kyguy"
-    if (!raw || raw.length <= 1) return;
-    const targetUsername = decodeURIComponent(raw.slice(1)).trim(); // strip leading "?"
-    if (!targetUsername) return;
-
-    // Find user by username (case-insensitive)
-    const match = allUsers.find(u =>
-      (u.username || '').toLowerCase() === targetUsername.toLowerCase()
-    );
-
-    if (!match) {
-      console.warn('Deep link: no user found with username:', targetUsername);
-      return;
-    }
-
-    // Create / open the conversation
-    await startConversation(match.email);
-
-    // Clean the URL so refreshing doesn't re-trigger (optional but clean UX)
-    window.history.replaceState(null, '', window.location.pathname);
-  }
-
-  // ── CONVERSATIONS ──
-  function getConvId(emailA, emailB) {
-    return [emailA, emailB].sort().join('__');
-  }
-
-  function subscribeToConversations() {
-    const convListEl = document.getElementById('conv-list');
-
-    const q = query(
-      collection(db, 'conversations'),
-      where('participants', 'array-contains', currentUser.email)
-    );
-
-    convsUnsubscribe = onSnapshot(q, async (snapshot) => {
-      // Fetch all user names in parallel before touching allConversations
-      const convPromises = snapshot.docs.map(async (docSnap) => {
-        const data = docSnap.data();
-        const otherEmail = data.participants.find(p => p !== currentUser.email);
-        let otherName = otherEmail;
-        if (userNameCache[otherEmail]) {
-          otherName = userNameCache[otherEmail];
-        } else {
-          try {
-            const uSnap = await getDoc(doc(db, 'users', otherEmail));
-            if (uSnap.exists() && uSnap.data().username) otherName = uSnap.data().username;
-            userNameCache[otherEmail] = otherName;
-          } catch {}
-        }
-        return { id: docSnap.id, ...data, otherEmail, otherName };
-      });
-
-      // Only update state once everything is ready — prevents flicker/duplication
-      const resolved = await Promise.all(convPromises);
-      resolved.sort((a, b) => {
-        const ta = a.lastMessageAt?.toMillis?.() || 0;
-        const tb = b.lastMessageAt?.toMillis?.() || 0;
-        return tb - ta;
-      });
-      allConversations = resolved;
-      renderConvList(allConversations);
-    });
-  }
-
-  function renderConvList(convs) {
-    const el = document.getElementById('conv-list');
-    // Filter out convos soft-deleted by the current user
-    const visible = convs.filter(c => !(c.deletedBy && c.deletedBy.includes(currentUser.email)));
-    if (visible.length === 0) {
-      el.innerHTML = `<div class="conv-empty">No conversations yet.<br>Hit <strong>New</strong> to start one.</div>`;
-      return;
-    }
-
-    el.innerHTML = visible.map(c => {
-      const initial = (c.otherName || c.otherEmail || '?')[0].toUpperCase();
-      const preview = c.lastMessage ? escapeHtml(c.lastMessage).slice(0, 40) + (c.lastMessage.length > 40 ? '…' : '') : 'No messages yet';
-      const time = c.lastMessageAt ? formatTime(c.lastMessageAt.toDate()) : '';
-      const isActive = c.id === activeConvId;
-      const hasUnread = c.unreadBy && c.unreadBy.includes(currentUser.email);
-
-      return `<div class="conv-item${isActive ? ' active' : ''}" onclick="openConversation('${c.id}')">
+        </div>`;}}
+area.innerHTML=html;area.scrollTop=area.scrollHeight;}
+function showAiTyping(){const area=document.getElementById('messages-area');const div=document.createElement('div');div.id='ai-typing-indicator';div.className='msg-row ai-msg theirs';div.style.maxWidth='75%';div.style.alignSelf='flex-start';div.innerHTML=`<div class="msg-avatar-sm">✦</div>
+      <div><div class="msg-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div></div>`;area.appendChild(div);area.scrollTop=area.scrollHeight;}
+function hideAiTyping(){const el=document.getElementById('ai-typing-indicator');if(el)el.remove();}
+async function sendAiMessage(text){if(!aiConfig?.aiEnabled)return;const now=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});aiMessages.push({role:'user',content:text,time:now});renderAiMessages();showAiTyping();const contents=aiMessages.filter(m=>m.role==='user'||m.role==='model').map(m=>({role:m.role==='user'?'user':'model',parts:[{text:m.content}]}));const payload={system_instruction:{parts:[{text:aiConfig.systemPrompt}]},contents};try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${aiConfig.model}:generateContent?key=${aiConfig.apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await res.json();const reply=data?.candidates?.[0]?.content?.parts?.[0]?.text||'Sorry, I couldn\'t generate a response.';const replyTime=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});aiMessages.push({role:'model',content:reply,time:replyTime});document.getElementById('ai-conv-preview').textContent=reply.slice(0,40)+(reply.length>40?'…':'');}catch(e){aiMessages.push({role:'model',content:'Sorry, something went wrong connecting to the AI.',time:now});}
+hideAiTyping();renderAiMessages();}
+async function loadAllUsers(){try{const snap=await getDocs(collection(db,'users'));allUsers=snap.docs.map(d=>({id:d.id,...d.data()})).filter(u=>u.email!==currentUser.email);}catch(e){console.warn('Could not load users:',e);}
+handleDeepLink();}
+async function handleDeepLink(){const raw=window.location.search;if(!raw||raw.length<=1)return;const targetUsername=decodeURIComponent(raw.slice(1)).trim();if(!targetUsername)return;const match=allUsers.find(u=>(u.username||'').toLowerCase()===targetUsername.toLowerCase());if(!match){console.warn('Deep link: no user found with username:',targetUsername);return;}
+await startConversation(match.email);window.history.replaceState(null,'',window.location.pathname);}
+function getConvId(emailA,emailB){return[emailA,emailB].sort().join('__');}
+function subscribeToConversations(){const convListEl=document.getElementById('conv-list');const q=query(collection(db,'conversations'),where('participants','array-contains',currentUser.email));convsUnsubscribe=onSnapshot(q,async(snapshot)=>{const convPromises=snapshot.docs.map(async(docSnap)=>{const data=docSnap.data();const otherEmail=data.participants.find(p=>p!==currentUser.email);let otherName=otherEmail;if(userNameCache[otherEmail]){otherName=userNameCache[otherEmail];}else{try{const uSnap=await getDoc(doc(db,'users',otherEmail));if(uSnap.exists()&&uSnap.data().username)otherName=uSnap.data().username;userNameCache[otherEmail]=otherName;}catch{}}
+return{id:docSnap.id,...data,otherEmail,otherName};});const resolved=await Promise.all(convPromises);resolved.sort((a,b)=>{const ta=a.lastMessageAt?.toMillis?.()||0;const tb=b.lastMessageAt?.toMillis?.()||0;return tb-ta;});allConversations=resolved;renderConvList(allConversations);});}
+function renderConvList(convs){const el=document.getElementById('conv-list');const visible=convs.filter(c=>!(c.deletedBy&&c.deletedBy.includes(currentUser.email)));if(visible.length===0){el.innerHTML=`<div class="conv-empty">No conversations yet.<br>Hit <strong>New</strong> to start one.</div>`;return;}
+el.innerHTML=visible.map(c=>{const initial=(c.otherName||c.otherEmail||'?')[0].toUpperCase();const preview=c.lastMessage?escapeHtml(c.lastMessage).slice(0,40)+(c.lastMessage.length>40?'…':''):'No messages yet';const time=c.lastMessageAt?formatTime(c.lastMessageAt.toDate()):'';const isActive=c.id===activeConvId;const hasUnread=c.unreadBy&&c.unreadBy.includes(currentUser.email);return`<div class="conv-item${isActive ? ' active' : ''}" onclick="openConversation('${c.id}')">
         <div class="conv-avatar">${initial}</div>
         <div class="conv-info">
           <div class="conv-name">${escapeHtml(c.otherName || c.otherEmail)}</div>
@@ -1656,596 +1215,53 @@
             <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/>
           </svg>
         </button>
-      </div>`;
-    }).join('');
-  }
-
-  window.filterConvs = function(q) {
-    const filtered = q
-      ? allConversations.filter(c =>
-          (c.otherName || '').toLowerCase().includes(q.toLowerCase()) ||
-          (c.otherEmail || '').toLowerCase().includes(q.toLowerCase()))
-      : allConversations;
-    renderConvList(filtered);
-  };
-
-  // ── DELETE CONVERSATION (soft delete — data kept in Firestore) ──
-  let deleteConfirmTimeout = null;
-
-  window.confirmDeleteConv = function(e, convId) {
-    e.stopPropagation();
-    const item = e.currentTarget.closest('.conv-item');
-    if (!item) return;
-
-    if (item.classList.contains('confirm-delete')) {
-      // Second click — do it
-      clearTimeout(deleteConfirmTimeout);
-      deleteConversation(convId, item);
-    } else {
-      // First click — ask for confirmation
-      item.classList.add('confirm-delete');
-      const preview = item.querySelector('.conv-preview');
-      const origText = preview.textContent;
-      preview.textContent = 'Tap again to delete';
-      deleteConfirmTimeout = setTimeout(() => {
-        item.classList.remove('confirm-delete');
-        preview.textContent = origText;
-      }, 2500);
-    }
-  };
-
-  async function deleteConversation(convId, itemEl) {
-    try {
-      // Soft delete: add current user to deletedBy array and record the clear timestamp.
-      // Data is kept intact in Firestore for admin review; clearedAt hides old messages from this user.
-      const safeKey = currentUser.email.replace(/[.@]/g, '_');
-      await updateDoc(doc(db, 'conversations', convId), {
-        deletedBy: [...((allConversations.find(c => c.id === convId)?.deletedBy) || []), currentUser.email],
-        [`clearedAt_${safeKey}`]: serverTimestamp()
-      });
-      // If this was the active conversation, close the chat pane
-      if (activeConvId === convId) {
-        if (messagesUnsubscribe) { messagesUnsubscribe(); messagesUnsubscribe = null; }
-        activeConvId = null;
-        document.getElementById('active-chat').style.display = 'none';
-        document.getElementById('chat-empty').style.display = '';
-      }
-    } catch(e) {
-      console.error('Delete error:', e);
-    }
-  }
-
-  // ── MOBILE NAVIGATION ──
-  function isMobile() { return window.innerWidth <= 700; }
-
-  function openChatMobile() {
-    if (!isMobile()) return;
-    document.getElementById('sidebar').classList.add('slide-out');
-    document.getElementById('chat-pane').classList.add('slide-in');
-  }
-
-  function closeChatMobile() {
-    if (!isMobile()) return;
-    document.getElementById('sidebar').classList.remove('slide-out');
-    document.getElementById('chat-pane').classList.remove('slide-in');
-  }
-
-  window.closeChatMobile = closeChatMobile;
-
-  // Handle resize: reset mobile state if user goes to desktop
-  window.addEventListener('resize', () => {
-    if (!isMobile()) {
-      document.getElementById('sidebar').classList.remove('slide-out');
-      document.getElementById('chat-pane').classList.remove('slide-in');
-    }
-  });
-
-  // ── OPEN CONVERSATION ──
-  window.openConversation = async function(convId) {
-    if (messagesUnsubscribe) messagesUnsubscribe();
-    activeConvId = convId;
-    aiConvActive = false;
-
-    // Reset AI avatar styling if switching from AI
-    const avatar = document.getElementById('chat-header-avatar');
-    avatar.style.color = '';
-
-    // Remove active from AI conv item
-    const aiItem = document.getElementById('ai-conv-item');
-    if (aiItem) aiItem.classList.remove('active');
-
-    const conv = allConversations.find(c => c.id === convId);
-    if (!conv) return;
-
-    // Mark read
-    if (conv.unreadBy && conv.unreadBy.includes(currentUser.email)) {
-      updateDoc(doc(db, 'conversations', convId), {
-        unreadBy: conv.unreadBy.filter(e => e !== currentUser.email)
-      }).catch(() => {});
-    }
-
-    // Update active state in sidebar
-    document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
-    const convEl = document.querySelector(`.conv-item[onclick="openConversation('${convId}')"]`);
-    if (convEl) convEl.classList.add('active');
-
-    // Populate header
-    const initial = (conv.otherName || conv.otherEmail || '?')[0].toUpperCase();
-    document.getElementById('chat-header-avatar').textContent = initial;
-    document.getElementById('chat-header-name').textContent = conv.otherName || conv.otherEmail;
-    document.getElementById('chat-header-sub').textContent = conv.otherEmail;
-
-    // Hide AI settings gear for regular convos, show copy-link btn
-    const settingsBtn = document.getElementById('chat-settings-btn');
-    if (settingsBtn) settingsBtn.style.display = 'none';
-    const copyBtn = document.getElementById('copy-link-btn');
-    if (copyBtn) {
-      copyBtn.style.display = 'flex';
-      copyBtn.style.marginLeft = 'auto';
-      copyBtn._convUsername = conv.otherName || conv.otherEmail;
-    }
-
-    // Show chat pane
-    document.getElementById('chat-empty').style.display = 'none';
-    const activeChat = document.getElementById('active-chat');
-    activeChat.style.display = 'flex';
-    activeChat.style.flexDirection = 'column';
-    activeChat.style.flex = '1';
-    activeChat.style.overflow = 'hidden';
-
-    // On mobile, slide to chat view
-    openChatMobile();
-
-    // Subscribe to messages
-    const msgsRef = collection(db, 'conversations', convId, 'messages');
-    const msgsQuery = query(msgsRef, orderBy('sentAt', 'asc'));
-
-    document.getElementById('messages-area').innerHTML = '<div class="loading-spinner"><div class="spinner"></div></div>';
-
-    // Get this user's clearedAt threshold (if they previously deleted this conv)
-    const safeKey = currentUser.email.replace(/[.@]/g, '_');
-    const clearedAt = conv[`clearedAt_${safeKey}`] || null;
-
-    messagesUnsubscribe = onSnapshot(msgsQuery, (snap) => {
-      renderMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })), clearedAt);
-    });
-  };
-
-  function renderMessages(msgs, clearedAt) {
-    const area = document.getElementById('messages-area');
-    const wasAtBottom = area.scrollHeight - area.scrollTop - area.clientHeight < 60;
-
-    // Hide messages sent before this user deleted the conversation
-    if (clearedAt) {
-      const cutoff = clearedAt.toMillis ? clearedAt.toMillis() : clearedAt;
-      msgs = msgs.filter(m => {
-        const t = m.sentAt?.toMillis ? m.sentAt.toMillis() : (m.sentAt ? new Date(m.sentAt).getTime() : 0);
-        return t > cutoff;
-      });
-    }
-
-    if (msgs.length === 0) {
-      area.innerHTML = `<div style="text-align:center;color:var(--muted);font-size:0.8rem;padding:2rem 0;opacity:0.6;">No messages yet. Say hi!</div>`;
-      return;
-    }
-
-    let html = '';
-    let lastDate = null;
-
-    for (const msg of msgs) {
-      const date = msg.sentAt?.toDate ? msg.sentAt.toDate() : new Date(msg.sentAt || Date.now());
-      const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-
-      if (dateStr !== lastDate) {
-        html += `<div class="msg-date-divider">${dateStr}</div>`;
-        lastDate = dateStr;
-      }
-
-      const isMine = msg.senderEmail === currentUser.email;
-      const initial = (msg.senderName || msg.senderEmail || '?')[0].toUpperCase();
-      const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-      html += `<div class="msg-row ${isMine ? 'mine' : 'theirs'}">
+      </div>`;}).join('');}
+window.filterConvs=function(q){const filtered=q?allConversations.filter(c=>(c.otherName||'').toLowerCase().includes(q.toLowerCase())||(c.otherEmail||'').toLowerCase().includes(q.toLowerCase())):allConversations;renderConvList(filtered);};let deleteConfirmTimeout=null;window.confirmDeleteConv=function(e,convId){e.stopPropagation();const item=e.currentTarget.closest('.conv-item');if(!item)return;if(item.classList.contains('confirm-delete')){clearTimeout(deleteConfirmTimeout);deleteConversation(convId,item);}else{item.classList.add('confirm-delete');const preview=item.querySelector('.conv-preview');const origText=preview.textContent;preview.textContent='Tap again to delete';deleteConfirmTimeout=setTimeout(()=>{item.classList.remove('confirm-delete');preview.textContent=origText;},2500);}};async function deleteConversation(convId,itemEl){try{const safeKey=currentUser.email.replace(/[.@]/g,'_');await updateDoc(doc(db,'conversations',convId),{deletedBy:[...((allConversations.find(c=>c.id===convId)?.deletedBy)||[]),currentUser.email],[`clearedAt_${safeKey}`]:serverTimestamp()});if(activeConvId===convId){if(messagesUnsubscribe){messagesUnsubscribe();messagesUnsubscribe=null;}
+activeConvId=null;document.getElementById('active-chat').style.display='none';document.getElementById('chat-empty').style.display='';}}catch(e){console.error('Delete error:',e);}}
+function isMobile(){return window.innerWidth<=700;}
+function openChatMobile(){if(!isMobile())return;document.getElementById('sidebar').classList.add('slide-out');document.getElementById('chat-pane').classList.add('slide-in');}
+function closeChatMobile(){if(!isMobile())return;document.getElementById('sidebar').classList.remove('slide-out');document.getElementById('chat-pane').classList.remove('slide-in');}
+window.closeChatMobile=closeChatMobile;window.addEventListener('resize',()=>{if(!isMobile()){document.getElementById('sidebar').classList.remove('slide-out');document.getElementById('chat-pane').classList.remove('slide-in');}});window.openConversation=async function(convId){if(messagesUnsubscribe)messagesUnsubscribe();activeConvId=convId;aiConvActive=false;const avatar=document.getElementById('chat-header-avatar');avatar.style.color='';const aiItem=document.getElementById('ai-conv-item');if(aiItem)aiItem.classList.remove('active');const conv=allConversations.find(c=>c.id===convId);if(!conv)return;if(conv.unreadBy&&conv.unreadBy.includes(currentUser.email)){updateDoc(doc(db,'conversations',convId),{unreadBy:conv.unreadBy.filter(e=>e!==currentUser.email)}).catch(()=>{});}
+document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));const convEl=document.querySelector(`.conv-item[onclick="openConversation('${convId}')"]`);if(convEl)convEl.classList.add('active');const initial=(conv.otherName||conv.otherEmail||'?')[0].toUpperCase();document.getElementById('chat-header-avatar').textContent=initial;document.getElementById('chat-header-name').textContent=conv.otherName||conv.otherEmail;document.getElementById('chat-header-sub').textContent=conv.otherEmail;const settingsBtn=document.getElementById('chat-settings-btn');if(settingsBtn)settingsBtn.style.display='none';const copyBtn=document.getElementById('copy-link-btn');if(copyBtn){copyBtn.style.display='flex';copyBtn.style.marginLeft='auto';copyBtn._convUsername=conv.otherName||conv.otherEmail;}
+document.getElementById('chat-empty').style.display='none';const activeChat=document.getElementById('active-chat');activeChat.style.display='flex';activeChat.style.flexDirection='column';activeChat.style.flex='1';activeChat.style.overflow='hidden';openChatMobile();const msgsRef=collection(db,'conversations',convId,'messages');const msgsQuery=query(msgsRef,orderBy('sentAt','asc'));document.getElementById('messages-area').innerHTML='<div class="loading-spinner"><div class="spinner"></div></div>';const safeKey=currentUser.email.replace(/[.@]/g,'_');const clearedAt=conv[`clearedAt_${safeKey}`]||null;messagesUnsubscribe=onSnapshot(msgsQuery,(snap)=>{renderMessages(snap.docs.map(d=>({id:d.id,...d.data()})),clearedAt);});};function renderMessages(msgs,clearedAt){const area=document.getElementById('messages-area');const wasAtBottom=area.scrollHeight-area.scrollTop-area.clientHeight<60;if(clearedAt){const cutoff=clearedAt.toMillis?clearedAt.toMillis():clearedAt;msgs=msgs.filter(m=>{const t=m.sentAt?.toMillis?m.sentAt.toMillis():(m.sentAt?new Date(m.sentAt).getTime():0);return t>cutoff;});}
+if(msgs.length===0){area.innerHTML=`<div style="text-align:center;color:var(--muted);font-size:0.8rem;padding:2rem 0;opacity:0.6;">No messages yet. Say hi!</div>`;return;}
+let html='';let lastDate=null;for(const msg of msgs){const date=msg.sentAt?.toDate?msg.sentAt.toDate():new Date(msg.sentAt||Date.now());const dateStr=date.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});if(dateStr!==lastDate){html+=`<div class="msg-date-divider">${dateStr}</div>`;lastDate=dateStr;}
+const isMine=msg.senderEmail===currentUser.email;const initial=(msg.senderName||msg.senderEmail||'?')[0].toUpperCase();const timeStr=date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});html+=`<div class="msg-row ${isMine ? 'mine' : 'theirs'}">
         ${!isMine ? `<div class="msg-avatar-sm">${initial}</div>` : ''}
         <div>
           <div class="msg-bubble">${escapeHtml(msg.text)}<span class="msg-time">${timeStr}</span></div>
         </div>
         ${isMine ? `<div class="msg-avatar-sm">${initial}</div>` : ''}
-      </div>`;
-    }
-
-    area.innerHTML = html;
-    if (wasAtBottom || msgs.length <= 1) {
-      area.scrollTop = area.scrollHeight;
-    }
-  }
-
-  // ── SEND MESSAGE ──
-  window.sendMessage = async function() {
-    const input = document.getElementById('msg-input');
-    const text = input.value.trim();
-    if (!text) return;
-
-    // Route to AI if AI conversation is active
-    if (aiConvActive) {
-      input.value = '';
-      input.style.height = 'auto';
-      await sendAiMessage(text);
-      return;
-    }
-
-    if (!activeConvId) return;
-
-    const btn = document.getElementById('send-btn');
-    btn.disabled = true;
-
-    const senderName = currentUserData?.username || currentUser.email;
-
-    try {
-      const msgRef = collection(db, 'conversations', activeConvId, 'messages');
-      await addDoc(msgRef, {
-        text,
-        senderEmail: currentUser.email,
-        senderName,
-        sentAt: serverTimestamp()
-      });
-
-      const conv = allConversations.find(c => c.id === activeConvId);
-      const otherEmail = conv?.otherEmail;
-      const currentDeletedBy = conv?.deletedBy || [];
-      await updateDoc(doc(db, 'conversations', activeConvId), {
-        lastMessage: text,
-        lastMessageAt: serverTimestamp(),
-        unreadBy: otherEmail ? [otherEmail] : [],
-        // Remove both users from deletedBy when a new message is sent
-        deletedBy: currentDeletedBy.filter(e => e !== currentUser.email && e !== otherEmail)
-      });
-
-      input.value = '';
-      input.style.height = 'auto';
-    } catch(e) {
-      console.error('Send error:', e);
-      alert('Failed to send message.');
-    }
-    btn.disabled = false;
-  };
-
-  window.handleMsgKey = function(e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
-  window.autoResizeTextarea = function(el) {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-  };
-
-  // ── NEW CONVERSATION MODAL ──
-  let searchTimeout = null;
-
-  window.openNewConvModal = function() {
-    document.getElementById('new-conv-modal').classList.add('open');
-    document.getElementById('user-search-input').value = '';
-    document.getElementById('modal-error').classList.remove('show');
-    // Only exclude people from active (non-deleted) conversations
-    const existingEmails = new Set(
-      allConversations
-        .filter(c => !(c.deletedBy && c.deletedBy.includes(currentUser.email)))
-        .map(c => c.otherEmail)
-    );
-    const newUsers = allUsers.filter(u => !existingEmails.has(u.email));
-    _renderUserList(newUsers);
-    setTimeout(() => document.getElementById('user-search-input').focus(), 50);
-  };
-
-  window.closeNewConvModal = function() {
-    document.getElementById('new-conv-modal').classList.remove('open');
-  };
-
-  document.getElementById('new-conv-modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('new-conv-modal')) closeNewConvModal();
-  });
-
-  window.searchUsers = function(q) {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => _searchUsers(q), 200);
-  };
-
-  function _renderUserList(users) {
-    const resultsEl = document.getElementById('user-results');
-    if (users.length === 0) {
-      resultsEl.innerHTML = `<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">No users found.</div>`;
-      return;
-    }
-    resultsEl.innerHTML = users.map(u => {
-      const name = u.username || u.email;
-      const initial = name[0].toUpperCase();
-      return `<div class="user-result-item" onclick="startConversation('${u.email}')">
+      </div>`;}
+area.innerHTML=html;if(wasAtBottom||msgs.length<=1){area.scrollTop=area.scrollHeight;}}
+window.sendMessage=async function(){const input=document.getElementById('msg-input');const text=input.value.trim();if(!text)return;if(aiConvActive){input.value='';input.style.height='auto';await sendAiMessage(text);return;}
+if(!activeConvId)return;const btn=document.getElementById('send-btn');btn.disabled=true;const senderName=currentUserData?.username||currentUser.email;try{const msgRef=collection(db,'conversations',activeConvId,'messages');await addDoc(msgRef,{text,senderEmail:currentUser.email,senderName,sentAt:serverTimestamp()});const conv=allConversations.find(c=>c.id===activeConvId);const otherEmail=conv?.otherEmail;const currentDeletedBy=conv?.deletedBy||[];await updateDoc(doc(db,'conversations',activeConvId),{lastMessage:text,lastMessageAt:serverTimestamp(),unreadBy:otherEmail?[otherEmail]:[],deletedBy:currentDeletedBy.filter(e=>e!==currentUser.email&&e!==otherEmail)});input.value='';input.style.height='auto';}catch(e){console.error('Send error:',e);alert('Failed to send message.');}
+btn.disabled=false;};window.handleMsgKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}};window.autoResizeTextarea=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';};let searchTimeout=null;window.openNewConvModal=function(){document.getElementById('new-conv-modal').classList.add('open');document.getElementById('user-search-input').value='';document.getElementById('modal-error').classList.remove('show');const existingEmails=new Set(allConversations.filter(c=>!(c.deletedBy&&c.deletedBy.includes(currentUser.email))).map(c=>c.otherEmail));const newUsers=allUsers.filter(u=>!existingEmails.has(u.email));_renderUserList(newUsers);setTimeout(()=>document.getElementById('user-search-input').focus(),50);};window.closeNewConvModal=function(){document.getElementById('new-conv-modal').classList.remove('open');};document.getElementById('new-conv-modal').addEventListener('click',e=>{if(e.target===document.getElementById('new-conv-modal'))closeNewConvModal();});window.searchUsers=function(q){clearTimeout(searchTimeout);searchTimeout=setTimeout(()=>_searchUsers(q),200);};function _renderUserList(users){const resultsEl=document.getElementById('user-results');if(users.length===0){resultsEl.innerHTML=`<div style="color:var(--muted);font-size:0.78rem;text-align:center;padding:1rem 0;">No users found.</div>`;return;}
+resultsEl.innerHTML=users.map(u=>{const name=u.username||u.email;const initial=name[0].toUpperCase();return`<div class="user-result-item" onclick="startConversation('${u.email}')">
         <div class="user-result-avatar">${initial}</div>
         <div>
           <div class="user-result-name">${escapeHtml(name)}</div>
           <div class="user-result-email">${escapeHtml(u.email)}</div>
         </div>
-      </div>`;
-    }).join('');
-  }
-
-  function _searchUsers(q) {
-    const existingEmails = new Set(
-      allConversations
-        .filter(c => !(c.deletedBy && c.deletedBy.includes(currentUser.email)))
-        .map(c => c.otherEmail)
-    );
-    if (!q.trim()) {
-      _renderUserList(allUsers.filter(u => !existingEmails.has(u.email)));
-      return;
-    }
-
-    const lower = q.toLowerCase();
-    const matches = allUsers.filter(u =>
-      !existingEmails.has(u.email) && (
-        (u.username || '').toLowerCase().includes(lower) ||
-        (u.email || '').toLowerCase().includes(lower)
-      )
-    );
-
-    _renderUserList(matches);
-  }
-
-  window.startConversation = async function(otherEmail) {
-    const errEl = document.getElementById('modal-error');
-    errEl.classList.remove('show');
-
-    if (otherEmail === currentUser.email) {
-      errEl.textContent = "You can't message yourself.";
-      errEl.classList.add('show');
-      return;
-    }
-
-    const convId = getConvId(currentUser.email, otherEmail);
-
-    // Check if conversation already exists
-    const convRef = doc(db, 'conversations', convId);
-    const convSnap = await getDoc(convRef);
-
-    if (!convSnap.exists()) {
-      await setDoc(convRef, {
-        participants: [currentUser.email, otherEmail],
-        createdAt: serverTimestamp(),
-        lastMessageAt: serverTimestamp(),
-        lastMessage: '',
-        unreadBy: []
-      });
-    }
-
-    closeNewConvModal();
-    // Wait a tick for subscription to catch up
-    setTimeout(() => openConversation(convId), 300);
-  };
-
-  // ── ADMIN SETTINGS ──
-  function isAdmin() {
-    return currentUserData && currentUserData.admin === true;
-  }
-
-  window.openSettingsModal = async function() {
-    if (!isAdmin()) return;
-    const modal = document.getElementById('settings-modal');
-    modal.classList.add('open');
-    document.getElementById('settings-error').style.display = 'none';
-    document.getElementById('settings-success').style.display = 'none';
-
-    // Load current values from Firestore
-    try {
-      const snap = await getDoc(doc(db, 'siteContent', 'main'));
-      if (!snap.exists()) return;
-      const data = snap.data();
-      const ai = data.aiSettings || {};
-      document.getElementById('s-ai-enabled').checked = !!ai.aiEnabled;
-      // Set model hidden input + display label
-      const currentModel = ai.model || '';
-      document.getElementById('s-model').value = currentModel;
-      document.getElementById('s-model-label').textContent = currentModel || 'Click to select a model...';
-      document.getElementById('s-model-label').style.color = currentModel ? 'var(--text)' : 'var(--muted)';
-      document.getElementById('s-system-prompt').value = ai.systemPrompt || '';
-
-      // Render API keys
-      const keysList = document.getElementById('s-api-keys-list');
-      keysList.innerHTML = '';
-      const keys = ai.apiKeys || [];
-      keys.forEach(k => addApiKeyField(k));
-      if (keys.length === 0) addApiKeyField('');
-
-      // Pre-fetch models using first available key
-      if (keys.length > 0) fetchGeminiModels(keys[0]);
-    } catch(e) {
-      console.error('Failed to load settings:', e);
-    }
-  };
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', e => {
-    const dd = document.getElementById('s-model-dropdown');
-    const display = document.getElementById('s-model-display');
-    if (dd && !dd.contains(e.target) && !display.contains(e.target)) {
-      dd.style.display = 'none';
-      document.getElementById('s-model-arrow').style.transform = '';
-    }
-  });
-
-  window.toggleModelDropdown = function() {
-    const dd = document.getElementById('s-model-dropdown');
-    const arrow = document.getElementById('s-model-arrow');
-    const isOpen = dd.style.display !== 'none';
-    if (isOpen) {
-      dd.style.display = 'none';
-      arrow.style.transform = '';
-    } else {
-      dd.style.display = 'block';
-      arrow.style.transform = 'rotate(180deg)';
-      // Fetch if list is empty or still showing loading
-      const list = document.getElementById('s-model-list');
-      if (!list.querySelector('.model-option')) {
-        const keys = Array.from(document.querySelectorAll('#s-api-keys-list .api-key-row input'))
-          .map(i => i.value.trim()).filter(Boolean);
-        if (keys.length > 0) fetchGeminiModels(keys[0]);
-      }
-    }
-  };
-
-  window.selectModel = function(modelId) {
-    document.getElementById('s-model').value = modelId;
-    document.getElementById('s-model-label').textContent = modelId;
-    document.getElementById('s-model-label').style.color = 'var(--text)';
-    document.getElementById('s-model-dropdown').style.display = 'none';
-    document.getElementById('s-model-arrow').style.transform = '';
-  };
-
-  async function fetchGeminiModels(apiKey) {
-    const list = document.getElementById('s-model-list');
-    list.innerHTML = `<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;"><div class="spinner" style="width:12px;height:12px;"></div> Loading models...</div>`;
-    try {
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=100`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || 'API error');
-      const models = (data.models || [])
-        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
-        .map(m => m.name.replace('models/', ''))
-        .sort();
-      if (models.length === 0) { list.innerHTML = `<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;">No models found.</div>`; return; }
-      const current = document.getElementById('s-model').value;
-      list.innerHTML = models.map(m => `
+      </div>`;}).join('');}
+function _searchUsers(q){const existingEmails=new Set(allConversations.filter(c=>!(c.deletedBy&&c.deletedBy.includes(currentUser.email))).map(c=>c.otherEmail));if(!q.trim()){_renderUserList(allUsers.filter(u=>!existingEmails.has(u.email)));return;}
+const lower=q.toLowerCase();const matches=allUsers.filter(u=>!existingEmails.has(u.email)&&((u.username||'').toLowerCase().includes(lower)||(u.email||'').toLowerCase().includes(lower)));_renderUserList(matches);}
+window.startConversation=async function(otherEmail){const errEl=document.getElementById('modal-error');errEl.classList.remove('show');if(otherEmail===currentUser.email){errEl.textContent="You can't message yourself.";errEl.classList.add('show');return;}
+const convId=getConvId(currentUser.email,otherEmail);const convRef=doc(db,'conversations',convId);const convSnap=await getDoc(convRef);if(!convSnap.exists()){await setDoc(convRef,{participants:[currentUser.email,otherEmail],createdAt:serverTimestamp(),lastMessageAt:serverTimestamp(),lastMessage:'',unreadBy:[]});}
+closeNewConvModal();setTimeout(()=>openConversation(convId),300);};function isAdmin(){return currentUserData&&currentUserData.admin===true;}
+window.openSettingsModal=async function(){if(!isAdmin())return;const modal=document.getElementById('settings-modal');modal.classList.add('open');document.getElementById('settings-error').style.display='none';document.getElementById('settings-success').style.display='none';try{const snap=await getDoc(doc(db,'siteContent','main'));if(!snap.exists())return;const data=snap.data();const ai=data.aiSettings||{};document.getElementById('s-ai-enabled').checked=!!ai.aiEnabled;const currentModel=ai.model||'';document.getElementById('s-model').value=currentModel;document.getElementById('s-model-label').textContent=currentModel||'Click to select a model...';document.getElementById('s-model-label').style.color=currentModel?'var(--text)':'var(--muted)';document.getElementById('s-system-prompt').value=ai.systemPrompt||'';const keysList=document.getElementById('s-api-keys-list');keysList.innerHTML='';const keys=ai.apiKeys||[];keys.forEach(k=>addApiKeyField(k));if(keys.length===0)addApiKeyField('');if(keys.length>0)fetchGeminiModels(keys[0]);}catch(e){console.error('Failed to load settings:',e);}};document.addEventListener('click',e=>{const dd=document.getElementById('s-model-dropdown');const display=document.getElementById('s-model-display');if(dd&&!dd.contains(e.target)&&!display.contains(e.target)){dd.style.display='none';document.getElementById('s-model-arrow').style.transform='';}});window.toggleModelDropdown=function(){const dd=document.getElementById('s-model-dropdown');const arrow=document.getElementById('s-model-arrow');const isOpen=dd.style.display!=='none';if(isOpen){dd.style.display='none';arrow.style.transform='';}else{dd.style.display='block';arrow.style.transform='rotate(180deg)';const list=document.getElementById('s-model-list');if(!list.querySelector('.model-option')){const keys=Array.from(document.querySelectorAll('#s-api-keys-list .api-key-row input')).map(i=>i.value.trim()).filter(Boolean);if(keys.length>0)fetchGeminiModels(keys[0]);}}};window.selectModel=function(modelId){document.getElementById('s-model').value=modelId;document.getElementById('s-model-label').textContent=modelId;document.getElementById('s-model-label').style.color='var(--text)';document.getElementById('s-model-dropdown').style.display='none';document.getElementById('s-model-arrow').style.transform='';};async function fetchGeminiModels(apiKey){const list=document.getElementById('s-model-list');list.innerHTML=`<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;display:flex;align-items:center;gap:0.5rem;"><div class="spinner" style="width:12px;height:12px;"></div> Loading models...</div>`;try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}&pageSize=100`);const data=await res.json();if(!res.ok)throw new Error(data.error?.message||'API error');const models=(data.models||[]).filter(m=>m.supportedGenerationMethods?.includes('generateContent')).map(m=>m.name.replace('models/','')).sort();if(models.length===0){list.innerHTML=`<div style="padding:0.75rem 1rem;color:var(--muted);font-size:0.78rem;">No models found.</div>`;return;}
+const current=document.getElementById('s-model').value;list.innerHTML=models.map(m=>`
         <div class="model-option ${m === current ? 'selected' : ''}" onclick="selectModel('${m}')">
           <span style="font-family:monospace;font-size:0.8rem;">${m}</span>
           ${m === current ? '<span style="color:var(--primary);font-size:0.65rem;">✓ current</span>' : ''}
-        </div>`).join('');
-    } catch(e) {
-      list.innerHTML = `<div style="padding:0.75rem 1rem;color:var(--danger);font-size:0.78rem;">Failed to load models: ${e.message}</div>`;
-    }
-  }
-
-  window.closeSettingsModal = function() {
-    document.getElementById('settings-modal').classList.remove('open');
-  };
-
-  document.getElementById('settings-modal').addEventListener('click', e => {
-    if (e.target === document.getElementById('settings-modal')) closeSettingsModal();
-  });
-
-  window.addApiKeyField = function(value = '') {
-    const list = document.getElementById('s-api-keys-list');
-    const row = document.createElement('div');
-    row.className = 'api-key-row';
-    row.innerHTML = `
+        </div>`).join('');}catch(e){list.innerHTML=`<div style="padding:0.75rem 1rem;color:var(--danger);font-size:0.78rem;">Failed to load models: ${e.message}</div>`;}}
+window.closeSettingsModal=function(){document.getElementById('settings-modal').classList.remove('open');};document.getElementById('settings-modal').addEventListener('click',e=>{if(e.target===document.getElementById('settings-modal'))closeSettingsModal();});window.addApiKeyField=function(value=''){const list=document.getElementById('s-api-keys-list');const row=document.createElement('div');row.className='api-key-row';row.innerHTML=`
       <input class="modal-input" type="text" value="${escapeHtml(value)}" placeholder="AIza..." style="font-family:monospace;font-size:0.78rem;" />
       <button class="api-key-del" onclick="this.parentElement.remove()" title="Remove">&times;</button>
-    `;
-    list.appendChild(row);
-  };
-
-  window.saveSettings = async function() {
-    if (!isAdmin()) return;
-    const errEl = document.getElementById('settings-error');
-    const okEl = document.getElementById('settings-success');
-    errEl.style.display = 'none';
-    okEl.style.display = 'none';
-
-    const aiEnabled = document.getElementById('s-ai-enabled').checked;
-    const model = document.getElementById('s-model').value.trim();
-    const systemPrompt = document.getElementById('s-system-prompt').value.trim();
-    const keyInputs = document.querySelectorAll('#s-api-keys-list .api-key-row input');
-    const apiKeys = Array.from(keyInputs).map(i => i.value.trim()).filter(Boolean);
-
-    if (!model) { errEl.textContent = 'Model name is required.'; errEl.style.display = 'block'; return; }
-
-    try {
-      await updateDoc(doc(db, 'siteContent', 'main'), {
-        'aiSettings.aiEnabled': aiEnabled,
-        'aiSettings.model': model,
-        'aiSettings.systemPrompt': systemPrompt,
-        'aiSettings.apiKeys': apiKeys
-      });
-      okEl.textContent = 'Settings saved successfully!';
-      okEl.style.display = 'block';
-      // Reload AI config in memory
-      loadAiConfig();
-      setTimeout(() => { okEl.style.display = 'none'; }, 3000);
-    } catch(e) {
-      console.error('Save error:', e);
-      errEl.textContent = 'Failed to save: ' + (e.message || e.code || 'Unknown error');
-      errEl.style.display = 'block';
-    }
-  };
-
-
-  // ── COPY CONVERSATION LINK ──
-  window.copyConvLink = function() {
-    const btn = document.getElementById('copy-link-btn');
-    const username = btn._convUsername;
-    if (!username) return;
-    const base = window.location.origin + window.location.pathname;
-    const url = base + '?' + encodeURIComponent(username);
-    navigator.clipboard.writeText(url).then(() => {
-      // Briefly swap icon to a checkmark
-      btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-      setTimeout(() => {
-        btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
-      }, 1500);
-    }).catch(() => {
-      prompt('Copy this link:', url);
-    });
-  };
-
-  // ── COPY User Link ──
-  window.copyUsername = function() {
-    const chip = document.getElementById('nav-username');
-    const username = chip.textContent.trim();
-    if (!username) return;
-    const base = window.location.origin + window.location.pathname;
-    const url = base + '?' + encodeURIComponent(username);
-    navigator.clipboard.writeText(url).then(() => {
-      const orig = chip.textContent;
-      chip.textContent = 'Link Copied!';
-      chip.style.color = 'var(--secondary)';
-      chip.style.borderColor = 'rgba(34,211,238,0.5)';
-      setTimeout(() => {
-        chip.textContent = orig;
-        chip.style.color = '';
-        chip.style.borderColor = '';
-      }, 1500);
-    }).catch(() => {
-      prompt('Your contact link:', url);
-    });
-  };
-  // ── UTILS ──
-  function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
-
-  function formatTime(date) {
-    const now = new Date();
-    const diff = now - date;
-    if (diff < 60000) return 'just now';
-    if (diff < 3600000) return Math.floor(diff / 60000) + 'm';
-    if (diff < 86400000) return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    if (diff < 604800000) return date.toLocaleDateString('en-US', { weekday: 'short' });
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-</script>
-
-<script>
-document.addEventListener("touchmove", function(e) {
-  if (e.touches.length > 1) { e.preventDefault(); }
-}, { passive: false });
-var lastTouch = 0;
-document.addEventListener("touchend", function(e) {
-  var now = Date.now();
-  if (now - lastTouch < 300) { e.preventDefault(); }
-  lastTouch = now;
-}, false);
-</script>
+    `;list.appendChild(row);};window.saveSettings=async function(){if(!isAdmin())return;const errEl=document.getElementById('settings-error');const okEl=document.getElementById('settings-success');errEl.style.display='none';okEl.style.display='none';const aiEnabled=document.getElementById('s-ai-enabled').checked;const model=document.getElementById('s-model').value.trim();const systemPrompt=document.getElementById('s-system-prompt').value.trim();const keyInputs=document.querySelectorAll('#s-api-keys-list .api-key-row input');const apiKeys=Array.from(keyInputs).map(i=>i.value.trim()).filter(Boolean);if(!model){errEl.textContent='Model name is required.';errEl.style.display='block';return;}
+try{await updateDoc(doc(db,'siteContent','main'),{'aiSettings.aiEnabled':aiEnabled,'aiSettings.model':model,'aiSettings.systemPrompt':systemPrompt,'aiSettings.apiKeys':apiKeys});okEl.textContent='Settings saved successfully!';okEl.style.display='block';loadAiConfig();setTimeout(()=>{okEl.style.display='none';},3000);}catch(e){console.error('Save error:',e);errEl.textContent='Failed to save: '+(e.message||e.code||'Unknown error');errEl.style.display='block';}};window.copyConvLink=function(){const btn=document.getElementById('copy-link-btn');const username=btn._convUsername;if(!username)return;const base=window.location.origin+window.location.pathname;const url=base+'?'+encodeURIComponent(username);navigator.clipboard.writeText(url).then(()=>{btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';setTimeout(()=>{btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';},1500);}).catch(()=>{prompt('Copy this link:',url);});};window.copyUsername=function(){const chip=document.getElementById('nav-username');const username=chip.textContent.trim();if(!username)return;const base=window.location.origin+window.location.pathname;const url=base+'?'+encodeURIComponent(username);navigator.clipboard.writeText(url).then(()=>{const orig=chip.textContent;chip.textContent='Link Copied!';chip.style.color='var(--secondary)';chip.style.borderColor='rgba(34,211,238,0.5)';setTimeout(()=>{chip.textContent=orig;chip.style.color='';chip.style.borderColor='';},1500);}).catch(()=>{prompt('Your contact link:',url);});};function escapeHtml(str){if(!str)return'';return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function formatTime(date){const now=new Date();const diff=now-date;if(diff<60000)return'just now';if(diff<3600000)return Math.floor(diff/60000)+'m';if(diff<86400000)return date.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});if(diff<604800000)return date.toLocaleDateString('en-US',{weekday:'short'});return date.toLocaleDateString('en-US',{month:'short',day:'numeric'});}</script>
+<script>document.addEventListener("touchmove",function(e){if(e.touches.length>1){e.preventDefault();}},{passive:false});var lastTouch=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-lastTouch<300){e.preventDefault();}
+lastTouch=now;},false);</script>
 </body>
 </html>
