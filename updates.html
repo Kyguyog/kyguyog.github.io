@@ -29,7 +29,6 @@
   }
 
   html { scroll-behavior: smooth; }
-
   body {
     background: var(--bg);
     color: var(--text);
@@ -38,419 +37,327 @@
     overflow-x: hidden;
   }
 
-  /* ── NAV ── */
+  /* NAV */
   nav {
-    position: sticky;
-    top: 0;
-    z-index: 200;
+    position: sticky; top: 0; z-index: 200;
     height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 0 2rem;
-    background: rgba(10,10,15,0.85);
+    background: rgba(10,10,15,0.88);
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--border);
   }
   .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    display: flex; align-items: center; gap: 0.6rem;
     text-decoration: none;
-    font-family: var(--font-display);
-    font-size: 1rem;
-    font-weight: 900;
-    letter-spacing: 0.08em;
-    color: var(--text);
+    font-family: var(--font-display); font-size: 1rem; font-weight: 900;
+    letter-spacing: 0.08em; color: var(--text);
   }
   .nav-logo img { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(168,85,247,0.7)); }
-  .nav-logo .logo-text { color: var(--text); }
   .nav-logo .logo-text span { color: var(--primary); }
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-  }
+  .nav-links { display: flex; align-items: center; gap: 2rem; }
   .nav-links a {
-    font-family: var(--font-display);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
+    font-family: var(--font-display); font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none; transition: color 0.2s;
   }
   .nav-links a:hover, .nav-links a.active { color: var(--primary); }
 
-  /* ── PAGE HEADER ── */
+  /* PAGE HEADER */
   .page-header {
-    padding: 4rem 2rem 2.5rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    padding: 4rem 2rem 2.5rem; text-align: center;
+    position: relative; overflow: hidden;
   }
   .page-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
+    content: ''; position: absolute; inset: 0;
     background: radial-gradient(ellipse 70% 60% at 50% 0%, rgba(168,85,247,0.12) 0%, transparent 70%);
     pointer-events: none;
   }
   .page-header-eyebrow {
-    font-family: var(--font-display);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--primary);
+    font-family: var(--font-display); font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.25em; text-transform: uppercase; color: var(--primary);
     margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.5rem;
   }
-  .page-header-eyebrow::before,
-  .page-header-eyebrow::after {
-    content: '';
-    width: 2rem;
-    height: 1px;
-    background: var(--primary);
-    opacity: 0.4;
+  .page-header-eyebrow::before, .page-header-eyebrow::after {
+    content: ''; width: 2rem; height: 1px; background: var(--primary); opacity: 0.4;
   }
   .page-header h1 {
     font-family: var(--font-display);
-    font-size: clamp(2rem, 6vw, 3.5rem);
-    font-weight: 900;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    margin-bottom: 0.75rem;
+    font-size: clamp(2rem, 6vw, 3.5rem); font-weight: 900;
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 0.75rem;
   }
   .page-header h1 span { color: var(--primary); }
-  .page-header p {
-    color: var(--muted);
-    font-size: 0.95rem;
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.6;
+  .page-header p { color: var(--muted); font-size: 0.95rem; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+  /* CONTAINER */
+  .container { max-width: 800px; margin: 0 auto; padding: 0 2rem 5rem; }
+
+  /* REPO BAR */
+  .repo-bar {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    margin-bottom: 1.25rem; flex-wrap: wrap;
+  }
+  .repo-bar-icon { color: var(--primary); flex-shrink: 0; display: flex; }
+  .repo-bar-name {
+    font-family: var(--font-display); font-size: 0.7rem; font-weight: 700;
+    letter-spacing: 0.08em; color: var(--text);
+  }
+  .repo-bar-name span { color: var(--primary); }
+
+  /* BRANCH SWITCHER */
+  .branch-switcher {
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-left: auto; flex-wrap: wrap;
+  }
+  .branch-switcher-label {
+    font-family: var(--font-display); font-size: 0.58rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  .branch-select-wrap { position: relative; display: flex; align-items: center; }
+  .branch-select-icon {
+    position: absolute; left: 0.55rem; pointer-events: none;
+    color: var(--secondary); display: flex; z-index: 1;
+  }
+  #branch-select {
+    appearance: none;
+    background: rgba(34,211,238,0.06);
+    border: 1px solid rgba(34,211,238,0.3);
+    border-radius: 6px;
+    color: var(--secondary);
+    font-family: var(--font-mono); font-size: 0.75rem;
+    padding: 0.35rem 1.8rem 0.35rem 1.75rem;
+    cursor: pointer; outline: none;
+    transition: border-color 0.2s, background 0.2s;
+    min-width: 110px;
+  }
+  #branch-select:hover { border-color: var(--secondary); background: rgba(34,211,238,0.1); }
+  #branch-select:focus { border-color: var(--secondary); box-shadow: 0 0 0 2px rgba(34,211,238,0.15); }
+  #branch-select option { background: #111118; color: var(--text); }
+  .branch-chevron {
+    position: absolute; right: 0.5rem; pointer-events: none;
+    color: var(--secondary); display: flex;
   }
 
-  /* ── MAIN CONTENT ── */
-  .container {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 2rem 5rem;
+  /* TAG KEY */
+  .tag-key {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.85rem 1.1rem;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .tag-key-label {
+    font-family: var(--font-display); font-size: 0.56rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+    padding-top: 1px; flex-shrink: 0;
+  }
+  .tag-key-items { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
+  .tag-key-item { display: flex; align-items: center; gap: 0.3rem; font-size: 0.76rem; color: rgba(226,232,240,0.55); }
+  .tag-key-item code {
+    font-family: var(--font-mono); font-size: 0.69rem;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+    border-radius: 3px; padding: 0.1rem 0.35rem; color: var(--secondary);
   }
 
-  /* ── FILTER/SORT BAR ── */
+  /* FILTER BAR */
   .filter-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;
   }
-  .filter-bar-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
+  .filter-bar-left { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
   .filter-chip {
-    padding: 0.4rem 0.9rem;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 999px;
+    padding: 0.37rem 0.82rem;
+    background: transparent; border: 1px solid var(--border); border-radius: 999px;
     color: var(--muted);
-    font-family: var(--font-display);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
+    font-family: var(--font-display); font-size: 0.57rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
   }
   .filter-chip:hover { border-color: var(--primary); color: var(--primary); }
   .filter-chip.active { background: var(--primary-dim); border-color: var(--primary); color: var(--primary); }
-  .commit-count-badge {
-    font-family: var(--font-body);
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
+  .filter-chip[data-filter="undefined"]:hover { border-color: var(--muted); color: var(--muted); }
+  .filter-chip[data-filter="undefined"].active { background: rgba(100,116,139,0.12); border-color: var(--muted); color: var(--muted); }
+
+  .commit-count-badge { font-size: 0.75rem; color: var(--muted); }
+
   #refresh-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.45rem 0.9rem;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 6px;
+    display: flex; align-items: center; gap: 0.4rem;
+    padding: 0.44rem 0.9rem;
+    background: transparent; border: 1px solid var(--border); border-radius: 6px;
     color: var(--muted);
-    font-family: var(--font-display);
-    font-size: 0.6rem;
-    font-weight: 700;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
+    font-family: var(--font-display); font-size: 0.6rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
   }
   #refresh-btn:hover { border-color: var(--secondary); color: var(--secondary); }
   #refresh-btn svg { transition: transform 0.4s; }
   #refresh-btn.spinning svg { animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── COMMIT CARDS ── */
-  #commits-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
+  /* COMMIT CARDS — full <a> tile */
+  #commits-list { display: flex; flex-direction: column; }
 
   .commit-card {
     position: relative;
-    display: flex;
-    gap: 1.25rem;
-    padding: 1.5rem 0;
-    border-bottom: 1px solid rgba(34,34,48,0.6);
-    transition: background 0.2s;
-    cursor: default;
-    animation: fadeUp 0.35s ease both;
+    display: flex; gap: 1.25rem;
+    padding: 1.4rem 0.75rem 1.4rem 0;
+    border-bottom: 1px solid rgba(34,34,48,0.7);
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.16s;
+    animation: fadeUp 0.3s ease both;
   }
-  .commit-card:first-child { border-top: 1px solid rgba(34,34,48,0.6); }
+  .commit-card:first-child { border-top: 1px solid rgba(34,34,48,0.7); }
+  .commit-card:hover { background: rgba(168,85,247,0.045); }
+  .commit-card:hover .commit-title { color: #fff; }
+  .commit-card:hover .commit-open-hint { opacity: 1; }
+
   @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
-  /* Timeline dot + line */
+  /* Timeline */
   .commit-timeline {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-    width: 36px;
-    padding-top: 2px;
+    display: flex; flex-direction: column; align-items: center;
+    flex-shrink: 0; width: 34px; padding-top: 3px;
   }
   .commit-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--primary);
-    box-shadow: 0 0 8px rgba(168,85,247,0.7);
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
+    width: 10px; height: 10px; border-radius: 50%;
+    flex-shrink: 0; position: relative; z-index: 1;
   }
-  .commit-dot.merge { background: var(--secondary); box-shadow: 0 0 8px rgba(34,211,238,0.7); }
-  .commit-dot.fix   { background: var(--green);     box-shadow: 0 0 8px rgba(34,197,94,0.7); }
-  .commit-dot.add   { background: #f59e0b;           box-shadow: 0 0 8px rgba(245,158,11,0.7); }
+  .commit-dot[data-type="fix"]       { background: var(--green);    box-shadow: 0 0 8px rgba(34,197,94,0.6); }
+  .commit-dot[data-type="feat"]      { background: #f59e0b;          box-shadow: 0 0 8px rgba(245,158,11,0.6); }
+  .commit-dot[data-type="update"]    { background: var(--primary);   box-shadow: 0 0 8px rgba(168,85,247,0.6); }
+  .commit-dot[data-type="merge"]     { background: var(--secondary); box-shadow: 0 0 8px rgba(34,211,238,0.6); }
+  .commit-dot[data-type="undefined"] { background: rgba(100,116,139,0.45); }
+
   .commit-line {
-    width: 1px;
-    flex: 1;
-    min-height: 20px;
-    background: linear-gradient(to bottom, rgba(168,85,247,0.35), transparent);
-    margin-top: 6px;
+    width: 1px; flex: 1; min-height: 16px; margin-top: 5px;
+    background: linear-gradient(to bottom, rgba(100,116,139,0.2), transparent);
   }
   .commit-card:last-child .commit-line { display: none; }
 
-  /* Card body */
+  /* Body */
   .commit-body { flex: 1; min-width: 0; }
   .commit-title-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.5rem;
+    display: flex; align-items: flex-start; gap: 0.7rem;
+    flex-wrap: wrap; margin-bottom: 0.5rem;
   }
   .commit-title {
-    font-weight: 600;
-    font-size: 0.97rem;
-    color: var(--text);
-    line-height: 1.4;
-    flex: 1;
-    min-width: 0;
-    word-break: break-word;
+    font-weight: 600; font-size: 0.95rem; color: rgba(226,232,240,0.88);
+    line-height: 1.45; flex: 1; min-width: 0; word-break: break-word;
+    transition: color 0.16s;
   }
-  .commit-badge {
-    font-family: var(--font-display);
-    font-size: 0.55rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.55rem;
-    border-radius: 4px;
-    flex-shrink: 0;
-    align-self: flex-start;
-    margin-top: 2px;
-  }
-  .commit-badge.fix   { background: rgba(34,197,94,0.12);  color: var(--green);     border: 1px solid rgba(34,197,94,0.3); }
-  .commit-badge.add   { background: rgba(245,158,11,0.12); color: #f59e0b;           border: 1px solid rgba(245,158,11,0.3); }
-  .commit-badge.merge { background: var(--secondary-dim);  color: var(--secondary);  border: 1px solid rgba(34,211,238,0.3); }
-  .commit-badge.update{ background: var(--primary-dim);    color: var(--primary);    border: 1px solid rgba(168,85,247,0.3); }
 
+  /* Badges */
+  .commit-badge {
+    font-family: var(--font-display); font-size: 0.52rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.18rem 0.5rem; border-radius: 4px;
+    flex-shrink: 0; align-self: flex-start; margin-top: 2px;
+  }
+  .commit-badge[data-type="fix"]       { background: rgba(34,197,94,0.1);   color: var(--green);    border: 1px solid rgba(34,197,94,0.28); }
+  .commit-badge[data-type="feat"]      { background: rgba(245,158,11,0.1);  color: #f59e0b;          border: 1px solid rgba(245,158,11,0.28); }
+  .commit-badge[data-type="update"]    { background: var(--primary-dim);    color: var(--primary);   border: 1px solid rgba(168,85,247,0.28); }
+  .commit-badge[data-type="merge"]     { background: var(--secondary-dim);  color: var(--secondary); border: 1px solid rgba(34,211,238,0.28); }
+  .commit-badge[data-type="undefined"] { background: rgba(100,116,139,0.1); color: var(--muted);     border: 1px solid rgba(100,116,139,0.28); }
+
+  /* Meta */
   .commit-meta {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    font-size: 0.78rem;
-    color: var(--muted);
+    display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap;
+    font-size: 0.77rem; color: var(--muted);
   }
   .commit-sha {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-family: var(--font-mono); font-size: 0.7rem;
     background: rgba(255,255,255,0.04);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 0.15rem 0.45rem;
-    color: var(--primary);
-    text-decoration: none;
-    transition: background 0.2s, border-color 0.2s;
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 0.12rem 0.4rem; color: rgba(168,85,247,0.65);
+    user-select: all;
   }
-  .commit-sha:hover { background: var(--primary-dim); border-color: rgba(168,85,247,0.4); }
   .commit-author { display: flex; align-items: center; gap: 0.3rem; }
   .commit-author-avatar {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid var(--border);
+    width: 18px; height: 18px; border-radius: 50%;
+    object-fit: cover; border: 1px solid var(--border);
   }
+  .commit-open-hint {
+    display: flex; align-items: center; gap: 0.3rem;
+    font-family: var(--font-display); font-size: 0.54rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--primary); opacity: 0; transition: opacity 0.16s;
+    white-space: nowrap; margin-left: auto;
+  }
+
+  /* Description */
   .commit-description {
-    margin-top: 0.6rem;
-    font-size: 0.82rem;
-    color: rgba(226,232,240,0.55);
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-    padding: 0.65rem 0.85rem;
-    background: rgba(255,255,255,0.025);
-    border-left: 2px solid rgba(168,85,247,0.3);
+    margin-top: 0.65rem;
+    font-size: 0.81rem; color: rgba(226,232,240,0.42);
+    line-height: 1.6; white-space: pre-wrap; word-break: break-word;
+    padding: 0.6rem 0.85rem;
+    background: rgba(255,255,255,0.02);
+    border-left: 2px solid rgba(168,85,247,0.22);
     border-radius: 0 4px 4px 0;
   }
 
-  /* ── LOADING / ERROR / EMPTY ── */
-  .state-box {
-    text-align: center;
-    padding: 5rem 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-  .state-box svg { opacity: 0.25; }
-  .state-box p {
-    color: var(--muted);
-    font-size: 0.9rem;
-  }
-  .state-box strong { color: var(--text); display: block; font-family: var(--font-display); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.25rem; }
-
-  /* Spinner */
+  /* STATES */
   .spinner-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-    padding: 5rem 1rem;
-    color: var(--muted);
-    font-size: 0.85rem;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 1.25rem; padding: 5rem 1rem;
+    color: var(--muted); font-size: 0.85rem;
   }
   .spinner {
-    width: 32px; height: 32px;
-    border: 2.5px solid rgba(168,85,247,0.25);
+    width: 30px; height: 30px;
+    border: 2.5px solid rgba(168,85,247,0.2);
     border-top-color: var(--primary);
     border-radius: 50%;
     animation: spin 0.75s linear infinite;
   }
-
-  /* ── LOAD MORE ── */
-  #load-more-wrap {
-    display: none;
-    justify-content: center;
-    margin-top: 2rem;
+  .state-box {
+    text-align: center; padding: 5rem 1rem;
+    display: flex; flex-direction: column; align-items: center; gap: 1rem;
   }
+  .state-box svg { opacity: 0.2; }
+  .state-box p { color: var(--muted); font-size: 0.9rem; }
+  .state-box strong {
+    color: var(--text); display: block;
+    font-family: var(--font-display); font-size: 0.72rem;
+    letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.25rem;
+  }
+
+  /* LOAD MORE */
+  #load-more-wrap { display: none; justify-content: center; margin-top: 2rem; }
   #load-more-btn {
     padding: 0.75rem 2.5rem;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    background: transparent; border: 1px solid var(--border); border-radius: 8px;
     color: var(--muted);
-    font-family: var(--font-display);
-    font-size: 0.65rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
+    font-family: var(--font-display); font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.2s;
   }
   #load-more-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
 
-  /* ── REPO INFO BAR ── */
-  .repo-bar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.85rem 1.25rem;
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-  }
-  .repo-bar svg { color: var(--primary); flex-shrink: 0; }
-  .repo-bar-name {
-    font-family: var(--font-display);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    color: var(--text);
-  }
-  .repo-bar-name span { color: var(--primary); }
-  .repo-bar-branch {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.72rem;
-    color: var(--secondary);
-    font-family: var(--font-mono);
-    margin-left: auto;
-  }
-  .repo-bar-branch svg { color: var(--secondary); }
-  .repo-link {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.7rem;
-    color: var(--muted);
-    text-decoration: none;
-    font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  .repo-link:hover { color: var(--primary); }
-
-  /* ── FOOTER ── */
+  /* FOOTER */
   footer {
     border-top: 1px solid var(--border);
-    padding: 2rem;
-    text-align: center;
-    color: var(--muted);
-    font-size: 0.78rem;
+    padding: 2rem; text-align: center;
+    color: var(--muted); font-size: 0.78rem;
   }
   footer a { color: var(--primary); text-decoration: none; }
   footer a:hover { text-decoration: underline; }
 
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
     nav { padding: 0 1rem; }
     .nav-links { gap: 1.25rem; }
     .page-header { padding: 3rem 1.25rem 2rem; }
     .container { padding: 0 1.25rem 4rem; }
-    .commit-card { gap: 0.85rem; padding: 1.25rem 0; }
+    .commit-card { gap: 0.85rem; padding: 1.2rem 0.25rem 1.2rem 0; }
     .commit-timeline { width: 24px; }
-    .repo-bar { gap: 0.75rem; }
-    .repo-bar-branch { margin-left: 0; }
+    .branch-switcher { margin-left: 0; }
+    .commit-open-hint { display: none; }
   }
 </style>
 </head>
@@ -471,31 +378,54 @@
 <div class="page-header">
   <div class="page-header-eyebrow">Changelog</div>
   <h1>Bug Fixes &amp; <span>Updates</span></h1>
-  <p>Live commit history pulled from the main branch. Every change, tracked.</p>
+  <p>Live commit history from GitHub. Tags come from commit messages — no guessing.</p>
 </div>
 
 <div class="container">
 
+  <!-- Repo bar + branch switcher -->
   <div class="repo-bar">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+    <span class="repo-bar-icon">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+    </span>
     <span class="repo-bar-name">Kyguyog / <span>kyguyog.github.io</span></span>
-    <div class="repo-bar-branch">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-      main
+    <div class="branch-switcher">
+      <span class="branch-switcher-label">Branch</span>
+      <div class="branch-select-wrap">
+        <span class="branch-select-icon">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+        </span>
+        <select id="branch-select" onchange="onBranchChange()">
+          <option value="main">main</option>
+        </select>
+        <span class="branch-chevron">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </span>
+      </div>
     </div>
-    <a class="repo-link" href="https://github.com/Kyguyog/kyguyog.github.io" target="_blank" rel="noopener noreferrer">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-      View on GitHub
-    </a>
   </div>
 
+  <!-- Tag key -->
+  <div class="tag-key">
+    <span class="tag-key-label">Tag key</span>
+    <div class="tag-key-items">
+      <span class="tag-key-item"><code>[fix]</code> Bug Fix</span>
+      <span class="tag-key-item"><code>[feat]</code> Feature</span>
+      <span class="tag-key-item"><code>[update]</code> Update</span>
+      <span class="tag-key-item"><code>[merge]</code> Merge</span>
+      <span class="tag-key-item" style="color:var(--muted);">No tag &rarr; <em>Undefined</em></span>
+    </div>
+  </div>
+
+  <!-- Filter + refresh -->
   <div class="filter-bar">
     <div class="filter-bar-left">
-      <button class="filter-chip active" data-filter="all" onclick="setFilter('all',this)">All</button>
-      <button class="filter-chip" data-filter="fix" onclick="setFilter('fix',this)">Bug Fixes</button>
-      <button class="filter-chip" data-filter="add" onclick="setFilter('add',this)">Features</button>
-      <button class="filter-chip" data-filter="update" onclick="setFilter('update',this)">Updates</button>
-      <button class="filter-chip" data-filter="merge" onclick="setFilter('merge',this)">Merges</button>
+      <button class="filter-chip active" data-filter="all"       onclick="setFilter('all',this)">All</button>
+      <button class="filter-chip"        data-filter="fix"       onclick="setFilter('fix',this)">Bug Fixes</button>
+      <button class="filter-chip"        data-filter="feat"      onclick="setFilter('feat',this)">Features</button>
+      <button class="filter-chip"        data-filter="update"    onclick="setFilter('update',this)">Updates</button>
+      <button class="filter-chip"        data-filter="merge"     onclick="setFilter('merge',this)">Merges</button>
+      <button class="filter-chip"        data-filter="undefined" onclick="setFilter('undefined',this)">Undefined</button>
     </div>
     <div style="display:flex;align-items:center;gap:0.75rem;">
       <span class="commit-count-badge" id="commit-count"></span>
@@ -515,141 +445,154 @@
 
 <footer>
   <div>KnowWhere &mdash; <a href="index.html">Back to Home</a></div>
-  <div style="margin-top:0.4rem;font-size:0.7rem;opacity:0.5;">Commit data pulled live from <a href="https://github.com/Kyguyog/kyguyog.github.io" target="_blank">GitHub API</a></div>
+  <div style="margin-top:0.4rem;font-size:0.68rem;opacity:0.45;">
+    Data from <a href="https://github.com/Kyguyog/kyguyog.github.io" target="_blank" rel="noopener">GitHub API</a>
+    &mdash; start commit messages with <code style="font-size:0.65rem;">[fix]</code>, <code style="font-size:0.65rem;">[feat]</code>, <code style="font-size:0.65rem;">[update]</code>, or <code style="font-size:0.65rem;">[merge]</code> to set a tag
+  </div>
 </footer>
 
 <script>
-  const REPO = 'Kyguyog/kyguyog.github.io';
-  const BRANCH = 'main';
+  const REPO     = 'Kyguyog/kyguyog.github.io';
   const PER_PAGE = 30;
   const API_BASE = 'https://api.github.com';
 
-  let allCommits = [];
-  let displayedCount = 0;
-  let currentFilter = 'all';
-  let page = 1;
-  let hasMore = false;
+  let currentBranch  = 'main';
+  let allCommits     = [];
+  let displayedCount = PER_PAGE;
+  let currentFilter  = 'all';
 
-  // ── Classify commit type from message
-  function classifyCommit(msg) {
-    const m = msg.toLowerCase();
-    if (m.startsWith('merge') || m.includes('merge pull request') || m.includes('merge branch')) return 'merge';
-    if (/\bfix(es|ed|ing)?\b|\bbug\b|\bpatch\b|\bresolv(es|ed|ing)?\b|\bhotfix\b/.test(m)) return 'fix';
-    if (/\badd(ed|ing|s)?\b|\bfeat(ure)?\b|\bnew\b|\bintroduc(e|ed|ing)?\b|\bcreate\b|\bimplement\b/.test(m)) return 'add';
-    return 'update';
+  // Parse tag from the very start of the first line: [fix], [feat], [update], [merge]
+  // Everything else → 'undefined'
+  function parseTag(firstLine) {
+    const m = firstLine.match(/^\[([^\]]+)\]/i);
+    if (!m) return 'undefined';
+    const t = m[1].toLowerCase().trim();
+    if (t === 'fix' || t === 'bugfix' || t === 'bug') return 'fix';
+    if (t === 'feat' || t === 'feature')               return 'feat';
+    if (t === 'update' || t === 'upd')                 return 'update';
+    if (t === 'merge')                                 return 'merge';
+    return 'undefined'; // unknown bracket tag
   }
 
-  const TYPE_LABELS = { fix: 'Bug Fix', add: 'Feature', merge: 'Merge', update: 'Update' };
+  const TYPE_LABELS = {
+    fix:       'Bug Fix',
+    feat:      'Feature',
+    update:    'Update',
+    merge:     'Merge',
+    undefined: 'Undefined',
+  };
 
-  // ── Format date
+  function escapeHtml(str) {
+    return String(str || '')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
   function timeAgo(dateStr) {
-    const now = Date.now();
-    const then = new Date(dateStr).getTime();
-    const diff = Math.floor((now - then) / 1000);
-    if (diff < 60) return `${diff}s ago`;
-    if (diff < 3600) return `${Math.floor(diff/60)}m ago`;
-    if (diff < 86400) return `${Math.floor(diff/3600)}h ago`;
-    if (diff < 2592000) return `${Math.floor(diff/86400)}d ago`;
-    return new Date(dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (diff < 60)      return diff + 's ago';
+    if (diff < 3600)    return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400)   return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 2592000) return Math.floor(diff / 86400) + 'd ago';
+    return new Date(dateStr).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
   }
 
-  function formatDate(dateStr) {
-    return new Date(dateStr).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  function fullDate(dateStr) {
+    return new Date(dateStr).toLocaleString('en-US', {
+      month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit'
+    });
   }
 
-  // ── Build a single commit card HTML
+  // Build one commit tile — an <a> so clicking anywhere opens the commit
   function buildCard(commit, delay) {
-    const sha = commit.sha.slice(0,7);
-    const url = commit.html_url;
-    const msg = commit.commit.message;
-    const [firstLine, ...rest] = msg.split('\n');
-    const description = rest.join('\n').trim();
-    const author = commit.author;
-    const authorName = commit.commit.author.name;
-    const authorLogin = author ? author.login : authorName;
-    const authorAvatar = author ? author.avatar_url : '';
-    const date = commit.commit.author.date;
-    const type = classifyCommit(firstLine);
+    const sha       = commit.sha.slice(0, 7);
+    const url       = commit.html_url;
+    const fullMsg   = commit.commit.message;
+    const lines     = fullMsg.split('\n');
+    const firstLine = lines[0].trim();
+    const desc      = lines.slice(1).join('\n').trim();
 
-    const dotClass = type;
-    const badgeClass = type;
-    const badgeLabel = TYPE_LABELS[type];
+    const type        = parseTag(firstLine);
+    // Strip [tag] prefix from the displayed title
+    const displayTitle = firstLine.replace(/^\[[^\]]+\]\s*/, '') || firstLine;
+
+    const author      = commit.author;
+    const authorLogin = author ? author.login : commit.commit.author.name;
+    const authorAvatar= author ? author.avatar_url : '';
+    const date        = commit.commit.author.date;
 
     const avatarHTML = authorAvatar
-      ? `<img class="commit-author-avatar" src="${authorAvatar}" alt="${authorLogin}" loading="lazy"/>`
-      : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.4"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+      ? `<img class="commit-author-avatar" src="${escapeHtml(authorAvatar)}" alt="${escapeHtml(authorLogin)}" loading="lazy"/>`
+      : `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.3"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
 
-    const descHTML = description
-      ? `<div class="commit-description">${escapeHtml(description)}</div>`
+    const descHTML = desc
+      ? `<div class="commit-description">${escapeHtml(desc)}</div>`
       : '';
 
     return `
-      <div class="commit-card" data-type="${type}" style="animation-delay:${delay}ms">
+      <a class="commit-card" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"
+         data-type="${type}" style="animation-delay:${delay}ms" title="Open on GitHub">
         <div class="commit-timeline">
-          <div class="commit-dot ${dotClass}"></div>
+          <div class="commit-dot" data-type="${type}"></div>
           <div class="commit-line"></div>
         </div>
         <div class="commit-body">
           <div class="commit-title-row">
-            <div class="commit-title">${escapeHtml(firstLine)}</div>
-            <span class="commit-badge ${badgeClass}">${badgeLabel}</span>
+            <div class="commit-title">${escapeHtml(displayTitle)}</div>
+            <span class="commit-badge" data-type="${type}">${TYPE_LABELS[type]}</span>
           </div>
           <div class="commit-meta">
-            <a class="commit-sha" href="${url}" target="_blank" rel="noopener noreferrer" title="View on GitHub">${sha}</a>
+            <span class="commit-sha">${sha}</span>
             <span class="commit-author">${avatarHTML} ${escapeHtml(authorLogin)}</span>
-            <span title="${formatDate(date)}">${timeAgo(date)}</span>
+            <span title="${escapeHtml(fullDate(date))}">${timeAgo(date)}</span>
+            <span class="commit-open-hint">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Open on GitHub
+            </span>
           </div>
           ${descHTML}
         </div>
-      </div>`;
+      </a>`;
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g,'&amp;')
-      .replace(/</g,'&lt;')
-      .replace(/>/g,'&gt;')
-      .replace(/"/g,'&quot;');
+  function getFiltered() {
+    if (currentFilter === 'all') return allCommits;
+    return allCommits.filter(c =>
+      parseTag(c.commit.message.split('\n')[0].trim()) === currentFilter
+    );
   }
 
-  // ── Render filtered commits
   function renderCommits(animated) {
-    const list = document.getElementById('commits-list');
-    const filtered = currentFilter === 'all'
-      ? allCommits
-      : allCommits.filter(c => classifyCommit(c.commit.message.split('\n')[0]) === currentFilter);
+    const list     = document.getElementById('commits-list');
+    const filtered = getFiltered();
+    const count    = filtered.length;
 
-    document.getElementById('commit-count').textContent = `${filtered.length} commit${filtered.length!==1?'s':''}`;
+    document.getElementById('commit-count').textContent =
+      count + ' commit' + (count !== 1 ? 's' : '');
 
-    if (filtered.length === 0) {
+    if (count === 0) {
       list.innerHTML = `<div class="state-box">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 15h8M9 9h.01M15 9h.01"/></svg>
-        <p><strong>No commits found</strong>No ${currentFilter} commits in this range.</p>
+        <p><strong>Nothing here</strong>No commits with tag &ldquo;${escapeHtml(currentFilter)}&rdquo; on <em>${escapeHtml(currentBranch)}</em>.</p>
       </div>`;
       document.getElementById('load-more-wrap').style.display = 'none';
       return;
     }
 
-    list.innerHTML = filtered.slice(0, displayedCount)
-      .map((c, i) => buildCard(c, animated ? i * 40 : 0))
+    list.innerHTML = filtered
+      .slice(0, displayedCount)
+      .map((c, i) => buildCard(c, animated ? Math.min(i * 32, 280) : 0))
       .join('');
 
-    const loadMoreWrap = document.getElementById('load-more-wrap');
-    loadMoreWrap.style.display = (displayedCount < filtered.length) ? 'flex' : 'none';
+    document.getElementById('load-more-wrap').style.display =
+      displayedCount < count ? 'flex' : 'none';
   }
 
-  // ── Load more
   function loadMore() {
-    displayedCount = Math.min(displayedCount + PER_PAGE, allCommits.length);
+    displayedCount += PER_PAGE;
     renderCommits(false);
-    // fetch more from API if needed
-    if (hasMore && displayedCount >= allCommits.length) {
-      page++;
-      fetchCommitsPage(page);
-    }
   }
 
-  // ── Set filter
   window.setFilter = function(filter, el) {
     currentFilter = filter;
     document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -658,52 +601,69 @@
     renderCommits(true);
   };
 
-  // ── Show loading state
+  window.onBranchChange = function() {
+    currentBranch = document.getElementById('branch-select').value;
+    fetchCommits(true);
+  };
+
   function showLoading() {
     document.getElementById('commits-list').innerHTML = `
       <div class="spinner-wrap">
         <div class="spinner"></div>
-        <span>Fetching commits from GitHub…</span>
+        <span>Fetching <strong style="color:var(--text)">${escapeHtml(currentBranch)}</strong>…</span>
       </div>`;
     document.getElementById('load-more-wrap').style.display = 'none';
     document.getElementById('commit-count').textContent = '';
   }
 
-  // ── Show error state
   function showError(msg) {
     document.getElementById('commits-list').innerHTML = `
       <div class="state-box">
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <p><strong>Failed to load commits</strong>${msg}</p>
+        <p><strong>Failed to load</strong>${escapeHtml(msg)}</p>
       </div>`;
   }
 
-  // ── Fetch a page of commits
-  async function fetchCommitsPage(p) {
-    const url = `${API_BASE}/repos/${REPO}/commits?sha=${BRANCH}&per_page=${PER_PAGE}&page=${p}`;
-    const res = await fetch(url, {
-      headers: { 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (!res.ok) throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);
-    const data = await res.json();
-    hasMore = data.length === PER_PAGE;
-    return data;
+  // Fetch all branches and populate the dropdown
+  async function fetchBranches() {
+    try {
+      const res = await fetch(
+        `${API_BASE}/repos/${REPO}/branches?per_page=100`,
+        { headers: { 'Accept': 'application/vnd.github.v3+json' } }
+      );
+      if (!res.ok) return;
+      const branches = await res.json();
+      const select = document.getElementById('branch-select');
+      select.innerHTML = branches
+        .map(b => `<option value="${escapeHtml(b.name)}"${b.name === 'main' ? ' selected' : ''}>${escapeHtml(b.name)}</option>`)
+        .join('');
+    } catch (e) {
+      // silently keep the default "main" option
+    }
   }
 
-  // ── Main fetch (with optional force-refresh)
-  async function fetchCommits(forceRefresh) {
+  // Fetch commits for the current branch
+  async function fetchCommits(showSpinner) {
     const btn = document.getElementById('refresh-btn');
     btn.classList.add('spinning');
-    if (forceRefresh) { allCommits = []; page = 1; }
-    if (allCommits.length === 0) showLoading();
+    if (showSpinner) showLoading();
+
+    // Reset state for new branch/refresh
+    allCommits     = [];
+    displayedCount = PER_PAGE;
+    currentFilter  = 'all';
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
 
     try {
-      const data = await fetchCommitsPage(1);
-      allCommits = data;
-      page = 1;
-      displayedCount = PER_PAGE;
+      const url = `${API_BASE}/repos/${REPO}/commits?sha=${encodeURIComponent(currentBranch)}&per_page=${PER_PAGE}&page=1`;
+      const res = await fetch(url, {
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if (!res.ok) throw new Error(`GitHub API ${res.status}: ${res.statusText}`);
+      allCommits = await res.json();
       renderCommits(true);
-    } catch(e) {
+    } catch (e) {
       showError(e.message || 'Unknown error. Check your connection.');
       console.error(e);
     } finally {
@@ -712,7 +672,8 @@
   }
 
   // Init
-  fetchCommits(false);
+  fetchBranches();
+  fetchCommits(true);
 </script>
 
 </body>
