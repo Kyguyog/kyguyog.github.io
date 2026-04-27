@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Time Shooter 2</title>
+  <style>
+    :root {
+      --bg: #0b1017;
+      --panel: rgba(10, 14, 22, 0.84);
+      --text: #e7eefc;
+      --muted: #9cb0d1;
+      --accent: #4ac1ff;
+      --danger: #ff8a70;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at 15% 15%, #17263b 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    #unity-container {
+      position: fixed;
+      inset: 0;
+    }
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      background: #0f1825;
+    }
+    #loading-cover {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, rgba(3, 7, 12, 0.82), rgba(3, 7, 12, 0.92));
+      z-index: 10;
+    }
+    #unity-loading-bar {
+      width: min(420px, 90vw);
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid rgba(156, 176, 209, 0.24);
+      border-radius: 12px;
+      backdrop-filter: blur(3px);
+    }
+    #unity-logo img {
+      display: block;
+      margin: 0 auto 14px;
+      width: min(220px, 65vw);
+      max-height: 72px;
+      object-fit: contain;
+    }
+    #unity-progress-bar-empty {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+    #unity-progress-bar-full {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #2ec5ff, #4bffce);
+      transition: width 120ms linear;
+    }
+    .status {
+      margin-top: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .warn {
+      color: var(--danger);
+      font-weight: 600;
+    }
+    #unity-fullscreen-button {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 20;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      color: #081320;
+      background: linear-gradient(180deg, #66d1ff, #3fb7ff);
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(36, 160, 231, 0.28);
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas"></canvas>
+  </div>
+
+  <div id="loading-cover">
+    <div id="unity-loading-bar">
+      <div id="unity-logo"><img id="unity-logo-image" alt="Time Shooter 2" /></div>
+      <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+      <div id="status" class="status">Loading Time Shooter 2...</div>
+    </div>
+  </div>
+
+  <button id="unity-fullscreen-button" type="button" style="display:none;">Fullscreen</button>
+
+  <script>
+    const buildUrl = "./assets/ts2";
+    const loaderUrl = buildUrl + "/ts2.loader.js";
+
+    const config = {
+      dataUrl: buildUrl + "/ts2.data",
+      frameworkUrl: buildUrl + "/ts2.framework.js",
+      codeUrl: buildUrl + "/ts2.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "GoGoMan",
+      productName: "Time Shooter 2",
+      productVersion: "0.1",
+    };
+
+    const container = document.querySelector("#unity-container");
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingCover = document.querySelector("#loading-cover");
+    const progressBarFull = document.querySelector("#unity-progress-bar-full");
+    const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    const status = document.querySelector("#status");
+    const logo = document.querySelector("#unity-logo-image");
+
+    logo.src = buildUrl + "/logo.png";
+    canvas.style.background = "url('" + buildUrl + "/ts2.jpg') center / cover";
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      container.className = "unity-mobile";
+      config.devicePixelRatio = 1;
+    }
+
+    if (location.protocol === "file:") {
+      status.innerHTML = "<span class='warn'>Offline is supported, but run from a local server (not file://). Example: <code>python3 -m http.server 8000</code></span>";
+    }
+
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarFull.style.width = `${100 * progress}%`;
+      }).then((unityInstance) => {
+        loadingCover.style.display = "none";
+        fullscreenButton.style.display = "block";
+        fullscreenButton.onclick = () => unityInstance.SetFullscreen(1);
+      }).catch((message) => {
+        status.innerHTML = "<span class='warn'>Failed to load: " + message + "</span>";
+      });
+    };
+    script.onerror = () => {
+      status.innerHTML = "<span class='warn'>Could not load local game files. Make sure <code>assets/ts2</code> exists and open through <code>http://localhost</code>.</span>";
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
