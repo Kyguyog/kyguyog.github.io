@@ -1,5 +1,13 @@
 [
   {
+    "sha": "eca889b0dd14c2238cd04331c01ff2c6a9aaa737",
+    "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/eca889b0dd14c2238cd04331c01ff2c6a9aaa737",
+    "message": "[update] remove branch selector\n\ni removed it cus it doesnt work",
+    "date": "2026-04-28T20:34:07Z",
+    "author_login": "Kyguyog",
+    "author_avatar": "https://avatars.githubusercontent.com/u/107652213?v=4"
+  },
+  {
     "sha": "236d95d15d7ac1bfaf66aedd0a65f4dafd16b7ab",
     "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/236d95d15d7ac1bfaf66aedd0a65f4dafd16b7ab",
     "message": "[fix] Fix Updates Page\n\nGithub is normally blocked so we changed it to hopefully unblock it",
