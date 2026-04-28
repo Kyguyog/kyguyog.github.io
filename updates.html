@@ -446,7 +446,7 @@
 <footer>
   <div>KnowWhere &mdash; <a href="index.html">Back to Home</a></div>
   <div style="margin-top:0.4rem;font-size:0.68rem;opacity:0.45;">
-    Data from <a href="https://github.com/Kyguyog/kyguyog.github.io" target="_blank" rel="noopener">GitHub API</a>
+    Data from <a href="https://raw.githubusercontent.com/Kyguyog/kyguyog.github.io/main/updates/updates.json" target="_blank" rel="noopener">updates feed (raw)</a>
     &mdash; start commit messages with <code style="font-size:0.65rem;">[fix]</code>, <code style="font-size:0.65rem;">[feat]</code>, <code style="font-size:0.65rem;">[update]</code>, or <code style="font-size:0.65rem;">[merge]</code> to set a tag
   </div>
 </footer>
@@ -454,7 +454,7 @@
 <script>
   const REPO     = 'Kyguyog/kyguyog.github.io';
   const PER_PAGE = 30;
-  const API_BASE = 'https://api.github.com';
+  const FEED_URL = 'https://raw.githubusercontent.com/Kyguyog/kyguyog.github.io/main/updates/updates.json';
 
   let currentBranch  = 'main';
   let allCommits     = [];
@@ -503,11 +503,22 @@
     });
   }
 
+  function normalizeEntry(e) {
+    return {
+      sha: e.sha || '',
+      url: e.url || `https://github.com/${REPO}/commit/${encodeURIComponent(e.sha || '')}`,
+      message: e.message || '',
+      date: e.date || new Date().toISOString(),
+      author_login: e.author_login || 'unknown',
+      author_avatar: e.author_avatar || ''
+    };
+  }
+
   // Build one commit tile — an <a> so clicking anywhere opens the commit
   function buildCard(commit, delay) {
-    const sha       = commit.sha.slice(0, 7);
-    const url       = commit.html_url;
-    const fullMsg   = commit.commit.message;
+    const sha       = (commit.sha || '').slice(0, 7);
+    const url       = commit.url;
+    const fullMsg   = commit.message;
     const lines     = fullMsg.split('\n');
     const firstLine = lines[0].trim();
     const desc      = lines.slice(1).join('\n').trim();
@@ -516,10 +527,9 @@
     // Strip [tag] prefix from the displayed title
     const displayTitle = firstLine.replace(/^\[[^\]]+\]\s*/, '') || firstLine;
 
-    const author      = commit.author;
-    const authorLogin = author ? author.login : commit.commit.author.name;
-    const authorAvatar= author ? author.avatar_url : '';
-    const date        = commit.commit.author.date;
+    const authorLogin = commit.author_login;
+    const authorAvatar= commit.author_avatar;
+    const date        = commit.date;
 
     const avatarHTML = authorAvatar
       ? `<img class="commit-author-avatar" src="${escapeHtml(authorAvatar)}" alt="${escapeHtml(authorLogin)}" loading="lazy"/>`
@@ -558,7 +568,7 @@
   function getFiltered() {
     if (currentFilter === 'all') return allCommits;
     return allCommits.filter(c =>
-      parseTag(c.commit.message.split('\n')[0].trim()) === currentFilter
+      parseTag((c.message || '').split('\n')[0].trim()) === currentFilter
     );
   }
 
@@ -624,25 +634,22 @@
       </div>`;
   }
 
-  // Fetch all branches and populate the dropdown
-  async function fetchBranches() {
-    try {
-      const res = await fetch(
-        `${API_BASE}/repos/${REPO}/branches?per_page=100`,
-        { headers: { 'Accept': 'application/vnd.github.v3+json' } }
-      );
-      if (!res.ok) return;
-      const branches = await res.json();
-      const select = document.getElementById('branch-select');
-      select.innerHTML = branches
-        .map(b => `<option value="${escapeHtml(b.name)}"${b.name === 'main' ? ' selected' : ''}>${escapeHtml(b.name)}</option>`)
-        .join('');
-    } catch (e) {
-      // silently keep the default "main" option
-    }
+  async function fetchFeed() {
+    const res = await fetch(FEED_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Feed ${res.status}: ${res.statusText}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('Feed JSON is not an array');
+    return data.map(normalizeEntry);
   }
 
-  // Fetch commits for the current branch
+  async function fetchLocalFallback() {
+    const res = await fetch('./updates/updates.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Local fallback ${res.status}: ${res.statusText}`);
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error('Local fallback JSON is not an array');
+    return data.map(normalizeEntry);
+  }
+
   async function fetchCommits(showSpinner) {
     const btn = document.getElementById('refresh-btn');
     btn.classList.add('spinning');
@@ -656,23 +663,27 @@
     document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
 
     try {
-      const url = `${API_BASE}/repos/${REPO}/commits?sha=${encodeURIComponent(currentBranch)}&per_page=${PER_PAGE}&page=1`;
-      const res = await fetch(url, {
-        headers: { 'Accept': 'application/vnd.github.v3+json' }
-      });
-      if (!res.ok) throw new Error(`GitHub API ${res.status}: ${res.statusText}`);
-      allCommits = await res.json();
+      allCommits = await fetchFeed();
       renderCommits(true);
     } catch (e) {
-      showError(e.message || 'Unknown error. Check your connection.');
-      console.error(e);
+      try {
+        allCommits = await fetchLocalFallback();
+        renderCommits(true);
+      } catch (fallbackErr) {
+        showError(fallbackErr.message || e.message || 'Unknown error. Check your connection.');
+        console.error(e);
+      }
     } finally {
       btn.classList.remove('spinning');
     }
   }
 
   // Init
-  fetchBranches();
+  const select = document.getElementById('branch-select');
+  if (select) {
+    select.innerHTML = '<option value="main" selected>main</option>';
+    select.disabled = true;
+  }
   fetchCommits(true);
 </script>
 

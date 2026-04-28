@@ -1,0 +1,64 @@
+name: Update Updates Feed
+
+on:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: write
+
+jobs:
+  append-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Build entry and prepend to updates.json
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'updates/updates.json';
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = context.sha;
+
+            const commitResp = await github.rest.repos.getCommit({ owner, repo, ref: sha });
+            const c = commitResp.data;
+            const entry = {
+              sha: c.sha,
+              url: c.html_url,
+              message: c.commit?.message || '',
+              date: c.commit?.author?.date || new Date().toISOString(),
+              author_login: c.author?.login || c.commit?.author?.name || 'unknown',
+              author_avatar: c.author?.avatar_url || ''
+            };
+
+            let arr = [];
+            if (fs.existsSync(path)) {
+              try { arr = JSON.parse(fs.readFileSync(path, 'utf8')); } catch (_) { arr = []; }
+            }
+            if (!Array.isArray(arr)) arr = [];
+
+            if (!arr.some(e => e && e.sha === entry.sha)) {
+              arr.unshift(entry);
+            }
+
+            arr = arr.slice(0, 150);
+            fs.mkdirSync('updates', { recursive: true });
+            fs.writeFileSync(path, JSON.stringify(arr, null, 2) + '\n');
+
+      - name: Commit and push
+        run: |
+          if git diff --quiet -- updates/updates.json; then
+            echo "No feed changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add updates/updates.json
+          git commit -m "chore(updates): append commit feed entry [skip ci]"
+          git push
