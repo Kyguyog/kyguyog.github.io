@@ -107,40 +107,6 @@
   }
   .repo-bar-name span { color: var(--primary); }
 
-  /* BRANCH SWITCHER */
-  .branch-switcher {
-    display: flex; align-items: center; gap: 0.5rem;
-    margin-left: auto; flex-wrap: wrap;
-  }
-  .branch-switcher-label {
-    font-family: var(--font-display); font-size: 0.58rem; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-  }
-  .branch-select-wrap { position: relative; display: flex; align-items: center; }
-  .branch-select-icon {
-    position: absolute; left: 0.55rem; pointer-events: none;
-    color: var(--secondary); display: flex; z-index: 1;
-  }
-  #branch-select {
-    appearance: none;
-    background: rgba(34,211,238,0.06);
-    border: 1px solid rgba(34,211,238,0.3);
-    border-radius: 6px;
-    color: var(--secondary);
-    font-family: var(--font-mono); font-size: 0.75rem;
-    padding: 0.35rem 1.8rem 0.35rem 1.75rem;
-    cursor: pointer; outline: none;
-    transition: border-color 0.2s, background 0.2s;
-    min-width: 110px;
-  }
-  #branch-select:hover { border-color: var(--secondary); background: rgba(34,211,238,0.1); }
-  #branch-select:focus { border-color: var(--secondary); box-shadow: 0 0 0 2px rgba(34,211,238,0.15); }
-  #branch-select option { background: #111118; color: var(--text); }
-  .branch-chevron {
-    position: absolute; right: 0.5rem; pointer-events: none;
-    color: var(--secondary); display: flex;
-  }
-
   /* TAG KEY */
   .tag-key {
     display: flex; align-items: flex-start; gap: 0.75rem;
@@ -356,7 +322,6 @@
     .container { padding: 0 1.25rem 4rem; }
     .commit-card { gap: 0.85rem; padding: 1.2rem 0.25rem 1.2rem 0; }
     .commit-timeline { width: 24px; }
-    .branch-switcher { margin-left: 0; }
     .commit-open-hint { display: none; }
   }
 </style>
@@ -383,26 +348,12 @@
 
 <div class="container">
 
-  <!-- Repo bar + branch switcher -->
+  <!-- Repo bar -->
   <div class="repo-bar">
     <span class="repo-bar-icon">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
     </span>
     <span class="repo-bar-name">Kyguyog / <span>kyguyog.github.io</span></span>
-    <div class="branch-switcher">
-      <span class="branch-switcher-label">Branch</span>
-      <div class="branch-select-wrap">
-        <span class="branch-select-icon">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-        </span>
-        <select id="branch-select" onchange="onBranchChange()">
-          <option value="main">main</option>
-        </select>
-        <span class="branch-chevron">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </span>
-      </div>
-    </div>
   </div>
 
   <!-- Tag key -->
@@ -611,11 +562,6 @@
     renderCommits(true);
   };
 
-  window.onBranchChange = function() {
-    currentBranch = document.getElementById('branch-select').value;
-    fetchCommits(true);
-  };
-
   function showLoading() {
     document.getElementById('commits-list').innerHTML = `
       <div class="spinner-wrap">
@@ -679,11 +625,6 @@
   }
 
   // Init
-  const select = document.getElementById('branch-select');
-  if (select) {
-    select.innerHTML = '<option value="main" selected>main</option>';
-    select.disabled = true;
-  }
   fetchCommits(true);
 </script>
 
