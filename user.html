@@ -722,10 +722,84 @@ window._canSeeAllOrders=(userData.orders===true||userData.admin===true);const or
       <span id="approvals-summary" style="font-size:0.73rem;color:var(--muted);white-space:nowrap;flex-shrink:0;"></span>
       <button onclick="refreshApprovalsPanel()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.3rem 0.65rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;flex-shrink:0;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
     </div>
-    <!-- Content -->
-    <div id="approvals-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-      <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
-    </div>
+     <!-- Content -->
+     <div id="approvals-list" style="overflow-y:auto;flex:1;padding:0.75rem 1.5rem;display:grid;gap:0.6rem;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));">
+       <div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>
+     </div>
+   </div>
+   <!-- User Popup Modal -->
+   <div id="user-modal" style="display:none;position:fixed;inset:0;z-index:20000;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:1.5rem;" onclick="if(event.target.id==='user-modal')closeUserModal();">
+     <div style="background:#0d0d14;border:1px solid rgba(168,85,247,0.4);border-radius:16px;width:100%;max-width:480px;box-shadow:0 0 80px rgba(168,85,247,0.15);overflow:hidden;max-height:90vh;overflow-y:auto;">
+       <!-- Modal Header -->
+       <div style="display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.75rem;border-bottom:1px solid var(--border);background:rgba(168,85,247,0.05);">
+         <div id="modal-header-name" style="font-family:var(--font-display);font-size:0.85rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--primary);">User Details</div>
+         <button onclick="closeUserModal()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);cursor:pointer;padding:0.4rem 0.75rem;font-size:0.75rem;font-family:var(--font-display);letter-spacing:0.1em;text-transform:uppercase;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--danger)';this.style.color='var(--danger)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">Close</button>
+       </div>
+       <!-- Modal Body -->
+       <div style="padding:1.75rem;display:flex;flex-direction:column;gap:0.8rem;">
+         <!-- Full Name + Username -->
+         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
+           <div style="display:flex;flex-direction:column;gap:0.2rem;">
+             <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Full Name</label>
+             <input id="modal-fn" class="admin-row-input" placeholder="Full name" style="background:#111118;font-size:0.8rem;" onclick="event.stopPropagation();" />
+           </div>
+           <div style="display:flex;flex-direction:column;gap:0.2rem;">
+             <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Username</label>
+             <input id="modal-un" class="admin-row-input" placeholder="Username" style="background:#111118;font-size:0.8rem;" onclick="event.stopPropagation();" />
+           </div>
+         </div>
+         <!-- Email (read-only) -->
+         <div style="display:flex;flex-direction:column;gap:0.2rem;">
+           <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Email</label>
+           <input id="modal-email" class="admin-row-input" placeholder="Email" style="background:#111118;font-size:0.8rem;color:var(--muted);" readonly />
+         </div>
+         <!-- Toggles -->
+         <div style="display:flex;flex-direction:column;gap:0.3rem;padding:0.5rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+           <div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;">
+             <label class="toggle-switch" style="margin:0;flex-shrink:0;">
+               <input type="checkbox" id="modal-st" onchange="updateToggleLabel('modal-st-lbl',this.checked,'Active','Inactive')" onclick="event.stopPropagation();">
+               <span class="toggle-track"></span>
+             </label>
+             <span id="modal-st-lbl" style="font-size:0.7rem;font-weight:600;color:var(--muted);">Active</span>
+           </div>
+           <div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;">
+             <label class="toggle-switch admin-toggle" style="margin:0;flex-shrink:0;">
+               <input type="checkbox" id="modal-ad" onchange="updateToggleLabel('modal-ad-lbl',this.checked,'Admin','Not Admin')" onclick="event.stopPropagation();">
+               <span class="toggle-track"></span>
+             </label>
+             <span id="modal-ad-lbl" style="font-size:0.7rem;font-weight:600;color:var(--muted);">Not Admin</span>
+           </div>
+           <div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;">
+             <label class="toggle-switch editor-toggle" style="margin:0;flex-shrink:0;">
+               <input type="checkbox" id="modal-ed" onchange="updateToggleLabel('modal-ed-lbl',this.checked,'Editor','Not Editor')" onclick="event.stopPropagation();">
+               <span class="toggle-track"></span>
+             </label>
+             <span id="modal-ed-lbl" style="font-size:0.7rem;font-weight:600;color:var(--muted);">Not Editor</span>
+           </div>
+           <div style="display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0;">
+             <label class="toggle-switch orders-toggle" style="margin:0;flex-shrink:0;">
+               <input type="checkbox" id="modal-or" onchange="updateToggleLabel('modal-or-lbl',this.checked,'Orders','No Orders')" onclick="event.stopPropagation();">
+               <span class="toggle-track"></span>
+             </label>
+             <span id="modal-or-lbl" style="font-size:0.7rem;font-weight:600;color:var(--muted);">No Orders</span>
+           </div>
+         </div>
+         <!-- Password -->
+         <div style="display:flex;flex-direction:column;gap:0.2rem;">
+           <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Password</label>
+           <div style="display:flex;gap:0.3rem;align-items:center;">
+             <input id="modal-pw" class="admin-row-input" type="password" placeholder="••••••••" style="background:#111118;flex:1;min-width:0;font-size:0.8rem;" onclick="event.stopPropagation();" />
+             <button type="button" onclick="toggleUserPwField('modal');event.stopPropagation();" title="Show/hide" style="flex-shrink:0;min-width:28px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;padding:0;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+           </div>
+         </div>
+         <!-- Save Button -->
+         <div style="display:flex;align-items:center;gap:0.4rem;margin-top:0.5rem;">
+           <button onclick="saveUserModal();event.stopPropagation();" style="flex:1;padding:0.55rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s,transform 0.15s;box-shadow:0 0 20px rgba(168,85,247,0.3);" onmouseover="this.style.opacity='0.85';this.style.transform='scale(1.02)'" onmouseout="this.style.opacity='1';this.style.transform='scale(1)'">Save Changes</button>
+           <span id="modal-msg" style="font-size:0.65rem;font-weight:600;min-width:60px;text-align:right;color:var(--muted);"></span>
+         </div>
+       </div>
+     </div>
+   </div>
   </div>
 </div>`;};function escAttr(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 window.openApprovalsPanel=function(){if(!window._isAdmin)return;const panel=document.getElementById('approvals-panel');if(!panel)return;panel.style.display='flex';panel.style.flexDirection='column';window._approvalsTab=window._approvalsTab||'requests';switchApprovalsTab(window._approvalsTab);};window.closeApprovalsPanel=function(){const panel=document.getElementById('approvals-panel');if(panel)panel.style.display='none';};window.switchApprovalsTab=function(tab){window._approvalsTab=tab;const reqTab=document.getElementById('ap-tab-requests');const usrTab=document.getElementById('ap-tab-users');if(reqTab&&usrTab){const active='border-bottom:2px solid var(--primary);color:var(--primary);';const inactive='border-bottom:2px solid transparent;color:var(--muted);';reqTab.style.cssText=reqTab.style.cssText.replace(/border-bottom:[^;]+;color:[^;]+;/g,'');usrTab.style.cssText=usrTab.style.cssText.replace(/border-bottom:[^;]+;color:[^;]+;/g,'');if(tab==='requests'){reqTab.style.borderBottom='2px solid var(--primary)';reqTab.style.color='var(--primary)';usrTab.style.borderBottom='2px solid transparent';usrTab.style.color='var(--muted)';const _s=document.getElementById('user-search');if(_s)_s.value='';const _rf=document.getElementById('user-role-filter');if(_rf)_rf.value='';const _tb=document.getElementById('ap-toolbar');if(_tb)_tb.style.display='none';loadSignupRequests();}else{usrTab.style.borderBottom='2px solid var(--primary)';usrTab.style.color='var(--primary)';reqTab.style.borderBottom='2px solid transparent';reqTab.style.color='var(--muted)';const _tb=document.getElementById('ap-toolbar');if(_tb)_tb.style.display='flex';loadApprovedUsers();}}};window.refreshApprovalsPanel=function(){if(window._approvalsTab==='users')loadApprovedUsers();else loadSignupRequests();};window.loadSignupRequests=async function(){const list=document.getElementById('approvals-list');const summary=document.getElementById('approvals-summary');list.innerHTML='<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';summary.textContent='';try{const requests=await window._fetchSignupRequests();const pending=requests.filter(r=>r.status==='pending');const others=requests.filter(r=>r.status!=='pending').sort((a,b)=>(b.approvedAt||b.deniedAt||'').localeCompare(a.approvedAt||a.deniedAt||''));summary.textContent=`${pending.length} pending · ${requests.length} total`;if(!requests.length){list.innerHTML='<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No signup requests yet.</div>';return;}
@@ -745,83 +819,29 @@ const renderRow=(r)=>{const isPending=r.status==='pending';const date=new Date(r
 try{await window._approveSignup(requestId,email,password,fullName,username);loadSignupRequests();}catch(e){alert('Failed to approve: '+e.message);if(btn){btn.disabled=false;btn.textContent='✓ Approve';}}};window.denyRequest=async function(requestId){if(!confirm('Deny this signup request?'))return;try{await window._denySignup(requestId);loadSignupRequests();}catch(e){alert('Failed to deny: '+e.message);}};window._allUsers=[];window.loadApprovedUsers=async function(){const list=document.getElementById('approvals-list');const summary=document.getElementById('approvals-summary');list.innerHTML='<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">Loading...</div>';summary.textContent='';const searchEl=document.getElementById('user-search');if(searchEl)searchEl.value='';const roleEl=document.getElementById('user-role-filter');if(roleEl)roleEl.value='';try{const users=await window._fetchAllUsers();window._allUsers=users.sort((a,b)=>(a.username||a.email).localeCompare(b.username||b.email));if(!users.length){list.innerHTML='<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No approved users yet.</div>';summary.textContent='0 users';return;}
 renderUserList(window._allUsers);}catch(e){list.innerHTML=`<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:2rem 0;">Failed to load: ${e.message}</div>`;}};function renderUserList(users){const list=document.getElementById('approvals-list');const summary=document.getElementById('approvals-summary');summary.textContent=`${users.length} of ${window._allUsers.length} user${window._allUsers.length !== 1 ? 's' : ''}`;if(!users.length){list.innerHTML='<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:2rem 0;">No users match your search.</div>';return;}
 list.innerHTML=users.map(u=>renderUserCard(u)).join('');}
-window.filterUsers=function(query){const q=(query||'').trim().toLowerCase();const roleFilter=document.getElementById('user-role-filter');const role=roleFilter?roleFilter.value:'';const roleKeywords={'admin':u=>u.admin===true,'editor':u=>u.editor===true,'orders':u=>u.orders===true,'active':u=>u.active!==false,'inactive':u=>u.active===false};const filtered=window._allUsers.filter(u=>{const textMatch=!q||(u.email||'').toLowerCase().includes(q)||(u.username||'').toLowerCase().includes(q)||(u.fullName||'').toLowerCase().includes(q)||(q==='admin'&&u.admin===true)||(q==='editor'&&u.editor===true)||(q==='orders'&&u.orders===true)||(q==='active'&&u.active!==false)||(q==='inactive'&&u.active===false);const roleMatch=!role||(roleKeywords[role]&&roleKeywords[role](u));return textMatch&&roleMatch;});renderUserList(filtered);};function renderUserCard(u){const isActive=u.active!==false;const isAdmin=u.admin===true;const isEditor=u.editor===true;const isOrders=u.orders===true;const safeEmail=escAttr(u.email);const safeId='usr-'+u.email.replace(/[^a-zA-Z0-9]/g,'_');return`<div id="card-${safeId}" style="display:flex;flex-direction:column;gap:0;background:#0d0d14;border:1px solid var(--border);border-radius:8px;overflow:hidden;">
-    <!-- Collapsed header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:0.65rem 0.9rem;cursor:pointer;user-select:none;" onclick="toggleUserCard('${safeId}')">
-      <div style="display:flex;flex-direction:column;gap:0.05rem;min-width:0;">
-        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-          ${u.fullName ? `<span style="font-size:0.88rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.02em;">${escHtml(u.fullName)}</span>` : ''}
-          ${u.username ? `<span style="font-size:0.72rem;color:var(--primary);font-weight:600;">@${escHtml(u.username)}</span>` : ''}
-        </div>
-        <span style="font-size:0.75rem;color:var(--muted);">${escHtml(u.email)}</span>
+window.filterUsers=function(query){const q=(query||'').trim().toLowerCase();const roleFilter=document.getElementById('user-role-filter');const role=roleFilter?roleFilter.value:'';const roleKeywords={'admin':u=>u.admin===true,'editor':u=>u.editor===true,'orders':u=>u.orders===true,'active':u=>u.active!==false,'inactive':u=>u.active===false};const filtered=window._allUsers.filter(u=>{const textMatch=!q||(u.email||'').toLowerCase().includes(q)||(u.username||'').toLowerCase().includes(q)||(u.fullName||'').toLowerCase().includes(q)||(q==='admin'&&u.admin===true)||(q==='editor'&&u.editor===true)||(q==='orders'&&u.orders===true)||(q==='active'&&u.active!==false)||(q==='inactive'&&u.active===false);const roleMatch=!role||(roleKeywords[role]&&roleKeywords[role](u));return textMatch&&roleMatch;});renderUserList(filtered);};function renderUserCard(u){const isActive=u.active!==false;const isAdmin=u.admin===true;const isEditor=u.editor===true;const isOrders=u.orders===true;const safeEmail=escAttr(u.email);const safeId='usr-'+u.email.replace(/[^a-zA-Z0-9]/g,'_');const initials=(u.fullName||u.username||u.email).split(' ')[0].slice(0,2).toUpperCase();return`<div id="card-${safeId}" style="display:flex;flex-direction:column;gap:0;background:#0d0d14;border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all 0.2s;padding:1rem;" onclick="openUserModal('${safeEmail}')">
+    <!-- File-like header -->
+    <div style="display:flex;flex-direction:column;gap:0.4rem;align-items:center;text-align:center;">
+      <!-- Avatar circle -->
+      <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--secondary));display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--font-display);font-weight:700;font-size:1.1rem;flex-shrink:0;">${initials}</div>
+      <!-- Name/Info -->
+      <div style="display:flex;flex-direction:column;gap:0.1rem;min-width:0;flex:1;">
+        <span style="font-size:0.85rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${u.fullName ? escHtml(u.fullName) : escHtml(u.username||u.email)}</span>
+        <span style="font-size:0.7rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${u.username ? '@'+escHtml(u.username) : escHtml(u.email)}</span>
       </div>
-      <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
-        <span id="badge-active-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;${isActive ? 'background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);' : 'background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);'}">${isActive ? 'ACTIVE' : 'INACTIVE'}</span>
-        <span id="badge-admin-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(168,85,247,0.12);color:var(--primary);border:1px solid rgba(168,85,247,0.3);display:${isAdmin ? 'inline-block' : 'none'};">ADMIN</span>
-        <span id="badge-editor-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,211,238,0.1);color:var(--secondary);border:1px solid rgba(34,211,238,0.3);display:${isEditor ? 'inline-block' : 'none'};">EDITOR</span>
-        <span id="badge-orders-${safeId}" style="font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.3);display:${isOrders ? 'inline-block' : 'none'};">ORDERS</span>
-        <svg id="chevron-${safeId}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);transition:transform 0.2s;flex-shrink:0;"><polyline points="6 9 12 15 18 9"/></svg>
-      </div>
-    </div>
-    <!-- Expanded edit form (hidden by default) -->
-    <div id="form-${safeId}" style="display:none;flex-direction:column;gap:0.5rem;padding:0.65rem 0.9rem;border-top:1px solid var(--border);background:rgba(0,0,0,0.15);">
-      <!-- Row 1: Full Name + Username -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.4rem;">
-        <div style="display:flex;flex-direction:column;gap:0.2rem;">
-          <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Full Name</label>
-          <input id="fn-${safeId}" class="admin-row-input" value="${escAttr(u.fullName||'')}" placeholder="Full name" style="background:#111118;" />
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0.2rem;">
-          <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Username</label>
-          <input id="un-${safeId}" class="admin-row-input" value="${escAttr(u.username||'')}" placeholder="Username" style="background:#111118;" />
-        </div>
-      </div>
-      <!-- Row 2: Toggles + Password -->
-      <div style="display:grid;grid-template-columns:auto auto auto auto 1fr;gap:0.75rem;align-items:center;">
-        <div style="display:flex;align-items:center;gap:0.4rem;">
-          <label class="toggle-switch" style="margin:0;">
-            <input type="checkbox" id="st-${safeId}" ${isActive ? 'checked' : ''} onchange="updateToggleLabel('st-lbl-${safeId}',this.checked,'Active','Inactive')">
-            <span class="toggle-track"></span>
-          </label>
-          <span id="st-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isActive ? '#22c55e' : 'var(--danger)'};">${isActive ? 'Active' : 'Inactive'}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.4rem;">
-          <label class="toggle-switch admin-toggle" style="margin:0;">
-            <input type="checkbox" id="ad-${safeId}" ${isAdmin ? 'checked' : ''} onchange="updateToggleLabel('ad-lbl-${safeId}',this.checked,'Admin','Not Admin')">
-            <span class="toggle-track"></span>
-          </label>
-          <span id="ad-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isAdmin ? 'var(--primary)' : 'var(--muted)'};">${isAdmin ? 'Admin' : 'Not Admin'}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.4rem;">
-          <label class="toggle-switch editor-toggle" style="margin:0;">
-            <input type="checkbox" id="ed-${safeId}" ${isEditor ? 'checked' : ''} onchange="updateToggleLabel('ed-lbl-${safeId}',this.checked,'Editor','Not Editor')">
-            <span class="toggle-track"></span>
-          </label>
-          <span id="ed-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isEditor ? 'var(--secondary)' : 'var(--muted)'};">${isEditor ? 'Editor' : 'Not Editor'}</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.4rem;">
-          <label class="toggle-switch orders-toggle" style="margin:0;">
-            <input type="checkbox" id="or-${safeId}" ${isOrders ? 'checked' : ''} onchange="updateToggleLabel('or-lbl-${safeId}',this.checked,'Orders','No Orders')">
-            <span class="toggle-track"></span>
-          </label>
-          <span id="or-lbl-${safeId}" style="font-size:0.72rem;font-weight:600;color:${isOrders ? '#22c55e' : 'var(--muted)'};">${isOrders ? 'Orders' : 'No Orders'}</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:0.2rem;">
-          <label style="font-size:0.58rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);">Password</label>
-          <div style="display:flex;gap:0.3rem;align-items:center;">
-            <input id="pw-${safeId}" class="admin-row-input" type="password" value="${escAttr(u.password||'')}" placeholder="••••••••" style="background:#111118;flex:1;min-width:0;" />
-            <button type="button" onclick="toggleUserPwField('${safeId}')" title="Show/hide" style="flex-shrink:0;min-width:28px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;padding:0;transition:border-color 0.15s,color 0.15s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
-          </div>
-        </div>
-      </div>
-      <!-- Row 3: Save -->
-      <div style="display:flex;align-items:center;gap:0.5rem;">
-        <button onclick="saveUserCard('${safeEmail}','${safeId}')" style="flex:1;padding:0.45rem;background:var(--primary-dim);border:1px solid rgba(168,85,247,0.4);border-radius:6px;color:var(--primary);font-family:var(--font-display);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(168,85,247,0.25)'" onmouseout="this.style.background='var(--primary-dim)'">Save Changes</button>
-        <span id="msg-${safeId}" style="font-size:0.73rem;font-weight:600;min-width:60px;text-align:right;"></span>
+      <!-- Status badges -->
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center;width:100%;">
+        <span style="font-size:0.55rem;font-weight:700;letter-spacing:0.08em;padding:0.15rem 0.45rem;border-radius:3px;${isActive ? 'background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);' : 'background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);'}">${isActive ? 'ACTIVE' : 'INACTIVE'}</span>
+        ${isAdmin ? `<span style="font-size:0.55rem;font-weight:700;letter-spacing:0.08em;padding:0.15rem 0.45rem;border-radius:3px;background:rgba(168,85,247,0.12);color:var(--primary);border:1px solid rgba(168,85,247,0.3);">ADMIN</span>` : ''}
+        ${isEditor ? `<span style="font-size:0.55rem;font-weight:700;letter-spacing:0.08em;padding:0.15rem 0.45rem;border-radius:3px;background:rgba(34,211,238,0.1);color:var(--secondary);border:1px solid rgba(34,211,238,0.3);">EDITOR</span>` : ''}
+        ${isOrders ? `<span style="font-size:0.55rem;font-weight:700;letter-spacing:0.08em;padding:0.15rem 0.45rem;border-radius:3px;background:rgba(34,197,94,0.1);color:#22c55e;border:1px solid rgba(34,197,94,0.3);">ORDERS</span>` : ''}
       </div>
     </div>
-  </div>`;}
-window.updateToggleLabel=function(labelId,checked,onText,offText){const el=document.getElementById(labelId);if(!el)return;el.textContent=checked?onText:offText;if(onText==='Active')el.style.color=checked?'#22c55e':'var(--danger)';else if(onText==='Admin')el.style.color=checked?'var(--primary)':'var(--muted)';else if(onText==='Editor')el.style.color=checked?'var(--secondary)':'var(--muted)';else if(onText==='Orders')el.style.color=checked?'#22c55e':'var(--muted)';else el.style.color=checked?'var(--primary)':'var(--muted)';};window.toggleUserCard=function(safeId){const form=document.getElementById('form-'+safeId);const chevron=document.getElementById('chevron-'+safeId);if(!form)return;const isOpen=form.style.display!=='none';form.style.display=isOpen?'none':'flex';if(chevron)chevron.style.transform=isOpen?'':'rotate(180deg)';};window.toggleUserPwField=function(safeId){const input=document.getElementById('pw-'+safeId);if(!input)return;input.type=input.type==='password'?'text':'password';};window.saveUserCard=async function(email,safeId){const msgEl=document.getElementById('msg-'+safeId);const fullName=(document.getElementById('fn-'+safeId).value||'').trim();const username=(document.getElementById('un-'+safeId).value||'').trim();const isActive=document.getElementById('st-'+safeId).checked;const isAdmin=document.getElementById('ad-'+safeId).checked;const isEditor=document.getElementById('ed-'+safeId).checked;const isOrders=document.getElementById('or-'+safeId).checked;const password=(document.getElementById('pw-'+safeId).value||'').trim();msgEl.textContent='Saving…';msgEl.style.color='var(--muted)';try{const patch={fullName,username,active:isActive,admin:isAdmin,editor:isEditor,orders:isOrders};if(password)patch.password=password;await window._updateUserProfile(email,patch);const activeBadge=document.getElementById('badge-active-'+safeId);if(activeBadge){activeBadge.textContent=isActive?'ACTIVE':'INACTIVE';activeBadge.style.cssText=isActive?'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);':'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);';}
+    <div style="display:none;"></div>
+  </div>`;};
+window.updateToggleLabel=function(labelId,checked,onText,offText){const el=document.getElementById(labelId);if(!el)return;el.textContent=checked?onText:offText;if(onText==='Active')el.style.color=checked?'#22c55e':'var(--danger)';else if(onText==='Admin')el.style.color=checked?'var(--primary)':'var(--muted)';else if(onText==='Editor')el.style.color=checked?'var(--secondary)':'var(--muted)';else if(onText==='Orders')el.style.color=checked?'#22c55e':'var(--muted)';else el.style.color=checked?'var(--primary)':'var(--muted)';};window.toggleUserPwField=function(prefix){const input=document.getElementById(prefix==='modal'?'modal-pw':'pw-'+prefix);if(!input)return;input.type=input.type==='password'?'text':'password';};window.toggleUserCard=function(safeId){const card=document.getElementById('card-'+safeId);if(!card)return;const form=document.getElementById('form-'+safeId);if(!form)return;const isOpen=form.style.display!=='none';if(!isOpen){const rect=card.getBoundingClientRect();const currentRow=Math.floor(rect.top/rect.height);const allCards=document.querySelectorAll('[id^="card-usr-"]');allCards.forEach(c=>{const cRect=c.getBoundingClientRect();const cRow=Math.floor(cRect.top/cRect.height);if(cRow===currentRow){const f=document.getElementById(c.id.replace('card-','form-'));if(f)f.style.display='flex';}else{const f=document.getElementById(c.id.replace('card-','form-'));if(f)f.style.display='none';}});}else{const allForms=document.querySelectorAll('[id^="form-usr-"]');allForms.forEach(f=>f.style.display='none');}
+if(form)form.style.display=isOpen?'none':'flex';};window.openUserModal=async function(email){const user=window._allUsers.find(u=>u.email===email);if(!user)return;document.getElementById('modal-header-name').textContent=user.fullName||user.username||user.email;document.getElementById('modal-email').value=user.email;document.getElementById('modal-fn').value=user.fullName||'';document.getElementById('modal-un').value=user.username||'';document.getElementById('modal-st').checked=user.active!==false;document.getElementById('modal-ad').checked=user.admin===true;document.getElementById('modal-ed').checked=user.editor===true;document.getElementById('modal-or').checked=user.orders===true;document.getElementById('modal-pw').value=user.password||'';updateToggleLabel('modal-st-lbl',user.active!==false,'Active','Inactive');updateToggleLabel('modal-ad-lbl',user.admin===true,'Admin','Not Admin');updateToggleLabel('modal-ed-lbl',user.editor===true,'Editor','Not Editor');updateToggleLabel('modal-or-lbl',user.orders===true,'Orders','No Orders');document.getElementById('modal-msg').textContent='';document.getElementById('user-modal').style.display='flex';document.getElementById('user-modal').dataset.currentEmail=email;};window.closeUserModal=function(){document.getElementById('user-modal').style.display='none';document.getElementById('user-modal').dataset.currentEmail='';};window.saveUserModal=async function(){const email=document.getElementById('user-modal').dataset.currentEmail;const fullName=document.getElementById('modal-fn').value.trim();const username=document.getElementById('modal-un').value.trim();const isActive=document.getElementById('modal-st').checked;const isAdmin=document.getElementById('modal-ad').checked;const isEditor=document.getElementById('modal-ed').checked;const isOrders=document.getElementById('modal-or').checked;const password=document.getElementById('modal-pw').value.trim();const msgEl=document.getElementById('modal-msg');msgEl.textContent='Saving…';msgEl.style.color='var(--muted)';try{const patch={fullName,username,active:isActive,admin:isAdmin,editor:isEditor,orders:isOrders};if(password)patch.password=password;await window._updateUserProfile(email,patch);const userIdx=window._allUsers.findIndex(u=>u.email===email);if(userIdx>=0){Object.assign(window._allUsers[userIdx],patch);}
+msgEl.textContent='✓ Saved';msgEl.style.color='#22c55e';setTimeout(()=>{closeUserModal();loadApprovedUsers();},1500);}catch(e){msgEl.textContent='✗ '+(e.message||'Failed');msgEl.style.color='var(--danger)';}};window.saveUserCard=async function(email,safeId){const msgEl=document.getElementById('msg-'+safeId);const fullName=(document.getElementById('fn-'+safeId).value||'').trim();const username=(document.getElementById('un-'+safeId).value||'').trim();const isActive=document.getElementById('st-'+safeId).checked;const isAdmin=document.getElementById('ad-'+safeId).checked;const isEditor=document.getElementById('ed-'+safeId).checked;const isOrders=document.getElementById('or-'+safeId).checked;const password=(document.getElementById('pw-'+safeId).value||'').trim();msgEl.textContent='Saving…';msgEl.style.color='var(--muted)';try{const patch={fullName,username,active:isActive,admin:isAdmin,editor:isEditor,orders:isOrders};if(password)patch.password=password;await window._updateUserProfile(email,patch);const activeBadge=document.getElementById('badge-active-'+safeId);if(activeBadge){activeBadge.textContent=isActive?'ACTIVE':'INACTIVE';activeBadge.style.cssText=isActive?'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:rgba(34,197,94,0.12);color:#22c55e;border:1px solid rgba(34,197,94,0.3);':'font-size:0.6rem;font-weight:700;letter-spacing:0.1em;padding:0.18rem 0.5rem;border-radius:4px;background:var(--danger-dim);color:var(--danger);border:1px solid rgba(239,68,68,0.25);';}
 const adminBadge=document.getElementById('badge-admin-'+safeId);if(adminBadge)adminBadge.style.display=isAdmin?'inline-block':'none';const editorBadge=document.getElementById('badge-editor-'+safeId);if(editorBadge)editorBadge.style.display=isEditor?'inline-block':'none';const ordersBadge=document.getElementById('badge-orders-'+safeId);if(ordersBadge)ordersBadge.style.display=isOrders?'inline-block':'none';const card=document.getElementById('card-'+safeId);if(card){const header=card.querySelector('div[onclick]');if(header){const nameSpans=header.querySelector('div > div');if(nameSpans){nameSpans.innerHTML=`
             <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
               ${fullName ? `<span style="font-size:0.88rem;font-weight:700;color:var(--text);font-family:var(--font-display);letter-spacing:0.02em;">${escHtml(fullName)}</span>` : ''}
