@@ -1815,12 +1815,21 @@ window.adminAddTopTier = function() {
 
 
 function renderGameRow(g = {}) {
+  const openInPopup = g.openInPopup === true;
+  const zipUrl = g.zipUrl || '';
+  const zipEntry = g.zipEntry || '';
   return `
     <div class="admin-row-item" data-original-name="${escAttr(g.name || '')}">
       <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name || '')}" style="flex:1.2;" />
       <input class="admin-row-input game-alias-input" placeholder="Search alias (optional)" value="${escAttr(g.alias || '')}" style="flex:1;" />
-      <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(g.url||'')}" style="flex:1.8;" />
-      <div style="flex:2.1;display:flex;align-items:center;gap:0.45rem;min-width:0;">
+      <input class="admin-row-input game-url-input" placeholder="Game URL (release file URL ok)" value="${escAttr(g.url||'')}" style="flex:1.8;" />
+      <div style="flex:3.3;display:flex;align-items:center;gap:0.45rem;min-width:0;">
+        <label style="display:flex;align-items:center;gap:0.35rem;color:var(--muted);font-size:0.68rem;white-space:nowrap;">
+          <input type="checkbox" class="game-popup-input" ${openInPopup ? 'checked' : ''} />
+          Popup
+        </label>
+        <input class="admin-row-input game-zip-url-input" placeholder="Zip URL in releases (optional)" value="${escAttr(zipUrl)}" style="flex:1.2;min-width:0;" />
+        <input class="admin-row-input game-zip-entry-input" placeholder="Zip entry (default index.html)" value="${escAttr(zipEntry)}" style="flex:0.95;min-width:0;" />
         <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:1;min-width:0;" onpaste="adminHandleGameScreenshotPaste(event, this)" onchange="adminHandleGameScreenshotUrlChange(this)" />
         <input type="file" class="game-screenshot-file-input" accept="image/*" style="display:none;" onchange="adminHandleGameScreenshotFiles(this)" />
         <button type="button" class="admin-game-upload-btn" onclick="adminOpenGameScreenshotPicker(this)" title="Upload screenshot" aria-label="Upload screenshot" style="width:34px;height:34px;display:flex;align-items:center;justify-content:center;padding:0;background:var(--secondary-dim);border:1px solid rgba(34,211,238,0.35);border-radius:6px;color:var(--secondary);cursor:pointer;transition:background 0.15s,border-color 0.15s;flex-shrink:0;" onmouseover="this.style.background='rgba(34,211,238,0.22)';this.style.borderColor='rgba(34,211,238,0.55)'" onmouseout="this.style.background='var(--secondary-dim)';this.style.borderColor='rgba(34,211,238,0.35)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 5 17 10"/><line x1="12" y1="5" x2="12" y2="16"/></svg></button>
@@ -1868,6 +1877,9 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     const name = row.querySelector('.game-name-input').value.trim();
     const alias = row.querySelector('.game-alias-input').value.trim();
     const url = row.querySelector('.game-url-input').value.trim();
+    const openInPopup = !!row.querySelector('.game-popup-input').checked;
+    const zipUrl = row.querySelector('.game-zip-url-input').value.trim();
+    const zipEntry = row.querySelector('.game-zip-entry-input').value.trim();
     const screenshot = row.querySelector('.game-screenshot-input').value.trim();
     const originalName = (row.dataset.originalName || '').trim();
     const originalKey = normalizeGameKey(originalName);
@@ -1875,6 +1887,9 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     const originalGame = originalKey ? originalMap.get(originalKey) : null;
     const nextGame = name ? { name, url } : null;
     if (nextGame && alias) nextGame.alias = alias;
+    if (nextGame && openInPopup) nextGame.openInPopup = true;
+    if (nextGame && zipUrl) nextGame.zipUrl = zipUrl;
+    if (nextGame && zipEntry) nextGame.zipEntry = zipEntry;
     if (nextGame && screenshot) nextGame.screenshot = screenshot;
 
     if (originalKey) remainingOriginalKeys.delete(originalKey);
@@ -1889,6 +1904,9 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
       url: originalGame.url || ''
     };
     if (originalGame.alias) originalComparable.alias = originalGame.alias;
+    if (originalGame.openInPopup === true) originalComparable.openInPopup = true;
+    if (originalGame.zipUrl) originalComparable.zipUrl = originalGame.zipUrl;
+    if (originalGame.zipEntry) originalComparable.zipEntry = originalGame.zipEntry;
     if (originalGame.screenshot) originalComparable.screenshot = originalGame.screenshot;
 
     const nextComparable = nextGame ? {
@@ -1896,6 +1914,9 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
       url: nextGame.url || ''
     } : null;
     if (nextComparable && nextGame.alias) nextComparable.alias = nextGame.alias;
+    if (nextComparable && nextGame.openInPopup === true) nextComparable.openInPopup = true;
+    if (nextComparable && nextGame.zipUrl) nextComparable.zipUrl = nextGame.zipUrl;
+    if (nextComparable && nextGame.zipEntry) nextComparable.zipEntry = nextGame.zipEntry;
     if (nextComparable && nextGame.screenshot) nextComparable.screenshot = nextGame.screenshot;
 
     const unchanged = JSON.stringify(originalComparable) === JSON.stringify(nextComparable);
