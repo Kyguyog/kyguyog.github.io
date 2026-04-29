@@ -200,6 +200,7 @@
   .commit-dot[data-type="feat"]      { background: #f59e0b;          box-shadow: 0 0 8px rgba(245,158,11,0.6); }
   .commit-dot[data-type="update"]    { background: var(--primary);   box-shadow: 0 0 8px rgba(168,85,247,0.6); }
   .commit-dot[data-type="merge"]     { background: var(--secondary); box-shadow: 0 0 8px rgba(34,211,238,0.6); }
+  .commit-dot[data-type="custom"]    { background: #60a5fa;          box-shadow: 0 0 8px rgba(96,165,250,0.6); }
   .commit-dot[data-type="undefined"] { background: rgba(100,116,139,0.45); }
 
   .commit-line {
@@ -231,6 +232,7 @@
   .commit-badge[data-type="feat"]      { background: rgba(245,158,11,0.1);  color: #f59e0b;          border: 1px solid rgba(245,158,11,0.28); }
   .commit-badge[data-type="update"]    { background: var(--primary-dim);    color: var(--primary);   border: 1px solid rgba(168,85,247,0.28); }
   .commit-badge[data-type="merge"]     { background: var(--secondary-dim);  color: var(--secondary); border: 1px solid rgba(34,211,238,0.28); }
+  .commit-badge[data-type="custom"]    { background: rgba(96,165,250,0.12); color: #60a5fa;         border: 1px solid rgba(96,165,250,0.28); }
   .commit-badge[data-type="undefined"] { background: rgba(100,116,139,0.1); color: var(--muted);     border: 1px solid rgba(100,116,139,0.28); }
 
   /* Meta */
@@ -370,14 +372,7 @@
 
   <!-- Filter + refresh -->
   <div class="filter-bar">
-    <div class="filter-bar-left">
-      <button class="filter-chip active" data-filter="all"       onclick="setFilter('all',this)">All</button>
-      <button class="filter-chip"        data-filter="fix"       onclick="setFilter('fix',this)">Bug Fixes</button>
-      <button class="filter-chip"        data-filter="feat"      onclick="setFilter('feat',this)">Features</button>
-      <button class="filter-chip"        data-filter="update"    onclick="setFilter('update',this)">Updates</button>
-      <button class="filter-chip"        data-filter="merge"     onclick="setFilter('merge',this)">Merges</button>
-      <button class="filter-chip"        data-filter="undefined" onclick="setFilter('undefined',this)">Undefined</button>
-    </div>
+    <div class="filter-bar-left" id="filter-chips"></div>
     <div style="display:flex;align-items:center;gap:0.75rem;">
       <span class="commit-count-badge" id="commit-count"></span>
       <button id="refresh-btn" onclick="fetchCommits(true)">
@@ -398,7 +393,7 @@
   <div>KnowWhere &mdash; <a href="index.html">Back to Home</a></div>
   <div style="margin-top:0.4rem;font-size:0.68rem;opacity:0.45;">
     Data from <a href="https://raw.githubusercontent.com/Kyguyog/kyguyog.github.io/main/updates/updates.json" target="_blank" rel="noopener">updates feed (raw)</a>
-    &mdash; start commit messages with <code style="font-size:0.65rem;">[fix]</code>, <code style="font-size:0.65rem;">[feat]</code>, <code style="font-size:0.65rem;">[update]</code>, or <code style="font-size:0.65rem;">[merge]</code> to set a tag
+    &mdash; start commit messages with one or more tags like <code style="font-size:0.65rem;">[fix][ui]</code> or <code style="font-size:0.65rem;">[other]</code>
   </div>
 </footer>
 
@@ -412,17 +407,31 @@
   let displayedCount = PER_PAGE;
   let currentFilter  = 'all';
 
-  // Parse tag from the very start of the first line: [fix], [feat], [update], [merge]
-  // Everything else → 'undefined'
-  function parseTag(firstLine) {
-    const m = firstLine.match(/^\[([^\]]+)\]/i);
-    if (!m) return 'undefined';
-    const t = m[1].toLowerCase().trim();
-    if (t === 'fix' || t === 'bugfix' || t === 'bug') return 'fix';
-    if (t === 'feat' || t === 'feature')               return 'feat';
-    if (t === 'update' || t === 'upd')                 return 'update';
-    if (t === 'merge')                                 return 'merge';
-    return 'undefined'; // unknown bracket tag
+  // Parse one or more tags from the very start of the first line:
+  // examples: [fix] title, [fix][ui] title, [other] title
+  function parseTags(firstLine) {
+    const start = (firstLine || '').match(/^(?:\s*\[[^\]]+\]\s*)+/);
+    if (!start) return [];
+    const tags = [];
+    const re = /\[([^\]]+)\]/g;
+    let m;
+    while ((m = re.exec(start[0])) !== null) {
+      const tag = (m[1] || '').trim().toLowerCase();
+      if (tag) tags.push(tag);
+    }
+    return tags;
+  }
+
+  function stripLeadingTags(firstLine) {
+    return (firstLine || '').replace(/^(?:\s*\[[^\]]+\]\s*)+/, '').trim();
+  }
+
+  function normalizeTag(tag) {
+    if (tag === 'fix' || tag === 'bugfix' || tag === 'bug') return 'fix';
+    if (tag === 'feat' || tag === 'feature') return 'feat';
+    if (tag === 'update' || tag === 'upd') return 'update';
+    if (tag === 'merge') return 'merge';
+    return tag;
   }
 
   const TYPE_LABELS = {
@@ -430,7 +439,8 @@
     feat:      'Feature',
     update:    'Update',
     merge:     'Merge',
-    undefined: 'Undefined',
+    custom:    'Custom',
+    undefined: 'Undefined'
   };
 
   function escapeHtml(str) {
@@ -474,9 +484,10 @@
     const firstLine = lines[0].trim();
     const desc      = lines.slice(1).join('\n').trim();
 
-    const type        = parseTag(firstLine);
-    // Strip [tag] prefix from the displayed title
-    const displayTitle = firstLine.replace(/^\[[^\]]+\]\s*/, '') || firstLine;
+    const parsedTags   = parseTags(firstLine).map(normalizeTag);
+    const tags         = parsedTags.length ? parsedTags : ['undefined'];
+    const type         = tags[0] === 'undefined' ? 'undefined' : (TYPE_LABELS[tags[0]] ? tags[0] : 'custom');
+    const displayTitle = stripLeadingTags(firstLine) || firstLine;
 
     const authorLogin = commit.author_login;
     const authorAvatar= commit.author_avatar;
@@ -490,9 +501,15 @@
       ? `<div class="commit-description">${escapeHtml(desc)}</div>`
       : '';
 
+    const tagsHTML = tags.map(tag => {
+      const badgeType = TYPE_LABELS[tag] ? tag : 'custom';
+      const label = TYPE_LABELS[tag] || tag;
+      return `<span class="commit-badge" data-type="${badgeType}">${escapeHtml(label)}</span>`;
+    }).join('');
+
     return `
       <a class="commit-card" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"
-         data-type="${type}" style="animation-delay:${delay}ms" title="Open on GitHub">
+         data-type="${type}" data-tags="${escapeHtml(tags.join(','))}" style="animation-delay:${delay}ms" title="Open on GitHub">
         <div class="commit-timeline">
           <div class="commit-dot" data-type="${type}"></div>
           <div class="commit-line"></div>
@@ -500,7 +517,7 @@
         <div class="commit-body">
           <div class="commit-title-row">
             <div class="commit-title">${escapeHtml(displayTitle)}</div>
-            <span class="commit-badge" data-type="${type}">${TYPE_LABELS[type]}</span>
+            ${tagsHTML}
           </div>
           <div class="commit-meta">
             <span class="commit-sha">${sha}</span>
@@ -518,9 +535,35 @@
 
   function getFiltered() {
     if (currentFilter === 'all') return allCommits;
-    return allCommits.filter(c =>
-      parseTag((c.message || '').split('\n')[0].trim()) === currentFilter
-    );
+    return allCommits.filter(c => {
+      const firstLine = (c.message || '').split('\n')[0].trim();
+      const tags = parseTags(firstLine).map(normalizeTag);
+      if (!tags.length) return currentFilter === 'undefined';
+      return tags.includes(currentFilter);
+    });
+  }
+
+  function renderFilterChips() {
+    const wrap = document.getElementById('filter-chips');
+    const customTags = new Set();
+    allCommits.forEach(c => {
+      const tags = parseTags((c.message || '').split('\n')[0].trim()).map(normalizeTag);
+      tags.forEach(t => {
+        if (!TYPE_LABELS[t] && t !== 'undefined') customTags.add(t);
+      });
+    });
+    const customButtons = Array.from(customTags).sort().map(t =>
+      `<button class="filter-chip" data-filter="${escapeHtml(t)}" onclick="setFilter('${escapeHtml(t)}',this)">[${escapeHtml(t)}]</button>`
+    ).join('');
+    wrap.innerHTML = `
+      <button class="filter-chip ${currentFilter === 'all' ? 'active' : ''}" data-filter="all" onclick="setFilter('all',this)">All</button>
+      <button class="filter-chip ${currentFilter === 'fix' ? 'active' : ''}" data-filter="fix" onclick="setFilter('fix',this)">Bug Fixes</button>
+      <button class="filter-chip ${currentFilter === 'feat' ? 'active' : ''}" data-filter="feat" onclick="setFilter('feat',this)">Features</button>
+      <button class="filter-chip ${currentFilter === 'update' ? 'active' : ''}" data-filter="update" onclick="setFilter('update',this)">Updates</button>
+      <button class="filter-chip ${currentFilter === 'merge' ? 'active' : ''}" data-filter="merge" onclick="setFilter('merge',this)">Merges</button>
+      ${customButtons}
+      <button class="filter-chip ${currentFilter === 'undefined' ? 'active' : ''}" data-filter="undefined" onclick="setFilter('undefined',this)">Undefined</button>
+    `;
   }
 
   function renderCommits(animated) {
@@ -605,15 +648,16 @@
     allCommits     = [];
     displayedCount = PER_PAGE;
     currentFilter  = 'all';
-    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-    document.querySelector('.filter-chip[data-filter="all"]').classList.add('active');
+    renderFilterChips();
 
     try {
       allCommits = await fetchFeed();
+      renderFilterChips();
       renderCommits(true);
     } catch (e) {
       try {
         allCommits = await fetchLocalFallback();
+        renderFilterChips();
         renderCommits(true);
       } catch (fallbackErr) {
         showError(fallbackErr.message || e.message || 'Unknown error. Check your connection.');
