@@ -707,7 +707,7 @@ window.adminAddShopItem = function() {
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-analytics.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile, updatePassword, createUserWithEmailAndPassword }
     from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, deleteDoc, collection, getDocs, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
   const FIREBASE_API_KEY = "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ";
 
@@ -835,6 +835,15 @@ window.adminAddShopItem = function() {
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   };
 
+  window._fetchGameRequests = async function() {
+    const snap = await getDocs(collection(db, 'gameRequests'));
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  };
+
+  window._deleteGameRequest = async function(requestId) {
+    await deleteDoc(doc(db, 'gameRequests', requestId));
+  };
+
   
   window._fetchAllUsers = async function() {
     const snap = await getDocs(collection(db, 'users'));
@@ -894,6 +903,7 @@ window.adminAddShopItem = function() {
       email,
       username: username || '',
       fullName: fullName || '',
+      password: password || '',
       createdAt: new Date().toISOString(),
       admin: false
     }, { merge: true });
@@ -1234,6 +1244,7 @@ window.injectAdminPanels = function() {
   <div class="admin-modal">
     <div class="admin-tabs">
       <button class="admin-tab active" onclick="switchAdminTab('games')">🎮 Games</button>
+      <button class="admin-tab" onclick="switchAdminTab('game-requests')">📥 Game Requests</button>
       <button class="admin-tab" onclick="switchAdminTab('toptier')">⭐ Top Tier</button>
       <button class="admin-tab" onclick="switchAdminTab('sites')">Sites</button>
       <button class="admin-tab" onclick="switchAdminTab('shop')">🛒 Shop</button>
@@ -1253,6 +1264,14 @@ window.injectAdminPanels = function() {
         <div id="ae-games-list" class="admin-row-list"></div>
         <button class="admin-add-btn" onclick="adminAddGame()">+ Add Game</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('games')">Save Games</button><span class="admin-status" id="status-games"></span></div>
+      </div>
+      <div class="admin-section" id="admin-game-requests">
+        <p class="admin-hint" style="margin-bottom:0.75rem;">Review community game suggestions. You can delete completed requests to keep the queue clean.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-bottom:0.7rem;">
+          <span id="game-requests-summary" style="font-size:0.74rem;color:var(--muted);"></span>
+          <button onclick="loadGameRequestsEditor()" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:0.68rem;padding:0.38rem 0.7rem;cursor:pointer;font-family:var(--font-display);letter-spacing:0.08em;transition:border-color 0.2s,color 0.2s;" onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↺ Refresh</button>
+        </div>
+        <div id="ae-game-requests-list" class="admin-row-list"></div>
       </div>
       <div class="admin-section" id="admin-sites">
         <div id="ae-sites-list" class="admin-row-list"></div>
@@ -1758,6 +1777,55 @@ window.closeAdminPanel = function() {
   document.getElementById('admin-panel').classList.remove('open');
 };
 
+window.loadGameRequestsEditor = async function() {
+  const list = document.getElementById('ae-game-requests-list');
+  const summary = document.getElementById('game-requests-summary');
+  if (!list || !summary) return;
+  list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:1.5rem 0;">Loading game requests...</div>';
+  summary.textContent = '';
+  try {
+    const rows = await window._fetchGameRequests();
+    const sorted = rows.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+    const completed = sorted.filter(r => (r.status || '').toLowerCase() === 'done').length;
+    summary.textContent = `${sorted.length} total · ${completed} completed`;
+    if (!sorted.length) {
+      list.innerHTML = '<div style="color:var(--muted);font-size:0.8rem;text-align:center;padding:1.5rem 0;">No game requests yet.</div>';
+      return;
+    }
+    list.innerHTML = sorted.map(r => {
+      const rid = escAttr(r.id || '');
+      const isDone = (r.status || '').toLowerCase() === 'done';
+      const created = r.createdAt ? new Date(r.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Unknown date';
+      return `<div style="display:flex;flex-direction:column;gap:0.35rem;padding:0.7rem;background:#0d0d14;border:1px solid var(--border);border-radius:8px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+          <div style="font-size:0.82rem;color:var(--text);font-weight:700;">${escHtml(r.name || 'Untitled')}</div>
+          <span style="font-size:0.62rem;color:${isDone ? '#22c55e' : 'var(--primary)'};font-weight:700;letter-spacing:0.06em;">${escHtml((r.status || 'pending').toUpperCase())}</span>
+        </div>
+        <div style="font-size:0.69rem;color:var(--muted);">${escHtml(r.email || 'unknown')}</div>
+        ${r.url ? `<a href="${escAttr(r.url)}" target="_blank" rel="noopener noreferrer" style="font-size:0.72rem;color:var(--secondary);word-break:break-all;">${escHtml(r.url)}</a>` : ''}
+        ${r.notes ? `<div style="font-size:0.75rem;color:var(--text);opacity:0.85;">${escHtml(r.notes)}</div>` : ''}
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-top:0.2rem;">
+          <span style="font-size:0.62rem;color:var(--muted);">${created}</span>
+          <button onclick="deleteGameRequestEditor('${rid}')" style="padding:0.35rem 0.55rem;background:var(--danger-dim);border:1px solid rgba(239,68,68,0.3);border-radius:5px;color:var(--danger);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    list.innerHTML = '<div style="color:var(--danger);font-size:0.8rem;text-align:center;padding:1.5rem 0;">Failed to load: ' + escHtml(e.message || 'error') + '</div>';
+  }
+};
+
+window.deleteGameRequestEditor = async function(requestId) {
+  if (!requestId) return;
+  if (!confirm('Delete this game request?')) return;
+  try {
+    await window._deleteGameRequest(requestId);
+    loadGameRequestsEditor();
+  } catch (e) {
+    alert('Failed to delete request: ' + e.message);
+  }
+};
+
 window.switchAdminTab = function(tab) {
   
   const editorRestricted = ['command', 'ai', 's3'];
@@ -1775,6 +1843,8 @@ window.switchAdminTab = function(tab) {
       const statusEl = document.getElementById('s3-status');
       if (statusEl) statusEl.textContent = '✗ ' + e.message;
     });
+  } else if (tab === 'game-requests') {
+    loadGameRequestsEditor();
   }
 };
 

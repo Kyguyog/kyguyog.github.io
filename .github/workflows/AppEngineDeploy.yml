@@ -23,5 +23,10 @@ jobs:
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
 
+    - name: Inject commit version into index footer
+      run: |
+        SHORT_SHA="${GITHUB_SHA::7}"
+        sed -i "s/window.KNOWWHERE_VERSION='[^']*'/window.KNOWWHERE_VERSION='${SHORT_SHA}'/g" index.html
+
     - name: Deploy to App Engine
       run: gcloud app deploy --quiet
