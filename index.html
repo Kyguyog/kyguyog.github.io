@@ -2114,7 +2114,8 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
     let totalMatches = 0;
     let html = '';
     const uploadCard = `<div class="letter-group"><div class="letter-bg">+</div><div class="letter-heading">ZIP</div><div class="games-grid"><a href="/zip-player.html" class="game-card" data-popup="1" data-launch-url="/zip-player.html" data-name="Upload ZIP Game" data-screenshot="" data-url="/zip-player.html">${GAMEPAD_SVG}<span>Upload ZIP Game</span></a></div></div>`;
-    const uploadMatches = !q || 'upload zip game zip-player local'.includes(q);
+    const uploadSearchText = 'upload zip game zip-player local';
+    const uploadMatches = !q || uploadSearchText.includes(q);
     for (const [letter, games] of Object.entries(GAMES).sort(([a], [b]) => a.localeCompare(b))) {
       const matched = q ? games.filter(g => {
         if (g.name.toLowerCase().includes(q)) return true;
@@ -2136,7 +2137,10 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
       }).join('');
       html += `<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;
     }
-    if (uploadMatches) html += uploadCard;
+    if (uploadMatches) {
+      html += uploadCard;
+      totalMatches += 1;
+    }
     archive.innerHTML = html;
     if (totalMatches === 0 && q) {
       noResults.style.display = 'block';
@@ -2169,6 +2173,9 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
       window.open(launchUrl, '_blank', 'noopener,noreferrer');
     }
   });
+
+  const searchInputEl = document.getElementById('search-input');
+  buildArchive(searchInputEl ? searchInputEl.value : '');
 })();
 </script>
 <script>document.addEventListener("touchmove",function(e){if(e.touches.length>1){e.preventDefault();}},{passive:false});var lastTouch=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-lastTouch<300){e.preventDefault();}
