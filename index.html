@@ -2174,7 +2174,17 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
           frame.msRequestFullscreen();
         }
       } catch (_) {}
+      setTimeout(focusGameFrame, 80);
     });
+    document.addEventListener('fullscreenchange', () => { setTimeout(focusGameFrame, 120); });
+    document.addEventListener('webkitfullscreenchange', () => { setTimeout(focusGameFrame, 120); });
+    document.addEventListener('msfullscreenchange', () => { setTimeout(focusGameFrame, 120); });
+  }
+  function focusGameFrame() {
+    const frame = document.getElementById('game-popup-frame');
+    if (!frame) return;
+    try { frame.focus(); } catch (_) {}
+    try { if (frame.contentWindow && frame.contentWindow.focus) frame.contentWindow.focus(); } catch (_) {}
   }
   function openGamePopup(title, src) {
     ensureGamePopup();
@@ -2182,9 +2192,12 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
     const frame = document.getElementById('game-popup-frame');
     const titleEl = document.getElementById('game-popup-title');
     titleEl.textContent = title || 'Game';
+    frame.setAttribute('tabindex', '-1');
     frame.setAttribute('src', src);
+    frame.onload = () => setTimeout(focusGameFrame, 80);
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
+    setTimeout(focusGameFrame, 120);
   }
   function closeGamePopup() {
     const modal = document.getElementById('game-popup-modal');
