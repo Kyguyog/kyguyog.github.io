@@ -1,5 +1,13 @@
 [
   {
+    "sha": "e90cb778a17bafe1bf3c3d7304c076c51845c60b",
+    "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/e90cb778a17bafe1bf3c3d7304c076c51845c60b",
+    "message": "[bug][main page] Fix fullscreen bug\n\nFix bug where if u toggle fullscreen then keyboard control is lost",
+    "date": "2026-04-29T03:49:59Z",
+    "author_login": "Kyguyog",
+    "author_avatar": "https://avatars.githubusercontent.com/u/107652213?v=4"
+  },
+  {
     "sha": "c05f859ce3b7ffc3857eb0b50289adee67583d3f",
     "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/c05f859ce3b7ffc3857eb0b50289adee67583d3f",
     "message": "[bug]split eaglercraft 1.12\n\nIt was causing issues with AppEngine",
