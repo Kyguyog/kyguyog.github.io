@@ -29,6 +29,13 @@
     .title { margin: 0 0 0.35rem; font-size: 1.08rem; }
     .hint { margin: 0 0 0.9rem; color: #b9c0eb; font-size: 0.9rem; }
     .drop {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      width: 100%;
+      box-sizing: border-box;
       border: 1px dashed rgba(163, 180, 255, 0.55);
       border-radius: 10px;
       padding: 1.2rem;
@@ -42,7 +49,7 @@
       border-color: rgba(163, 180, 255, 0.95);
     }
     .file-btn {
-      margin-top: 0.75rem;
+      margin-top: 0;
       border: 1px solid rgba(255,255,255,0.28);
       border-radius: 8px;
       background: rgba(255,255,255,0.08);
