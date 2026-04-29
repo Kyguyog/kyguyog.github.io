@@ -1,5 +1,13 @@
 [
   {
+    "sha": "c05f859ce3b7ffc3857eb0b50289adee67583d3f",
+    "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/c05f859ce3b7ffc3857eb0b50289adee67583d3f",
+    "message": "[bug]split eaglercraft 1.12\n\nIt was causing issues with AppEngine",
+    "date": "2026-04-29T03:26:51Z",
+    "author_login": "Kyguyog",
+    "author_avatar": "https://avatars.githubusercontent.com/u/107652213?v=4"
+  },
+  {
     "sha": "6e8351fbd123c932a950c6d585cfa46192b219ee",
     "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/6e8351fbd123c932a950c6d585cfa46192b219ee",
     "message": "[dev][update] Update Updates\n\nallow custom commit tags and multiple tags",
