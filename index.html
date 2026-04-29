@@ -2026,7 +2026,97 @@ function showImg(preview){const previewData=typeof preview==='string'?{src:previ
 function hideTooltip(){clearTimeout(tooltip._showTimer);current=null;hideTimer=setTimeout(()=>{tooltip.classList.remove('visible');},80);}
 function positionTooltip(e){const tw=tooltip.offsetWidth||240;const th=tooltip.offsetHeight||190;const vw=window.innerWidth;const vh=window.innerHeight;let x=e.clientX+PAD;let y=e.clientY+PAD;if(x+tw>vw-8)x=e.clientX-tw-PAD;if(y+th>vh-8)y=e.clientY-th-PAD;if(x<8)x=8;if(y<8)y=8;tooltip.style.left=x+'px';tooltip.style.top=y+'px';}
 document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archive .game-card');if(card){card._lastMouseEvent=e;showTooltip(card);}});document.addEventListener('mousemove',(e)=>{const card=e.target.closest('#archive .game-card');if(card){card._lastMouseEvent=e;positionTooltip(e);}});document.addEventListener('mouseout',(e)=>{const card=e.target.closest('#archive .game-card');if(card&&!card.contains(e.relatedTarget)){hideTooltip();}});})();</script>
-<script>(function(){window.scheduleBlockChecks=function(){};})();</script>
+<script>
+(function(){
+  let _blockCheckTimer = null;
+  let _blockCheckEpoch = 0;
+
+  function setDotState(dot, state, label) {
+    if (!dot) return;
+    dot.dataset.status = state;
+    dot.dataset.label = label;
+  }
+
+  function probeViaImage(url, timeoutMs) {
+    return new Promise((resolve) => {
+      let done = false;
+      const img = new Image();
+      const finish = (ok) => {
+        if (done) return;
+        done = true;
+        clearTimeout(timer);
+        img.onload = null;
+        img.onerror = null;
+        resolve(ok ? 'ok' : 'unknown');
+      };
+      const timer = setTimeout(() => finish(false), timeoutMs);
+      img.onload = () => finish(true);
+      img.onerror = () => finish(false);
+      try {
+        const parsed = new URL(url, location.href);
+        const probe = parsed.origin + '/favicon.ico';
+        img.referrerPolicy = 'no-referrer';
+        img.src = probe + (probe.includes('?') ? '&' : '?') + 'kw_probe=' + Date.now();
+      } catch (_) {
+        finish(false);
+      }
+    });
+  }
+
+  async function probeViaNoCorsFetch(url, timeoutMs) {
+    try {
+      const parsed = new URL(url, location.href);
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      await fetch(parsed.href, {
+        method: 'GET',
+        mode: 'no-cors',
+        cache: 'no-store',
+        referrerPolicy: 'no-referrer',
+        signal: controller.signal
+      });
+      clearTimeout(timer);
+      return 'ok';
+    } catch (_) {
+      return 'unknown';
+    }
+  }
+
+  async function classifyUrl(url) {
+    const [imgRes, fetchRes] = await Promise.all([
+      probeViaImage(url, 2600),
+      probeViaNoCorsFetch(url, 2600)
+    ]);
+    const positives = [imgRes, fetchRes].filter(v => v === 'ok').length;
+    if (positives >= 1) return { state: 'ok', label: 'Likely unblocked' };
+    return { state: 'checking', label: 'Unknown / mixed signal' };
+  }
+
+  window.scheduleBlockChecks = function() {
+    if (_blockCheckTimer) clearTimeout(_blockCheckTimer);
+    _blockCheckTimer = setTimeout(async () => {
+      const epoch = ++_blockCheckEpoch;
+      const dots = Array.from(document.querySelectorAll('.block-dot[data-url]'));
+      if (!dots.length) return;
+      dots.forEach(dot => setDotState(dot, 'checking', 'Checking…'));
+
+      const byUrl = new Map();
+      dots.forEach(dot => {
+        const url = (dot.dataset.url || '').trim();
+        if (!url) return;
+        if (!byUrl.has(url)) byUrl.set(url, []);
+        byUrl.get(url).push(dot);
+      });
+
+      for (const [url, urlDots] of byUrl.entries()) {
+        const result = await classifyUrl(url);
+        if (epoch !== _blockCheckEpoch) return;
+        urlDots.forEach(dot => setDotState(dot, result.state, result.label));
+      }
+    }, 120);
+  };
+})();
+</script>
 <script>
 (function () {
   function escAttr(s) {
@@ -2133,7 +2223,7 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
         const launchUrl = gameLaunchUrl(g);
         const safeLaunchUrl = escAttr(launchUrl);
         const popup = parseBool(g.openInPopup);
-        return `<a href="${safeLaunchUrl || safeUrl}" target="_blank" rel="noopener noreferrer" class="game-card" data-popup="${popup ? '1' : '0'}" data-launch-url="${safeLaunchUrl}" data-name="${escAttr(g.name || '')}" data-screenshot="${safeScreenshot}" data-url="${safeUrl}">${GAMEPAD_SVG}<span>${g.name}</span></a>`;
+        return `<a href="${safeLaunchUrl || safeUrl}" target="_blank" rel="noopener noreferrer" class="game-card" data-popup="${popup ? '1' : '0'}" data-launch-url="${safeLaunchUrl}" data-name="${escAttr(g.name || '')}" data-screenshot="${safeScreenshot}" data-url="${safeUrl}">${GAMEPAD_SVG}<span>${g.name}</span><span class="block-dot block-dot-tooltip" data-status="checking" data-url="${safeUrl}" data-label="Checking…"></span></a>`;
       }).join('');
       html += `<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;
     }
