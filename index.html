@@ -2160,17 +2160,9 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
     if (!card) return;
     const launchUrl = (card.dataset.launchUrl || '').trim() || card.getAttribute('href');
     if (!launchUrl) return;
-    let parsed = null;
-    try { parsed = new URL(launchUrl, location.href); } catch (_) {}
-    const sameOrigin = !!(parsed && parsed.origin === location.origin);
-    if (card.dataset.popup === '1' && sameOrigin) {
-      e.preventDefault();
-      openGamePopup(card.dataset.name || 'Game', launchUrl);
-      return;
-    }
     if (card.dataset.popup === '1') {
       e.preventDefault();
-      window.open(launchUrl, '_blank', 'noopener,noreferrer');
+      openGamePopup(card.dataset.name || 'Game', launchUrl);
     }
   });
 

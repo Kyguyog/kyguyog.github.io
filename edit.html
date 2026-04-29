@@ -1823,9 +1823,12 @@ function renderGameRow(g = {}) {
       <input class="admin-row-input game-alias-input" placeholder="Search alias (optional)" value="${escAttr(g.alias || '')}" style="flex:1;" />
       <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(gameUrl)}" style="flex:1.8;" />
       <div style="flex:3.3;display:flex;align-items:center;gap:0.45rem;min-width:0;">
-        <label style="display:flex;align-items:center;gap:0.35rem;color:var(--muted);font-size:0.68rem;white-space:nowrap;">
-          <input type="checkbox" class="game-popup-input" ${openInPopup ? 'checked' : ''} />
-          Popup
+        <label class="toggle-wrap" style="white-space:nowrap;">
+          <span class="toggle-switch">
+            <input type="checkbox" class="game-popup-input" ${openInPopup ? 'checked' : ''} />
+            <span class="toggle-track"></span>
+          </span>
+          <span class="toggle-label">Popup</span>
         </label>
         <input class="admin-row-input game-screenshot-input" placeholder="Screenshot URL (optional)" value="${escAttr(g.screenshot||'')}" style="flex:1;min-width:0;" onpaste="adminHandleGameScreenshotPaste(event, this)" onchange="adminHandleGameScreenshotUrlChange(this)" />
         <input type="file" class="game-screenshot-file-input" accept="image/*" style="display:none;" onchange="adminHandleGameScreenshotFiles(this)" />
@@ -1855,7 +1858,70 @@ function flattenGames(gamesObj) {
   return flat;
 }
 
+function getDomainFromUrl(url) {
+  try {
+    return new URL(url).hostname.replace(/^www\./i, '').toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function syncPopupTogglesByDomain(sourceRow, preferSourceState) {
+  const rows = [...document.querySelectorAll('#ae-games-list .admin-row-item')];
+  if (sourceRow) {
+    const sourceDomain = getDomainFromUrl(sourceRow.querySelector('.game-url-input')?.value?.trim() || '');
+    if (sourceDomain) {
+      let desiredState = !!sourceRow.querySelector('.game-popup-input')?.checked;
+      if (!preferSourceState) {
+        const existing = rows.find(row => row !== sourceRow && getDomainFromUrl(row.querySelector('.game-url-input')?.value?.trim() || '') === sourceDomain);
+        if (existing) desiredState = !!existing.querySelector('.game-popup-input')?.checked;
+      }
+      rows.forEach(row => {
+        if (getDomainFromUrl(row.querySelector('.game-url-input')?.value?.trim() || '') !== sourceDomain) return;
+        const popupInput = row.querySelector('.game-popup-input');
+        if (popupInput) popupInput.checked = desiredState;
+      });
+      return;
+    }
+  }
+
+  const domainStatus = new Map();
+  rows.forEach(row => {
+    const domain = getDomainFromUrl(row.querySelector('.game-url-input')?.value?.trim() || '');
+    if (!domain) return;
+    if (!domainStatus.has(domain)) {
+      domainStatus.set(domain, !!row.querySelector('.game-popup-input')?.checked);
+    }
+  });
+  rows.forEach(row => {
+    const domain = getDomainFromUrl(row.querySelector('.game-url-input')?.value?.trim() || '');
+    if (!domain || !domainStatus.has(domain)) return;
+    const popupInput = row.querySelector('.game-popup-input');
+    if (popupInput) popupInput.checked = domainStatus.get(domain);
+  });
+}
+
 function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
+  const normalizedRows = rows.map(row => {
+    const name = row.querySelector('.game-name-input').value.trim();
+    const alias = row.querySelector('.game-alias-input').value.trim();
+    const url = row.querySelector('.game-url-input').value.trim();
+    const screenshot = row.querySelector('.game-screenshot-input').value.trim();
+    const originalName = (row.dataset.originalName || '').trim();
+    const domain = getDomainFromUrl(url);
+    return { row, name, alias, url, screenshot, originalName, domain, openInPopup: !!row.querySelector('.game-popup-input').checked };
+  });
+
+  const popupByDomain = new Map();
+  normalizedRows.forEach(item => {
+    if (!item.domain || popupByDomain.has(item.domain)) return;
+    popupByDomain.set(item.domain, item.openInPopup);
+  });
+  normalizedRows.forEach(item => {
+    if (!item.domain || !popupByDomain.has(item.domain)) return;
+    item.openInPopup = popupByDomain.get(item.domain);
+  });
+
   const latestMap = new Map();
   flattenGames(latestGamesObj).forEach(game => {
     const key = normalizeGameKey(game.name);
@@ -1870,13 +1936,13 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
 
   const remainingOriginalKeys = new Set(originalMap.keys());
 
-  rows.forEach(row => {
-    const name = row.querySelector('.game-name-input').value.trim();
-    const alias = row.querySelector('.game-alias-input').value.trim();
-    const url = row.querySelector('.game-url-input').value.trim();
-    const openInPopup = !!row.querySelector('.game-popup-input').checked;
-    const screenshot = row.querySelector('.game-screenshot-input').value.trim();
-    const originalName = (row.dataset.originalName || '').trim();
+  normalizedRows.forEach(item => {
+    const name = item.name;
+    const alias = item.alias;
+    const url = item.url;
+    const openInPopup = item.openInPopup;
+    const screenshot = item.screenshot;
+    const originalName = item.originalName;
     const originalKey = normalizeGameKey(originalName);
     const nextKey = normalizeGameKey(name);
     const originalGame = originalKey ? originalMap.get(originalKey) : null;
@@ -2057,6 +2123,17 @@ window.adminAddGame = function() {
   document.getElementById('ae-games-list').appendChild(row);
   row.querySelector('input').focus();
 };
+
+document.addEventListener('change', function(e) {
+  if (!e.target) return;
+  if (e.target.classList.contains('game-popup-input')) {
+    syncPopupTogglesByDomain(e.target.closest('.admin-row-item'), true);
+    return;
+  }
+  if (e.target.classList.contains('game-url-input')) {
+    syncPopupTogglesByDomain(e.target.closest('.admin-row-item'), false);
+  }
+});
 function renderSitesEditor(items) {
   document.getElementById('ae-sites-list').innerHTML = items.map(s => `
     <div class="admin-row-item">
@@ -2152,6 +2229,7 @@ window.adminSave = async function(section) {
       patch.games = mergedGames;
       window._siteData = Object.assign({}, latestData, { games: mergedGames });
       window._adminOriginalData = Object.assign({}, window._adminOriginalData || {}, { games: JSON.parse(JSON.stringify(mergedGames)) });
+      renderGamesEditor(mergedGames);
     } else if (section === 'sites') {
       patch.sites = [...document.querySelectorAll('#ae-sites-list .admin-row-item')].map(row => {
         const [n, u] = row.querySelectorAll('input');
