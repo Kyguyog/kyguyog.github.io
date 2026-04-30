@@ -1,5 +1,13 @@
 [
   {
+    "sha": "bbefbe32f945888799fa2757766088220161c6ff",
+    "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/bbefbe32f945888799fa2757766088220161c6ff",
+    "message": "[Update] Improve Game Blocked Checking",
+    "date": "2026-04-30T04:10:15Z",
+    "author_login": "Kyguyog",
+    "author_avatar": "https://avatars.githubusercontent.com/u/107652213?v=4"
+  },
+  {
     "sha": "6067edc482644d90fbd0ee55c89aa2fec4e771bf",
     "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/6067edc482644d90fbd0ee55c89aa2fec4e771bf",
     "message": "[bug] Fixed games re-check after search",
