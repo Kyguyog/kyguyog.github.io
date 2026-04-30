@@ -1,5 +1,13 @@
 [
   {
+    "sha": "6067edc482644d90fbd0ee55c89aa2fec4e771bf",
+    "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/6067edc482644d90fbd0ee55c89aa2fec4e771bf",
+    "message": "[bug] Fixed games re-check after search",
+    "date": "2026-04-30T03:59:19Z",
+    "author_login": "Kyguyog",
+    "author_avatar": "https://avatars.githubusercontent.com/u/107652213?v=4"
+  },
+  {
     "sha": "9e26735bd4a271f2fe28b00eaf9acf7332d5d1c0",
     "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/9e26735bd4a271f2fe28b00eaf9acf7332d5d1c0",
     "message": "Merge branch 'main' of https://github.com/Kyguyog/kyguyog.github.io",
