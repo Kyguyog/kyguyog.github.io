@@ -2045,6 +2045,33 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
   let _blockCheckTimer = null;
   let _blockCheckEpoch = 0;
   const _blockStatusCache = new Map();
+  const BLOCK_CHECK_MAX_INSTANCES = 12;
+  const BLOCK_CHECK_SECOND_ATTEMPT_DELAY_MS = 5000;
+  const BLOCK_CHECK_URL_TIMEOUT_MS = 30000;
+  const BLOCK_CHECK_ATTEMPT_TIMEOUT_MS = 10000;
+  let _activeBlockCheckInstances = 0;
+  const _blockCheckWaiters = [];
+
+  function releaseBlockCheckInstance() {
+    _activeBlockCheckInstances = Math.max(0, _activeBlockCheckInstances - 1);
+    const next = _blockCheckWaiters.shift();
+    if (next) next();
+  }
+
+  async function acquireBlockCheckInstance() {
+    if (_activeBlockCheckInstances < BLOCK_CHECK_MAX_INSTANCES) {
+      _activeBlockCheckInstances += 1;
+      return;
+    }
+    await new Promise(resolve => _blockCheckWaiters.push(resolve));
+    _activeBlockCheckInstances += 1;
+  }
+
+  function tryAcquireBlockCheckInstance() {
+    if (_activeBlockCheckInstances >= BLOCK_CHECK_MAX_INSTANCES) return false;
+    _activeBlockCheckInstances += 1;
+    return true;
+  }
 
   function setDotState(dot, state, label) {
     if (!dot) return;
@@ -2104,12 +2131,69 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
 
   async function classifyUrl(url) {
     const [imgRes, fetchRes] = await Promise.all([
-      probeViaImage(url, 2600),
-      probeViaNoCorsFetch(url, 2600)
+      probeViaImage(url, BLOCK_CHECK_ATTEMPT_TIMEOUT_MS),
+      probeViaNoCorsFetch(url, BLOCK_CHECK_ATTEMPT_TIMEOUT_MS)
     ]);
     const positives = [imgRes, fetchRes].filter(v => v === 'ok').length;
     if (positives >= 1) return { state: 'ok', label: 'Likely unblocked' };
     return { state: 'checking', label: 'Unknown / mixed signal' };
+  }
+
+  function runClassifyAttemptWithOwnedInstance(url) {
+    return (async () => {
+      try {
+        return await classifyUrl(url);
+      } finally {
+        releaseBlockCheckInstance();
+      }
+    })();
+  }
+
+  async function classifyUrlWithBackup(url) {
+    await acquireBlockCheckInstance();
+    let settled = false;
+    let launchedAttempts = 1;
+    let completedAttempts = 0;
+    let finish;
+    const done = new Promise(resolve => { finish = resolve; });
+
+    const settleOnce = (result) => {
+      if (settled) return;
+      settled = true;
+      finish(result);
+    };
+    const onAttemptDone = () => {
+      completedAttempts += 1;
+      if (!settled && completedAttempts >= launchedAttempts) {
+        settleOnce({ state: 'checking', label: 'Checking…' });
+      }
+    };
+
+    const primaryAttempt = runClassifyAttemptWithOwnedInstance(url);
+    primaryAttempt.then((result) => {
+      if (result && result.state === 'ok') settleOnce(result);
+    }).finally(onAttemptDone);
+
+    const secondAttemptTimer = setTimeout(() => {
+      if (settled) return;
+      if (!tryAcquireBlockCheckInstance()) return;
+      launchedAttempts += 1;
+      const secondAttempt = runClassifyAttemptWithOwnedInstance(url);
+      secondAttempt.then((result) => {
+        if (result && result.state === 'ok') settleOnce(result);
+      }).finally(onAttemptDone);
+    }, BLOCK_CHECK_SECOND_ATTEMPT_DELAY_MS);
+
+    const timeoutTimer = setTimeout(() => {
+      settleOnce({ state: 'checking', label: 'Checking…' });
+    }, BLOCK_CHECK_URL_TIMEOUT_MS);
+
+    try {
+      return await done;
+    } finally {
+      clearTimeout(secondAttemptTimer);
+      clearTimeout(timeoutTimer);
+    }
   }
 
   window.scheduleBlockChecks = function() {
@@ -2133,16 +2217,12 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
       });
 
       const entries = Array.from(byUrl.entries());
-      const concurrency = 12;
-      for (let i = 0; i < entries.length; i += concurrency) {
-        const batch = entries.slice(i, i + concurrency);
-        await Promise.all(batch.map(async ([url, urlDots]) => {
-          const result = await classifyUrl(url);
-          if (epoch !== _blockCheckEpoch) return;
-          _blockStatusCache.set(url, result);
-          urlDots.forEach(dot => setDotState(dot, result.state, result.label));
-        }));
-      }
+      await Promise.all(entries.map(async ([url, urlDots]) => {
+        const result = await classifyUrlWithBackup(url);
+        if (epoch !== _blockCheckEpoch) return;
+        _blockStatusCache.set(url, result);
+        urlDots.forEach(dot => setDotState(dot, result.state, result.label));
+      }));
     }, 120);
   };
 })();
