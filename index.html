@@ -2044,12 +2044,18 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
 (function(){
   let _blockCheckTimer = null;
   let _blockCheckEpoch = 0;
+  const _blockStatusCache = new Map();
 
   function setDotState(dot, state, label) {
     if (!dot) return;
     dot.dataset.status = state;
     dot.dataset.label = label;
   }
+  window.getCachedBlockStatus = function(url) {
+    const key = (url || '').trim();
+    if (!key) return null;
+    return _blockStatusCache.get(key) || null;
+  };
 
   function probeViaImage(url, timeoutMs) {
     return new Promise((resolve) => {
@@ -2112,12 +2118,16 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
       const epoch = ++_blockCheckEpoch;
       const dots = Array.from(document.querySelectorAll('.block-dot[data-url]'));
       if (!dots.length) return;
-      dots.forEach(dot => setDotState(dot, 'checking', 'Checking…'));
-
       const byUrl = new Map();
       dots.forEach(dot => {
         const url = (dot.dataset.url || '').trim();
         if (!url) return;
+        const cached = _blockStatusCache.get(url);
+        if (cached) {
+          setDotState(dot, cached.state, cached.label);
+          return;
+        }
+        setDotState(dot, 'checking', 'Checking…');
         if (!byUrl.has(url)) byUrl.set(url, []);
         byUrl.get(url).push(dot);
       });
@@ -2129,6 +2139,7 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
         await Promise.all(batch.map(async ([url, urlDots]) => {
           const result = await classifyUrl(url);
           if (epoch !== _blockCheckEpoch) return;
+          _blockStatusCache.set(url, result);
           urlDots.forEach(dot => setDotState(dot, result.state, result.label));
         }));
       }
@@ -2259,7 +2270,12 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
         const launchUrl = gameLaunchUrl(g);
         const safeLaunchUrl = escAttr(launchUrl);
         const popup = parseBool(g.openInPopup);
-        return `<a href="${safeLaunchUrl || safeUrl}" target="_blank" rel="noopener noreferrer" class="game-card" data-popup="${popup ? '1' : '0'}" data-launch-url="${safeLaunchUrl}" data-name="${escAttr(g.name || '')}" data-screenshot="${safeScreenshot}" data-url="${safeLaunchUrl || safeUrl}">${GAMEPAD_SVG}<span>${g.name}${g.version?` <small style="opacity:0.7;">v${escAttr(g.version)}</small>`:''}</span><span class="block-dot block-dot-tooltip" data-status="checking" data-url="${safeLaunchUrl || safeUrl}" data-label="Checking…"></span></a>`;
+        const dotUrlRaw = launchUrl || (g.url || '');
+        const dotUrl = escAttr(dotUrlRaw);
+        const cachedStatus = window.getCachedBlockStatus ? window.getCachedBlockStatus(dotUrlRaw) : null;
+        const dotState = cachedStatus ? cachedStatus.state : 'checking';
+        const dotLabel = cachedStatus ? cachedStatus.label : 'Checking…';
+        return `<a href="${safeLaunchUrl || safeUrl}" target="_blank" rel="noopener noreferrer" class="game-card" data-popup="${popup ? '1' : '0'}" data-launch-url="${safeLaunchUrl}" data-name="${escAttr(g.name || '')}" data-screenshot="${safeScreenshot}" data-url="${dotUrl}">${GAMEPAD_SVG}<span>${g.name}${g.version?` <small style="opacity:0.7;">v${escAttr(g.version)}</small>`:''}</span><span class="block-dot block-dot-tooltip" data-status="${dotState}" data-url="${dotUrl}" data-label="${escAttr(dotLabel)}"></span></a>`;
       }).join('');
       html += `<div class="letter-group"><div class="letter-bg">${letter}</div><div class="letter-heading">${letter}</div><div class="games-grid">${cards}</div></div>`;
     }
@@ -2278,7 +2294,6 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
       archive.style.display = 'flex';
       searchCount.textContent = q ? `${totalMatches} game${totalMatches !== 1 ? 's' : ''} found` : '';
     }
-    scheduleBlockChecks();
   };
 
   document.addEventListener('click', (e) => {
