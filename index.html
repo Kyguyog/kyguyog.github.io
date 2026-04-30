@@ -1791,6 +1791,20 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 </form>
 </div>
 <div class="popup-section">
+<button class="popup-btn" onclick="togglePopupForm('pfp-form')">
+<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="8" r="4"></circle><path d="M4 20a8 8 0 0 1 16 0"></path></svg>
+      Profile Picture
+    </button>
+<form class="popup-inline-form" id="pfp-form" onsubmit="saveProfilePicture();return false;">
+<input accept="image/*" id="pfp-upload-input" type="file"/>
+<div class="popup-msg" id="pfp-msg"></div>
+<div class="popup-inline-form-row">
+<button class="popup-save-btn" onclick="saveProfilePicture();return false;" type="button">Save</button>
+<button class="popup-cancel-btn" onclick="togglePopupForm('pfp-form')" type="button">Cancel</button>
+</div>
+</form>
+</div>
+<div class="popup-section">
 <button class="popup-btn danger" onclick="handleSignOut()">
 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
       Sign Out
@@ -1821,11 +1835,11 @@ document.getElementById('new-password').value='';document.getElementById('confir
 msg.className='popup-msg err';}};window.submitGameRequest=async function(){const name=(document.getElementById('game-request-name')?.value||'').trim();const url=(document.getElementById('game-request-url')?.value||'').trim();const notes=(document.getElementById('game-request-notes')?.value||'').trim();const msg=document.getElementById('game-request-msg');msg.className='popup-msg';if(!name){msg.textContent='Enter a game name.';msg.className='popup-msg err';return;}try{await window._saveGameRequest({name,url,notes});msg.textContent='Request sent.';msg.className='popup-msg ok';document.getElementById('game-request-name').value='';document.getElementById('game-request-url').value='';document.getElementById('game-request-notes').value='';}catch(e){msg.textContent=e.message||'Failed to send request.';msg.className='popup-msg err';}};let _forcedSignout=false;onAuthStateChanged(auth,async(user)=>{const wall=document.getElementById('auth-wall');const main=document.getElementById('main-content');const badge=document.getElementById('nav-user-badge');if(!user&&_forcedSignout){_forcedSignout=false;wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';const errEl=document.getElementById('auth-error');if(errEl){errEl.textContent='Your account has been disabled. Contact an admin for help.';errEl.classList.add('show');}
 return;}
 if(user){try{window._capturePublicIp&&window._capturePublicIp();}catch(_){}try{const activeSnap=await getDoc(doc(db,'users',user.email));if(activeSnap.exists()){const d=activeSnap.data();if(d.active===false&&d.admin!==true){_forcedSignout=true;await signOut(auth);return;}}}catch(e){console.warn('Could not verify account status — signing out for safety:',e);_forcedSignout=true;await signOut(auth);return;}
-wall.classList.add('hidden');main.classList.add('visible');let username=user.email;let fullName='';try{const snap=await getDoc(doc(db,'users',user.email));if(snap.exists()){const snapData=snap.data();if(snapData.username){username=snapData.username;if(user.displayName!==username){await updateProfile(user,{displayName:username});}}else{username=user.displayName||user.email;}
-fullName=snapData.fullName||'';}else{username=user.displayName||user.email;}}catch(e){username=user.displayName||user.email;}
+wall.classList.add('hidden');main.classList.add('visible');let username=user.email;let fullName='';let pfpUrl='';try{const snap=await getDoc(doc(db,'users',user.email));if(snap.exists()){const snapData=snap.data();if(snapData.username){username=snapData.username;if(user.displayName!==username){await updateProfile(user,{displayName:username});}}else{username=user.displayName||user.email;}
+fullName=snapData.fullName||'';pfpUrl=snapData.pfp||'';if(!pfpUrl&&snapData.pfpBucket&&snapData.pfpRegion&&snapData.pfpKey){pfpUrl=`https://${snapData.pfpBucket}.s3.${snapData.pfpRegion}.amazonaws.com/${String(snapData.pfpKey).split('/').map(encodeURIComponent).join('/')}`;}}else{username=user.displayName||user.email;}}catch(e){username=user.displayName||user.email;}
 if(badge){badge.innerHTML=`
           <button class="auth-user-name" onclick="toggleUserPopup()">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span style="width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);font-size:0.62rem;font-weight:700;">${pfpUrl?`<img src="${String(pfpUrl).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:String((username||'?')[0]||'?').toUpperCase()}</span>
             ${username || fullName}
           </button>`;document.getElementById('popup-display-name').textContent=username;document.getElementById('popup-email').textContent=user.email;const fullNameEl=document.getElementById('popup-full-name');if(fullNameEl){fullNameEl.textContent=fullName;fullNameEl.style.display=fullName?'block':'none';}}
 const adminBtn=document.getElementById('admin-popup-btn');const adminSection=document.getElementById('admin-popup-section');const approvalsBtn=document.getElementById('approvals-popup-btn');const ordersSection=document.getElementById('orders-popup-section');if(adminBtn)adminBtn.style.display='none';if(adminSection)adminSection.style.display='none';if(approvalsBtn)approvalsBtn.style.display='none';if(ordersSection)ordersSection.style.display='block';try{const contentSnap=await getDoc(doc(db,'siteContent','main'));if(contentSnap.exists()){window._siteData=contentSnap.data();populatePage(window._siteData);}}catch(e){console.error('Failed to load site content:',e);}
@@ -2393,5 +2407,230 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
 </script>
 <script>document.addEventListener("touchmove",function(e){if(e.touches.length>1){e.preventDefault();}},{passive:false});var lastTouch=0;document.addEventListener("touchend",function(e){var now=Date.now();if(now-lastTouch<300){e.preventDefault();}
 lastTouch=now;},false);</script>
+<script>
+if(typeof window.saveProfilePicture!=="function"){
+  window.saveProfilePicture=function(){
+    const msg=document.getElementById("pfp-msg");
+    if(msg){
+      msg.textContent="Profile upload is still loading. Refresh and try again.";
+      msg.className="popup-msg err";
+    }
+  };
+}
+</script>
+<script type="module">
+import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAP-GnPXo490Frl1hGYWbje8QdhxtD19PQ",
+  authDomain: "knowwhere1.firebaseapp.com",
+  projectId: "knowwhere1",
+  storageBucket: "knowwhere1.firebasestorage.app",
+  messagingSenderId: "747448090609",
+  appId: "1:747448090609:web:e3af5b2c8ffa8fb3a9ce50",
+  measurementId: "G-DV44FGDQ2N"
+};
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+function escHtml(str) {
+  return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function pfpAvatarHtml(pfp, fallback) {
+  if (pfp) return `<img src="${escHtml(pfp)}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  return escHtml(fallback || "?");
+}
+function normalizePfp(data) {
+  if (!data) return "";
+  if (data.pfp) return data.pfp;
+  if (data.pfpBucket && data.pfpRegion && data.pfpKey) {
+    return `https://${data.pfpBucket}.s3.${data.pfpRegion}.amazonaws.com/${String(data.pfpKey).split("/").map(encodeURIComponent).join("/")}`;
+  }
+  return "";
+}
+async function fetchUserProfileByEmail(email) {
+  const raw = String(email || "").trim();
+  if (!raw) return {};
+  const candidates = [raw];
+  const lower = raw.toLowerCase();
+  if (lower !== raw) candidates.push(lower);
+  for (const id of candidates) {
+    try {
+      const snap = await getDoc(doc(db, "users", id));
+      if (snap.exists()) return snap.data() || {};
+    } catch (_) {}
+  }
+  return {};
+}
+function renderUserBadge(username, pfp) {
+  const badge = document.getElementById("nav-user-badge");
+  if (!badge) return;
+  badge.innerHTML = `<button class="auth-user-name" onclick="toggleUserPopup()"><span style="width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);font-size:0.62rem;font-weight:700;">${pfpAvatarHtml(pfp, (username || "?")[0]?.toUpperCase())}</span>${escHtml(username || "")}</button>`;
+}
+let _s3Creds = null;
+const EMPTY_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+function _amzNow() {
+  const d = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getUTCFullYear()}${pad(d.getUTCMonth() + 1)}${pad(d.getUTCDate())}T${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
+}
+async function _sha256(msg) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(msg));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function _sha256Bytes(bytes) {
+  const buf = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function _hmacSha256(key, data) {
+  const cryptoKey = await crypto.subtle.importKey("raw", key, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  return new Uint8Array(await crypto.subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(data)));
+}
+function _hex(bytes) {
+  return Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+async function _signingKey(secret, dateStamp, region, service) {
+  const kDate = await _hmacSha256(new TextEncoder().encode("AWS4" + secret), dateStamp);
+  const kRegion = await _hmacSha256(kDate, region);
+  const kService = await _hmacSha256(kRegion, service);
+  return _hmacSha256(kService, "aws4_request");
+}
+async function s3EnsureCreds() {
+  if (_s3Creds && _s3Creds.keyId) return _s3Creds;
+  const snap = await getDoc(doc(db, "s3", "s3"));
+  if (!snap.exists()) throw new Error("S3 credentials not configured.");
+  _s3Creds = snap.data();
+  if (!_s3Creds?.region || !_s3Creds?.bucket || !_s3Creds?.keyId || !_s3Creds?.secret) {
+    throw new Error("S3 credentials are incomplete.");
+  }
+  return _s3Creds;
+}
+function s3ObjectUrl(key) {
+  const { region, bucket } = _s3Creds;
+  return `https://${bucket}.s3.${region}.amazonaws.com/${key.split("/").map(encodeURIComponent).join("/")}`;
+}
+async function _s3Fetch(method, key, query, body, contentType) {
+  const creds = await s3EnsureCreds();
+  const { region, bucket, keyId, secret } = creds;
+  const host = `${bucket}.s3.${region}.amazonaws.com`;
+  const amzDate = _amzNow();
+  const dateStamp = amzDate.slice(0, 8);
+  const encodedKey = key ? "/" + key.split("/").map(encodeURIComponent).join("/") : "/";
+  const payloadHash = body ? await _sha256Bytes(body) : EMPTY_HASH;
+  const qs = query || "";
+  const headers = {
+    host,
+    "x-amz-content-sha256": payloadHash,
+    "x-amz-date": amzDate,
+    ...(contentType ? { "content-type": contentType } : {})
+  };
+  const sortedNames = Object.keys(headers).sort();
+  const canonicalHeaders = sortedNames.map((k) => `${k}:${headers[k]}`).join("\n") + "\n";
+  const signedHeaders = sortedNames.join(";");
+  const canonicalRequest = [method, encodedKey, qs, canonicalHeaders, signedHeaders, payloadHash].join("\n");
+  const credScope = `${dateStamp}/${region}/s3/aws4_request`;
+  const stringToSign = ["AWS4-HMAC-SHA256", amzDate, credScope, await _sha256(canonicalRequest)].join("\n");
+  const sk = await _signingKey(secret, dateStamp, region, "s3");
+  const sig = _hex(await _hmacSha256(sk, stringToSign));
+  const authHeader = `AWS4-HMAC-SHA256 Credential=${keyId}/${credScope}, SignedHeaders=${signedHeaders}, Signature=${sig}`;
+  const reqHeaders = {
+    Authorization: authHeader,
+    "x-amz-date": amzDate,
+    "x-amz-content-sha256": payloadHash,
+    ...(contentType ? { "Content-Type": contentType } : {})
+  };
+  const url = `https://${host}${encodedKey}${qs ? "?" + qs : ""}`;
+  return fetch(url, { method, headers: reqHeaders, body: body || undefined });
+}
+async function s3UploadProfilePicture(file, userEmail) {
+  await s3EnsureCreds();
+  const ext = (file.name.includes(".") ? file.name.split(".").pop() : "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  const safeExt = ext || (file.type.includes("png") ? "png" : file.type.includes("webp") ? "webp" : "jpg");
+  const safeUser = (userEmail || "user").toLowerCase().replace(/[^a-z0-9]/g, "_");
+  const key = `${(_s3Creds.prefix || "").replace(/\/+$/,"") ? (_s3Creds.prefix || "").replace(/\/+$/,"") + "/" : ""}pfp/${safeUser}_${Date.now()}.${safeExt}`;
+  const bytes = await file.arrayBuffer();
+  const res = await _s3Fetch("PUT", key, null, bytes, file.type || "application/octet-stream");
+  if (!res.ok) {
+    const txt = await res.text();
+    const message = txt.match(/<Message>(.*?)<\/Message>/)?.[1] || `S3 upload failed (${res.status})`;
+    throw new Error(message);
+  }
+  return { url: s3ObjectUrl(key), key, bucket: _s3Creds.bucket, region: _s3Creds.region };
+}
+
+window.saveProfilePicture = async function () {
+  const msg = document.getElementById("pfp-msg");
+  const input = document.getElementById("pfp-upload-input");
+  if (!msg) return;
+  msg.className = "popup-msg";
+  if (!auth.currentUser) {
+    msg.textContent = "You are not signed in. Refresh and log in again.";
+    msg.className = "popup-msg err";
+    return;
+  }
+  if (!input?.files?.length) {
+    msg.textContent = "Choose an image first.";
+    msg.className = "popup-msg err";
+    return;
+  }
+  const file = input.files[0];
+  if (!file.type.startsWith("image/")) {
+    msg.textContent = "Please upload an image file.";
+    msg.className = "popup-msg err";
+    return;
+  }
+  if (file.size > 4 * 1024 * 1024) {
+    msg.textContent = "Image too large. Max 4MB.";
+    msg.className = "popup-msg err";
+    return;
+  }
+  try {
+    msg.textContent = "Uploading...";
+    msg.className = "popup-msg ok";
+    const uploaded = await s3UploadProfilePicture(file, auth.currentUser.email);
+    const emailRaw = String(auth.currentUser.email || "");
+    const emailLower = emailRaw.toLowerCase();
+    const patch = {
+      pfp: uploaded.url,
+      pfpKey: uploaded.key,
+      pfpBucket: uploaded.bucket,
+      pfpRegion: uploaded.region,
+      pfpUpdatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, "users", emailRaw), patch, { merge: true });
+    if (emailLower && emailLower !== emailRaw) {
+      await setDoc(doc(db, "users", emailLower), patch, { merge: true });
+    }
+    const data = await fetchUserProfileByEmail(auth.currentUser.email);
+    const username = data.username || auth.currentUser.displayName || auth.currentUser.email;
+    renderUserBadge(username, normalizePfp(data));
+    msg.textContent = `Profile picture updated: ${uploaded.bucket}/${uploaded.key}`;
+    msg.className = "popup-msg ok";
+    input.value = "";
+  } catch (e) {
+    msg.textContent = "Failed to save profile picture: " + (e?.message || "Unknown error");
+    msg.className = "popup-msg err";
+    console.error("PFP upload/save failed:", e);
+  }
+};
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+  try {
+    const data = await fetchUserProfileByEmail(user.email);
+    const name = data.username || user.displayName || user.email;
+    renderUserBadge(name, normalizePfp(data));
+    setTimeout(async () => {
+      try {
+        const latest = await fetchUserProfileByEmail(user.email);
+        renderUserBadge(latest.username || name, normalizePfp(latest));
+      } catch (_) {}
+    }, 1200);
+  } catch (_) {}
+});
+</script>
 </body>
 </html>
