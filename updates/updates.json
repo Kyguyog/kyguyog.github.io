@@ -1,5 +1,13 @@
 [
   {
+    "sha": "53ff28b7d045c8ba5b1a169bc6e04034d2e45ecd",
+    "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/53ff28b7d045c8ba5b1a169bc6e04034d2e45ecd",
+    "message": "[feature] Add tab editing",
+    "date": "2026-05-01T15:59:16Z",
+    "author_login": "Kyguyog",
+    "author_avatar": "https://avatars.githubusercontent.com/u/107652213?v=4"
+  },
+  {
     "sha": "af6ceedce150ad4f6259fd587760fbbcef81ee8d",
     "url": "https://github.com/Kyguyog/kyguyog.github.io/commit/af6ceedce150ad4f6259fd587760fbbcef81ee8d",
     "message": "[Site] Add chromebook Killer\n\nu need to allow popups 4 it to work",
