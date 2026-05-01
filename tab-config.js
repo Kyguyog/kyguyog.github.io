@@ -5,8 +5,8 @@
   
   // Default configuration
   const DEFAULT_CONFIG = {
-    name: "KnowWhere",
-    icon: "favicon.png"
+    name: "Dashboard",
+    icon: "https://instructure-uploads.s3.amazonaws.com/account_29340000000000001/attachments/112692/Screen%20Shot%202018-08-20%20at%206.22.27%20PM.png"
   };
 
   // Get current page filename
