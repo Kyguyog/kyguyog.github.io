@@ -4,8 +4,8 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>Dashboard</title>
-<link href="https://instructure-uploads.s3.amazonaws.com/account_29340000000000001/attachments/112692/Screen%20Shot%202018-08-20%20at%206.22.27%20PM.png" rel="icon" type="image/x-icon"/>
+<title>KnowWhere</title>
+<link href="favicon.png" rel="icon" type="image/x-icon"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&amp;family=Orbitron:wght@400;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
@@ -196,6 +196,36 @@
     .popup-header {
       padding: 1rem 1.25rem 0.75rem;
       border-bottom: 1px solid var(--border);
+    }
+    .popup-header-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .popup-header-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: rgba(168,85,247,0.15);
+      border: 1px solid rgba(168,85,247,0.3);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+    .popup-header-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .popup-header-meta {
+      min-width: 0;
+      flex: 1;
     }
     .popup-header-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.2rem; }
     .popup-header-name { font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; color: var(--primary); }
@@ -1738,9 +1768,14 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <div id="user-popup">
 <div class="popup-header">
 <div class="popup-header-label">Signed in as</div>
+<div class="popup-header-row">
+<span class="popup-header-avatar" id="popup-avatar">?</span>
+<div class="popup-header-meta">
 <div class="popup-header-name" id="popup-display-name"></div>
 <div id="popup-full-name" style="display:none;font-size:0.78rem;color:var(--primary);margin-top:0.1rem;font-weight:500;"></div>
 <div class="popup-header-email" id="popup-email"></div>
+</div>
+</div>
 </div>
 <div class="popup-section" id="admin-popup-section" style="display:none;">
 <a class="popup-btn" href="./edit.html" id="admin-popup-btn" style="color:var(--primary);display:none;text-decoration:none;">
@@ -1775,7 +1810,7 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 </form>
 </div>
 <div class="popup-section">
-<button class="popup-btn" onclick="openSettings('tab')">
+<button class="popup-btn" onclick="openSettings('tab-editor')">
 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
       Settings
     </button>
@@ -1795,6 +1830,7 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <button class="settings-tab active" data-tab="tab-editor" onclick="switchSettingsTab('tab-editor')" style="flex:1;padding:0.75rem;background:transparent;border:none;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:border-color 0.2s, color 0.2s;">Tab</button>
 <button class="settings-tab" data-tab="password" onclick="switchSettingsTab('password')" style="flex:1;padding:0.75rem;background:transparent;border:none;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:border-color 0.2s, color 0.2s;">Password</button>
 <button class="settings-tab" data-tab="profile" onclick="switchSettingsTab('profile')" style="flex:1;padding:0.75rem;background:transparent;border:none;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:border-color 0.2s, color 0.2s;">Profile</button>
+<button class="settings-tab" data-tab="actions" onclick="switchSettingsTab('actions')" style="flex:1;padding:0.75rem;background:transparent;border:none;color:var(--muted);font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-bottom:2px solid transparent;transition:border-color 0.2s, color 0.2s;">Actions</button>
 </div>
 
 <!-- Settings Content -->
@@ -1830,7 +1866,7 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <label style="font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:0.4rem;">Confirm Password</label>
 <input autocomplete="new-password" id="confirm-password" placeholder="Confirm password" type="password" style="width:100%;background:#0d0d14;border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;color:var(--text);font-size:0.95rem;font-family:var(--font-body);outline:none;transition:border-color 0.2s, box-shadow 0.2s;" onkeydown="if(event.key==='Enter'){savePassword();}"/>
 </div>
-<div class="popup-msg" id="password-msg" style="font-size:0.75rem;padding:0.3rem 0.1rem;display:none;"></div>
+<div class="popup-msg" id="password-msg" style="font-size:0.75rem;padding:0.3rem 0.1rem;"></div>
 <button onclick="savePassword()" style="width:100%;padding:0.75rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;">Update Password</button>
 </div>
 </div>
@@ -1842,21 +1878,26 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <label style="font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:0.4rem;">Select Image</label>
 <input accept="image/*" id="pfp-upload-input" type="file" style="width:100%;padding:0.75rem;background:#0d0d14;border:1px dashed var(--border);border-radius:6px;color:var(--muted);font-size:0.9rem;cursor:pointer;"/>
 </div>
-<div class="popup-msg" id="pfp-msg" style="font-size:0.75rem;padding:0.3rem 0.1rem;display:none;"></div>
+<div class="popup-msg" id="pfp-msg" style="font-size:0.75rem;padding:0.3rem 0.1rem;"></div>
 <button onclick="saveProfilePicture()" style="width:100%;padding:0.75rem;background:var(--primary);color:#fff;border:none;border-radius:6px;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;">Upload Photo</button>
 </div>
 </div>
 
-</div>
-
-</div>
-</div>
-
-<div class="popup-section">
-<button class="popup-btn danger" onclick="handleSignOut()">
+<!-- Actions Tab -->
+<div class="settings-tab-content" data-tab="actions" style="display:none;">
+<div style="display:flex;flex-direction:column;gap:0.75rem;">
+<button onclick="openSiteInAboutBlank()" style="width:100%;padding:0.75rem;background:rgba(34,211,238,0.1);color:var(--secondary);border:1px solid rgba(34,211,238,0.35);border-radius:6px;font-family:var(--font-display);font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;">Open in about:blank</button>
+<button onclick="handleSignOut()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.55rem;padding:0.75rem;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.35);border-radius:6px;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,border-color 0.2s;">
 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
       Sign Out
     </button>
+<div class="popup-msg" id="actions-msg" style="font-size:0.75rem;padding:0.3rem 0.1rem;"></div>
+</div>
+</div>
+
+</div>
+
+</div>
 </div>
 </div>
 </div>
@@ -1880,19 +1921,23 @@ if(pw.length<6){msg.textContent='Password must be at least 6 characters.';msg.cl
 if(pw!==cpw){msg.textContent='Passwords do not match.';msg.className='popup-msg err';return;}
 try{await updatePassword(auth.currentUser,pw);try{await setDoc(doc(db,'users',auth.currentUser.email),{password:pw},{merge:true});}catch(fe){console.warn('Could not save password to Firestore:',fe);}
 document.getElementById('new-password').value='';document.getElementById('confirm-password').value='';msg.textContent='✓ Password updated!';msg.className='popup-msg ok';setTimeout(()=>{msg.className='popup-msg';},1500);}catch(e){if(e.code==='auth/requires-recent-login'){msg.textContent='Please sign out and sign in again first.';}else{msg.textContent='Failed to update password.';}
-msg.className='popup-msg err';}};window.submitGameRequest=async function(){const name=(document.getElementById('game-request-name')?.value||'').trim();const url=(document.getElementById('game-request-url')?.value||'').trim();const notes=(document.getElementById('game-request-notes')?.value||'').trim();const msg=document.getElementById('game-request-msg');msg.className='popup-msg';if(!name){msg.textContent='Enter a game name.';msg.className='popup-msg err';return;}try{await window._saveGameRequest({name,url,notes});msg.textContent='Request sent.';msg.className='popup-msg ok';document.getElementById('game-request-name').value='';document.getElementById('game-request-url').value='';document.getElementById('game-request-notes').value='';}catch(e){msg.textContent=e.message||'Failed to send request.';msg.className='popup-msg err';}};window.openSettings=function(tab='tab-editor'){const modal=document.getElementById('settings-modal');const nameInput=document.getElementById('tab-name-input');const iconInput=document.getElementById('tab-icon-input');const config=window.getTabConfig();if(config){nameInput.value=config.name||'';iconInput.value=config.icon||'';}else{nameInput.value='';iconInput.value='';}
-modal.style.display='flex';switchSettingsTab(tab);};window.closeSettings=function(){document.getElementById('settings-modal').style.display='none';};window.switchSettingsTab=function(tab){document.querySelectorAll('.settings-tab-content').forEach(el=>el.style.display='none');document.querySelectorAll('.settings-tab').forEach(el=>el.classList.remove('active'));document.querySelector(`.settings-tab-content[data-tab="${tab}"]`).style.display='block';document.querySelector(`.settings-tab[data-tab="${tab}"]`).classList.add('active');const activeTab=document.querySelector(`.settings-tab[data-tab="${tab}"]`);if(activeTab){activeTab.style.borderBottomColor='var(--primary)';activeTab.style.color='var(--text)';document.querySelectorAll('.settings-tab').forEach(el=>{if(el.dataset.tab!==tab){el.style.borderBottomColor='transparent';el.style.color='var(--muted)';}});}};window.saveTabConfig=function(){const nameInput=document.getElementById('tab-name-input').value.trim();const iconInput=document.getElementById('tab-icon-input').value.trim();const msg=document.getElementById('tab-config-msg');msg.className='popup-msg';if(!nameInput||!iconInput){msg.textContent='Please fill in both fields.';msg.className='popup-msg err';return;}try{const success=window.setTabConfig({name:nameInput,icon:iconInput});if(success){msg.textContent='✓ Tab customized!';msg.className='popup-msg ok';}else{msg.textContent='Failed to save. Try again.';msg.className='popup-msg err';}}catch(e){msg.textContent=e.message||'Failed to save.';msg.className='popup-msg err';}};window.resetTabConfig=function(){const msg=document.getElementById('tab-config-msg');try{const resetFunc=Object.getPrototypeOf(window.setTabConfig);localStorage.removeItem('kw_tab_config');document.getElementById('tab-name-input').value='';document.getElementById('tab-icon-input').value='';msg.textContent='✓ Reset to default!';msg.className='popup-msg ok';setTimeout(()=>{msg.className='popup-msg'},1500);}catch(e){msg.textContent='Failed to reset.';msg.className='popup-msg err';}};document.getElementById('settings-modal').addEventListener('click',(e)=>{if(e.target.id==='settings-modal'){window.closeSettings();}});let _forcedSignout=false;onAuthStateChanged(auth,async(user)=>{const wall=document.getElementById('auth-wall');const main=document.getElementById('main-content');const badge=document.getElementById('nav-user-badge');if(!user&&_forcedSignout){_forcedSignout=false;wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';const errEl=document.getElementById('auth-error');if(errEl){errEl.textContent='Your account has been disabled. Contact an admin for help.';errEl.classList.add('show');}
+msg.className='popup-msg err';}};window.savePassword=async function(){const pw=document.getElementById('new-password')?.value;const cpw=document.getElementById('confirm-password')?.value;const msg=document.getElementById('password-msg');if(!msg)return;msg.className='popup-msg';if(!pw||pw.length<6){msg.textContent='Password must be at least 6 characters.';msg.className='popup-msg err';return;}
+if(pw!==cpw){msg.textContent='Passwords do not match.';msg.className='popup-msg err';return;}
+try{await updatePassword(auth.currentUser,pw);try{await setDoc(doc(db,'users',auth.currentUser.email),{password:pw},{merge:true});}catch(fe){console.warn('Could not save password to Firestore:',fe);}
+document.getElementById('new-password').value='';document.getElementById('confirm-password').value='';msg.textContent='✓ Password updated!';msg.className='popup-msg ok';setTimeout(()=>{msg.className='popup-msg';},1500);}catch(e){if(e.code==='auth/requires-recent-login'){msg.textContent='Please sign out and sign in again first.';}else{msg.textContent='Failed to update password.';}
+msg.className='popup-msg err';}};window.submitGameRequest=async function(){const name=(document.getElementById('game-request-name')?.value||'').trim();const url=(document.getElementById('game-request-url')?.value||'').trim();const notes=(document.getElementById('game-request-notes')?.value||'').trim();const msg=document.getElementById('game-request-msg');msg.className='popup-msg';if(!name){msg.textContent='Enter a game name.';msg.className='popup-msg err';return;}try{await window._saveGameRequest({name,url,notes});msg.textContent='Request sent.';msg.className='popup-msg ok';document.getElementById('game-request-name').value='';document.getElementById('game-request-url').value='';document.getElementById('game-request-notes').value='';}catch(e){msg.textContent=e.message||'Failed to send request.';msg.className='popup-msg err';}};window.openSettings=function(tab='tab-editor'){const modal=document.getElementById('settings-modal');if(!modal)return;const nameInput=document.getElementById('tab-name-input');const iconInput=document.getElementById('tab-icon-input');const config=window.getTabConfig();if(config){nameInput.value=config.name||'';iconInput.value=config.icon||'';}else{nameInput.value='';iconInput.value='';}
+modal.style.display='flex';switchSettingsTab(tab);};window.closeSettings=function(){document.getElementById('settings-modal').style.display='none';};window.switchSettingsTab=function(tab){const targetContent=document.querySelector(`.settings-tab-content[data-tab="${tab}"]`);const targetTabBtn=document.querySelector(`.settings-tab[data-tab="${tab}"]`);if(!targetContent||!targetTabBtn)return;document.querySelectorAll('.settings-tab-content').forEach(el=>el.style.display='none');document.querySelectorAll('.settings-tab').forEach(el=>el.classList.remove('active'));targetContent.style.display='block';targetTabBtn.classList.add('active');targetTabBtn.style.borderBottomColor='var(--primary)';targetTabBtn.style.color='var(--text)';document.querySelectorAll('.settings-tab').forEach(el=>{if(el.dataset.tab!==tab){el.style.borderBottomColor='transparent';el.style.color='var(--muted)';}});};window.saveTabConfig=function(){const nameInput=document.getElementById('tab-name-input').value.trim();const iconInput=document.getElementById('tab-icon-input').value.trim();const msg=document.getElementById('tab-config-msg');msg.className='popup-msg';if(!nameInput||!iconInput){msg.textContent='Please fill in both fields.';msg.className='popup-msg err';return;}try{const success=window.setTabConfig({name:nameInput,icon:iconInput});if(success){msg.textContent='✓ Tab customized!';msg.className='popup-msg ok';}else{msg.textContent='Failed to save. Try again.';msg.className='popup-msg err';}}catch(e){msg.textContent=e.message||'Failed to save.';msg.className='popup-msg err';}};window.resetTabConfig=function(){const msg=document.getElementById('tab-config-msg');try{const resetFunc=Object.getPrototypeOf(window.setTabConfig);localStorage.removeItem('kw_tab_config');document.getElementById('tab-name-input').value='';document.getElementById('tab-icon-input').value='';msg.textContent='✓ Reset to default!';msg.className='popup-msg ok';setTimeout(()=>{msg.className='popup-msg'},1500);}catch(e){msg.textContent='Failed to reset.';msg.className='popup-msg err';}};window.openSiteInAboutBlank=function(){const msg=document.getElementById('actions-msg');if(msg){msg.className='popup-msg';msg.textContent='';}try{const w=window.open('about:blank','_blank');if(!w){if(msg){msg.textContent='Popup blocked. Allow popups and try again.';msg.className='popup-msg err';}return;}const src=window.location.href;const safeTitle=String(document.title||'');const safeSrc=String(src).replace(/&/g,'&amp;').replace(/\"/g,'&quot;');w.document.write('<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>'+safeTitle+'</title><style>html,body,iframe{margin:0;padding:0;width:100%;height:100%;border:0;overflow:hidden;background:#000;}iframe{display:block;}</style></head><body><iframe src=\"'+safeSrc+'\" allowfullscreen referrerpolicy=\"no-referrer\"></iframe></body></html>');w.document.close();if(msg){msg.textContent='Opened in about:blank.';msg.className='popup-msg ok';}}catch(e){if(msg){msg.textContent='Failed to open about:blank.';msg.className='popup-msg err';}}};document.getElementById('settings-modal').addEventListener('click',(e)=>{if(e.target.id==='settings-modal'){window.closeSettings();}});let _forcedSignout=false;onAuthStateChanged(auth,async(user)=>{const wall=document.getElementById('auth-wall');const main=document.getElementById('main-content');const badge=document.getElementById('nav-user-badge');if(!user&&_forcedSignout){_forcedSignout=false;wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';const errEl=document.getElementById('auth-error');if(errEl){errEl.textContent='Your account has been disabled. Contact an admin for help.';errEl.classList.add('show');}
 return;}
-if(user){try{window._capturePublicIp&&window._capturePublicIp();}catch(_){}try{const activeSnap=await getDoc(doc(db,'users',user.email));if(activeSnap.exists()){const d=activeSnap.data();if(d.active===false&&d.admin!==true){_forcedSignout=true;await signOut(auth);return;}}}catch(e){console.warn('Could not verify account status — signing out for safety:',e);_forcedSignout=true;await signOut(auth);return;}
+if(user){try{window._capturePublicIp&&window._capturePublicIp();}catch(_){}try{const activeSnap=await getDoc(doc(db,'users',user.email));const activeSnapLower=!activeSnap.exists()&&user.email&&user.email.toLowerCase()!==user.email?await getDoc(doc(db,'users',user.email.toLowerCase())):activeSnap;const d=(activeSnapLower.exists()?activeSnapLower.data():null);if(d&&d.active===false&&d.admin!==true){_forcedSignout=true;await signOut(auth);return;}}catch(e){console.warn('Could not verify account status — signing out for safety:',e);_forcedSignout=true;await signOut(auth);return;}
 wall.classList.add('hidden');main.classList.add('visible');let username=user.email;let fullName='';let pfpUrl='';try{const snap=await getDoc(doc(db,'users',user.email));if(snap.exists()){const snapData=snap.data();if(snapData.username){username=snapData.username;if(user.displayName!==username){await updateProfile(user,{displayName:username});}}else{username=user.displayName||user.email;}
 fullName=snapData.fullName||'';pfpUrl=snapData.pfp||'';if(!pfpUrl&&snapData.pfpBucket&&snapData.pfpRegion&&snapData.pfpKey){pfpUrl=`https://${snapData.pfpBucket}.s3.${snapData.pfpRegion}.amazonaws.com/${String(snapData.pfpKey).split('/').map(encodeURIComponent).join('/')}`;}}else{username=user.displayName||user.email;}}catch(e){username=user.displayName||user.email;}
 if(badge){badge.innerHTML=`
           <button class="auth-user-name" onclick="toggleUserPopup()">
             <span style="width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);font-size:0.62rem;font-weight:700;">${pfpUrl?`<img src="${String(pfpUrl).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`:String((username||'?')[0]||'?').toUpperCase()}</span>
             ${username || fullName}
-          </button>`;document.getElementById('popup-display-name').textContent=username;document.getElementById('popup-email').textContent=user.email;const fullNameEl=document.getElementById('popup-full-name');if(fullNameEl){fullNameEl.textContent=fullName;fullNameEl.style.display=fullName?'block':'none';}}
+          </button>`;document.getElementById('popup-display-name').textContent=username;document.getElementById('popup-email').textContent=user.email;const popupAvatar=document.getElementById('popup-avatar');if(popupAvatar){popupAvatar.innerHTML=pfpUrl?`<img src="${String(pfpUrl).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" alt="Profile">`:String((username||'?')[0]||'?').toUpperCase();}const fullNameEl=document.getElementById('popup-full-name');if(fullNameEl){fullNameEl.textContent=fullName;fullNameEl.style.display=fullName?'block':'none';}}
 const adminBtn=document.getElementById('admin-popup-btn');const adminSection=document.getElementById('admin-popup-section');const approvalsBtn=document.getElementById('approvals-popup-btn');const ordersSection=document.getElementById('orders-popup-section');if(adminBtn)adminBtn.style.display='none';if(adminSection)adminSection.style.display='none';if(approvalsBtn)approvalsBtn.style.display='none';if(ordersSection)ordersSection.style.display='block';try{const contentSnap=await getDoc(doc(db,'siteContent','main'));if(contentSnap.exists()){window._siteData=contentSnap.data();populatePage(window._siteData);}}catch(e){console.error('Failed to load site content:',e);}
-try{const userSnap=await getDoc(doc(db,'users',user.email));const userData=userSnap.exists()?userSnap.data():{};const isAdmin=userData.admin===true;const isEditor=userData.editor===true;if(isAdmin||isEditor){if(adminBtn)adminBtn.style.display='flex';if(adminSection)adminSection.style.display='block';if(isAdmin){if(approvalsBtn)approvalsBtn.style.display='flex';}}
+try{const userSnap=await getDoc(doc(db,'users',user.email));const userSnapLower=!userSnap.exists()&&user.email&&user.email.toLowerCase()!==user.email?await getDoc(doc(db,'users',user.email.toLowerCase())):userSnap;const userData=userSnapLower.exists()?userSnapLower.data():{};const isAdmin=userData.admin===true;const isEditor=userData.editor===true;if(isAdmin||isEditor){if(adminBtn)adminBtn.style.display='flex';if(adminSection)adminSection.style.display='block';if(isAdmin){if(approvalsBtn)approvalsBtn.style.display='flex';}}
 window._canSeeAllOrders=(userData.orders===true||userData.admin===true);}catch(e){console.warn('Could not check order permissions:',e);}}else{wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';const popup=document.getElementById('user-popup');if(popup)popup.classList.remove('open');document.getElementById('auth-email').value='';document.getElementById('auth-password').value='';document.getElementById('auth-error').classList.remove('show');document.getElementById('signup-fullname').value='';document.getElementById('signup-username').value='';document.getElementById('signup-email').value='';document.getElementById('signup-password').value='';document.getElementById('signup-confirm').value='';document.getElementById('signup-error').classList.remove('show');document.getElementById('signup-success').style.display='none';document.getElementById('signup-submit').style.display='block';document.getElementById('signup-submit').disabled=false;document.getElementById('signup-submit').textContent='Request Access';switchTab('login');}});document.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!document.getElementById('auth-wall').classList.contains('hidden')){const loginVisible=document.getElementById('login-form-wrap').style.display!=='none';if(loginVisible)handleAuth();}});</script>
 <script>const GAMEPAD_SVG=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 9v2"/><path d="M6 10h2"/></svg>`;const EXT_SVG=`<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>`;const STAR_SVG=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>`;const ARROW_SVG=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>`;let GAMES={};function animateCounter(el){const target=parseInt(el.dataset.target);const suffix=el.dataset.suffix||'';const duration=1800;const start=performance.now();function step(now){const t=Math.min((now-start)/duration,1);const ease=1-Math.pow(1-t,3);el.textContent=Math.round(ease*target)+suffix;if(t<1)requestAnimationFrame(step);}
 requestAnimationFrame(step);}
@@ -2519,6 +2564,21 @@ function renderUserBadge(username, pfp) {
   if (!badge) return;
   badge.innerHTML = `<button class="auth-user-name" onclick="toggleUserPopup()"><span style="width:24px;height:24px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;overflow:hidden;background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);font-size:0.62rem;font-weight:700;">${pfpAvatarHtml(pfp, (username || "?")[0]?.toUpperCase())}</span>${escHtml(username || "")}</button>`;
 }
+function renderUserPopupHeader(username, email, fullName, pfp) {
+  const avatar = document.getElementById("popup-avatar");
+  const displayName = document.getElementById("popup-display-name");
+  const emailEl = document.getElementById("popup-email");
+  const fullNameEl = document.getElementById("popup-full-name");
+  if (displayName) displayName.textContent = username || "";
+  if (emailEl) emailEl.textContent = email || "";
+  if (fullNameEl) {
+    fullNameEl.textContent = fullName || "";
+    fullNameEl.style.display = fullName ? "block" : "none";
+  }
+  if (avatar) {
+    avatar.innerHTML = pfp ? `<img src="${escHtml(pfp)}" alt="Profile">` : escHtml((username || "?")[0]?.toUpperCase() || "?");
+  }
+}
 let _s3Creds = null;
 const EMPTY_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 function _amzNow() {
@@ -2631,8 +2691,8 @@ window.saveProfilePicture = async function () {
     msg.className = "popup-msg err";
     return;
   }
-  if (file.size > 4 * 1024 * 1024) {
-    msg.textContent = "Image too large. Max 4MB.";
+  if (file.size > 10 * 1024 * 1024) {
+    msg.textContent = "Image too large. Max 10MB.";
     msg.className = "popup-msg err";
     return;
   }
@@ -2656,6 +2716,7 @@ window.saveProfilePicture = async function () {
     const data = await fetchUserProfileByEmail(auth.currentUser.email);
     const username = data.username || auth.currentUser.displayName || auth.currentUser.email;
     renderUserBadge(username, normalizePfp(data));
+    renderUserPopupHeader(username, auth.currentUser.email, data.fullName || "", normalizePfp(data));
     msg.textContent = `Profile picture updated: ${uploaded.bucket}/${uploaded.key}`;
     msg.className = "popup-msg ok";
     input.value = "";
@@ -2672,10 +2733,12 @@ onAuthStateChanged(auth, async (user) => {
     const data = await fetchUserProfileByEmail(user.email);
     const name = data.username || user.displayName || user.email;
     renderUserBadge(name, normalizePfp(data));
+    renderUserPopupHeader(name, user.email, data.fullName || "", normalizePfp(data));
     setTimeout(async () => {
       try {
         const latest = await fetchUserProfileByEmail(user.email);
         renderUserBadge(latest.username || name, normalizePfp(latest));
+        renderUserPopupHeader(latest.username || name, user.email, latest.fullName || "", normalizePfp(latest));
       } catch (_) {}
     }, 1200);
   } catch (_) {}
