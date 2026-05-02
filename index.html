@@ -1839,6 +1839,7 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <!-- Tab Editor Tab -->
 <div class="settings-tab-content active" data-tab="tab-editor" style="display:block;">
 <div style="display:flex;flex-direction:column;gap:1rem;">
+<button onclick="openSiteInAboutBlank()" style="width:100%;padding:0.75rem;background:rgba(34,211,238,0.1);color:var(--secondary);border:1px solid rgba(34,211,238,0.35);border-radius:6px;font-family:var(--font-display);font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;">Open in about:blank</button>
 <div>
 <label style="font-size:0.7rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:0.4rem;">Tab Name</label>
 <input id="tab-name-input" placeholder="e.g., My Dashboard" type="text" style="width:100%;background:#0d0d14;border:1px solid var(--border);border-radius:6px;padding:0.75rem 1rem;color:var(--text);font-size:0.95rem;font-family:var(--font-body);outline:none;transition:border-color 0.2s, box-shadow 0.2s;" onkeydown="if(event.key==='Enter'){saveTabConfig();}"/>
@@ -1886,7 +1887,6 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <!-- Actions Tab -->
 <div class="settings-tab-content" data-tab="actions" style="display:none;">
 <div style="display:flex;flex-direction:column;gap:0.75rem;">
-<button onclick="openSiteInAboutBlank()" style="width:100%;padding:0.75rem;background:rgba(34,211,238,0.1);color:var(--secondary);border:1px solid rgba(34,211,238,0.35);border-radius:6px;font-family:var(--font-display);font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s;">Open in about:blank</button>
 <button onclick="handleSignOut()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.55rem;padding:0.75rem;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.35);border-radius:6px;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,border-color 0.2s;">
 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
       Sign Out
