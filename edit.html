@@ -1938,8 +1938,6 @@ window.adminAddTopTier = function() {
 
 
 function renderGameRow(g = {}) {
-  const addedAtMs = g.addedAt ? new Date(g.addedAt).getTime() : NaN;
-  const isNewGame = Number.isFinite(addedAtMs) && (Date.now() - addedAtMs) <= 7 * 24 * 60 * 60 * 1000;
   const openInPopup = g.openInPopup === true;
   const gameUrl = g.url || '';
   const isSwf = /\.swf($|\?)/i.test(gameUrl);
@@ -1950,10 +1948,10 @@ function renderGameRow(g = {}) {
     <div class="admin-row-item" data-original-name="${escAttr(g.name || '')}">
       <div style="flex:1.2;display:flex;align-items:center;gap:0.35rem;min-width:0;">
         <input class="admin-row-input game-name-input" placeholder="Game name" value="${escAttr(g.name || '')}" style="flex:1;" />
-        ${isNewGame ? '<span style="flex-shrink:0;padding:0.1rem 0.4rem;border-radius:999px;font-size:0.58rem;letter-spacing:0.1em;font-weight:700;color:#22c55e;background:rgba(34,197,94,0.14);border:1px solid rgba(34,197,94,0.4);text-transform:uppercase;">New</span>' : ''}
       </div>
       <input class="admin-row-input game-alias-input" placeholder="Search alias (optional)" value="${escAttr(g.alias || '')}" style="flex:1;" />
       <input class="admin-row-input game-url-input" placeholder="Game URL" value="${escAttr(gameUrl)}" style="flex:1.8;" oninput="adminHandleGameUrlInput(this)" />
+      <input class="admin-row-input game-desc-input" placeholder="Description (shown on hover)" value="${escAttr(g.description||'')}" style="flex:1.8;" />
       <div style="flex:3.8;display:flex;align-items:center;gap:0.45rem;min-width:0;">
         <label class="toggle-wrap" style="white-space:nowrap;${toggleDim}">
           <span class="toggle-switch">
@@ -2074,6 +2072,7 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
       screenshot,
       originalName,
       domain,
+      description: row.querySelector('.game-desc-input').value.trim(),
       openInPopup: !!row.querySelector('.game-popup-input').checked,
       hiddenOnChromebook: !!row.querySelector('.game-hidden-chromebook-input')?.checked
     };
@@ -2110,6 +2109,7 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     const openInPopup = item.openInPopup;
     const screenshot = item.screenshot;
     const hiddenOnChromebook = item.hiddenOnChromebook;
+    const description = item.description;
     const originalName = item.originalName;
     const originalKey = normalizeGameKey(originalName);
     const nextKey = normalizeGameKey(name);
@@ -2119,6 +2119,7 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     if (nextGame && openInPopup) nextGame.openInPopup = true;
     if (nextGame && screenshot) nextGame.screenshot = screenshot;
     if (nextGame && hiddenOnChromebook) nextGame.hiddenOnChromebook = true;
+    if (nextGame && description) nextGame.description = description;
     if (nextGame && originalGame && originalGame.addedAt) nextGame.addedAt = originalGame.addedAt;
     if (nextGame && !originalGame) nextGame.addedAt = new Date().toISOString();
 
@@ -2137,6 +2138,7 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     if (originalGame.openInPopup === true) originalComparable.openInPopup = true;
     if (originalGame.screenshot) originalComparable.screenshot = originalGame.screenshot;
     if (originalGame.hiddenOnChromebook === true) originalComparable.hiddenOnChromebook = true;
+    if (originalGame.description) originalComparable.description = originalGame.description;
 
     const nextComparable = nextGame ? {
       name: nextGame.name || '',
@@ -2146,6 +2148,7 @@ function mergeGameEditorChanges(latestGamesObj, originalGamesObj, rows) {
     if (nextComparable && nextGame.openInPopup === true) nextComparable.openInPopup = true;
     if (nextComparable && nextGame.screenshot) nextComparable.screenshot = nextGame.screenshot;
     if (nextComparable && nextGame.hiddenOnChromebook === true) nextComparable.hiddenOnChromebook = true;
+    if (nextComparable && nextGame.description) nextComparable.description = nextGame.description;
 
     const unchanged = JSON.stringify(originalComparable) === JSON.stringify(nextComparable);
     if (unchanged) return;
