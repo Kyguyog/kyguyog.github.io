@@ -15,8 +15,8 @@
       '<span class="logo-text">KNOW<span>WHERE</span></span>' +
     '</a>' +
     '<div class="nav-links">' +
-      '<a href="/msg.html">Message</a>' +
       '<a href="/index.html">Home</a>' +
+      '<a href="/msg.html">Message</a>' +
       '<a href="/playtime.html">Playtime</a>' +
       '<a href="/updates.html">Updates</a>' +
       '<a href="/bugs.html">Bugs</a>' +
@@ -50,6 +50,7 @@
     side.id = 'nav-sidebar';
     side.className = 'sidebar-' + sidebarPos;
     side.innerHTML =
+      '<a class="sidebar-link" href="#home" title="Home"><img src="KnowWhere-Logo-Trans.png" width="18" height="18" alt=""><span>Home</span></a>' +
       '<a class="sidebar-link" href="#top-tier" title="Tier"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><span>Tier</span></a>' +
       '<a class="sidebar-link" href="#games" title="Games"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4M8 10v4"/><circle cx="15" cy="9" r="1"/><circle cx="18" cy="9" r="1"/><circle cx="15" cy="15" r="1"/><circle cx="18" cy="15" r="1"/></svg><span>Games</span></a>' +
       '<a class="sidebar-link" href="#sites" title="Sites"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg><span>Sites</span></a>' +
