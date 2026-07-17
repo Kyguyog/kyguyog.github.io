@@ -63,49 +63,6 @@
     }
     .orb-1 { width: 500px; height: 500px; background: var(--primary); top: -150px; right: -150px; }
     .orb-2 { width: 400px; height: 400px; background: var(--secondary); bottom: -100px; left: -100px; }
-
-    /* ── NAV ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      height: 60px;
-    }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.6rem;
-      text-decoration: none;
-    }
-    .nav-logo img { width: 30px; height: 30px; filter: drop-shadow(0 0 8px rgba(168,85,247,0.8)); }
-    .nav-logo-text {
-      font-family: var(--font-display);
-      font-size: 0.95rem;
-      font-weight: 900;
-      letter-spacing: 0.06em;
-      color: var(--text);
-    }
-    .nav-logo-text span { color: var(--primary); }
-    .nav-badge {
-      font-family: var(--font-display);
-      font-size: 0.55rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--secondary);
-      border: 1px solid rgba(34,211,238,0.3);
-      padding: 0.25rem 0.6rem;
-      border-radius: 4px;
-      background: rgba(34,211,238,0.06);
-    }
-
     /* ── HERO ── */
     .hero {
       position: relative;
@@ -394,13 +351,8 @@
 <div class="orb orb-1"></div>
 <div class="orb orb-2"></div>
 
-<nav>
-<a class="nav-logo" href="index.html">
-<img alt="KnowWhere" src="KnowWhere-Logo-Trans.png"/>
-<span class="nav-logo-text">Know<span>Where</span></span>
-</a>
-<span class="nav-badge">Terms of Service</span>
-</nav>
+<script src="nav.js"></script>
+<script type="module" src="user-menu.js"></script>
 
 <div class="hero">
 <h1>Terms of Service &amp;<br/>Participation Agreement</h1>

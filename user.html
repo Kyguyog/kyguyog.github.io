@@ -38,6 +38,7 @@
       font-family: var(--font-body);
       min-height: 100vh;
       overflow-x: hidden;
+      padding-top: 56px;
     }
 
     /* ── AUTH WALL ── */
@@ -53,7 +54,7 @@
     }
     #auth-wall.hidden { display: none; }
     #main-content { display: none; }
-    #main-content.visible { display: contents; }
+    #main-content.visible { display: block; }
 
     .auth-box {
       background: var(--card);
@@ -248,52 +249,6 @@
     .popup-msg { font-size: 0.75rem; padding: 0.3rem 0.1rem; display: none; }
     .popup-msg.ok { display: block; color: #22c55e; }
     .popup-msg.err { display: block; color: var(--danger); }
-
-    /* ── NAV ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      height: 56px;
-    }
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem; /* keeps spacing between image and text */
-      text-decoration: none;
-    }
-
-    .logo-text {
-      display: inline-block; /* ensures KNOW + WHERE act as one unit */
-      font-family: var(--font-display);
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      text-decoration: none;
-    }
-    .nav-logo img { width: 28px; height: 28px; object-fit: contain; }
-    .logo-text { color: var(--text); text-decoration: none; }
-    .logo-text > span { margin-left: -0.05em; color: var(--primary); text-decoration: none; }
-    .nav-logo svg { color: var(--primary); }
-    .nav-logo svg { color: var(--primary); }
-    .nav-links { display: flex; gap: 2.5rem; position: absolute; left: 50%; transform: translateX(-50%); }
-    .nav-links a {
-      font-family: var(--font-display);
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
 
 /* ── ADMIN PANEL ── */
     #admin-panel {
@@ -642,14 +597,8 @@
 </div>
 
 <div id="main-content">
-<nav>
-<a class="nav-logo" href="index.html" style="display:flex;align-items:center;gap:0.5rem;text-decoration:none;">
-<img src="KnowWhere-Logo-Trans.png" style="width:28px;height:28px;object-fit:contain;"/>
-<span style="font-family:var(--font-display);font-weight:900;letter-spacing:0.05em;color:var(--text);">KNOW<span style="color:var(--primary);">WHERE</span></span>
-</a>
-<span style="font-family:var(--font-display);font-size:0.7rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--primary);position:absolute;left:50%;transform:translateX(-50%);">👥 USER MANAGEMENT</span>
-<div id="nav-user-badge" style="display:flex;align-items:center;gap:0.5rem;margin-left:auto;"></div>
-</nav>
+<script src="nav.js"></script>
+<script type="module" src="user-menu.js"></script>
 </div>
 <div id="admin-panels-mount"></div>
 <script>window.populatePage=function(){};</script>
@@ -686,11 +635,7 @@ return;}
 if(user){try{const activeSnap=await getDoc(doc(db,'users',user.email));const activeSnapLower=!activeSnap.exists()&&user.email&&user.email.toLowerCase()!==user.email?await getDoc(doc(db,'users',user.email.toLowerCase())):activeSnap;if(activeSnapLower.exists()){const d=activeSnapLower.data();if(d.active===false){_forcedSignout=true;await signOut(auth);return;}}if(accountStatusUnsubscribe)accountStatusUnsubscribe();const accountDocId=activeSnap.exists()?user.email:user.email.toLowerCase();accountStatusUnsubscribe=onSnapshot(doc(db,'users',accountDocId),async(snap)=>{const data=snap.exists()?snap.data():null;if(data&&data.active===false&&auth.currentUser){_forcedSignout=true;if(accountStatusUnsubscribe){accountStatusUnsubscribe();accountStatusUnsubscribe=null;}await signOut(auth);}});}catch(e){console.warn('Could not verify account status — signing out for safety:',e);_forcedSignout=true;await signOut(auth);return;}
 wall.classList.add('hidden');main.classList.add('visible');let username=user.email;let fullName='';try{const snap=await getDoc(doc(db,'users',user.email));if(snap.exists()){const snapData=snap.data();if(snapData.username){username=snapData.username;if(user.displayName!==username){await updateProfile(user,{displayName:username});}}else{username=user.displayName||user.email;}
 fullName=snapData.fullName||'';}else{username=user.displayName||user.email;}}catch(e){username=user.displayName||user.email;}
-if(badge){badge.innerHTML=`
-          <span class="auth-user-name" style="cursor:default;">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            ${username}
-          </span>`;}
+window.renderUserBadge&&window.renderUserBadge(username,'');window.renderUserPopupHeader&&window.renderUserPopupHeader(username,user.email,fullName,'');
 try{const contentSnap=await getDoc(doc(db,'siteContent','main'));if(contentSnap.exists())window._siteData=contentSnap.data();}catch(e){}
 try{const userSnap=await getDoc(doc(db,'users',user.email));const userSnapLower=!userSnap.exists()&&user.email&&user.email.toLowerCase()!==user.email?await getDoc(doc(db,'users',user.email.toLowerCase())):userSnap;const userData=userSnapLower.exists()?userSnapLower.data():{};const isAdmin=userData.admin===true;const isEditor=userData.editor===true;if(isAdmin){window._isAdmin=true;window._isEditor=false;injectAdminPanels();setTimeout(()=>openApprovalsPanel(),100);}else{window.location.href='/';}window._canSeeAllOrders=(userData.orders===true||userData.admin===true);const ordersSection=document.getElementById('orders-popup-section');if(ordersSection)ordersSection.style.display='block';}catch(e){console.warn('Could not check admin/editor status:',e);}}else{wall.classList.remove('hidden');main.classList.remove('visible');if(badge)badge.innerHTML='';if(accountStatusUnsubscribe){accountStatusUnsubscribe();accountStatusUnsubscribe=null;}document.getElementById('auth-email').value='';document.getElementById('auth-password').value='';document.getElementById('auth-error').classList.remove('show');}});document.addEventListener('keydown',(e)=>{if(e.key==='Enter'&&!document.getElementById('auth-wall').classList.contains('hidden')){const loginVisible=document.getElementById('login-form-wrap').style.display!=='none';if(loginVisible)handleAuth();}});window._fetchAiHistory=async function(email){const q=query(collection(db,'aiHistory'),where('email','==',email));const snap=await getDocs(q);return snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0));};window._fetchUserConversations=async function(email){const convoSnap=await getDocs(query(collection(db,'conversations'),where('participants','array-contains',email)));const convos=await Promise.all(convoSnap.docs.map(async(d)=>{const data=d.data();const messagesSnap=await getDocs(collection(db,'conversations',d.id,'messages'));const messages=messagesSnap.docs.map(md=>({id:md.id,...md.data()})).sort((a,b)=>{const ta=a.sentAt?.toMillis?a.sentAt.toMillis():new Date(a.sentAt||0).getTime();const tb=b.sentAt?.toMillis?b.sentAt.toMillis():new Date(b.sentAt||0).getTime();return ta-tb;});const lastTs=data.lastMessageAt?.toMillis?data.lastMessageAt.toMillis():new Date(data.lastMessageAt||0).getTime();return{id:d.id,...data,messages,lastTs};}));return convos.sort((a,b)=>(b.lastTs||0)-(a.lastTs||0));};window._getAiHistoryDoc=async function(docId){const docSnap=await getDoc(doc(db,'aiHistory',docId));if(!docSnap.exists())throw new Error('History not found');return docSnap.data();};</script>
 

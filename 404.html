@@ -35,33 +35,6 @@
       overflow-x: hidden;
     }
 
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 2rem;
-      background: rgba(10,10,15,0.85);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(12px);
-      z-index: 100;
-    }
-
-    .nav-logo {
-      font-family: var(--font-display);
-      font-weight: 900;
-      font-size: 1.1rem;
-      letter-spacing: 0.05em;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      text-decoration: none;
-      color: var(--text);
-    }
-    .nav-logo span { color: var(--primary); }
-
     .page-wrap {
       flex: 1;
       display: flex;
@@ -168,6 +141,8 @@
   </style>
 </head>
 <body>
+  <script src="nav.js"></script>
+  <script type="module" src="user-menu.js"></script>
 
   <div class="scanlines"></div>
 

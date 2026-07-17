@@ -1137,19 +1137,20 @@
 </div>
 </div>
 
-<nav>
-<a class="nav-logo" href="index.html">
-<img alt="Logo" src="KnowWhere-Logo-Trans.png"/>
-<span class="logo-text"><span class="know-text">KNOW</span><span>WHERE</span></span>
-</a>
-<div class="nav-title">
-<svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-    Messages
-  </div>
-<div class="nav-right">
-<span class="nav-user-chip" id="nav-username" onclick="copyUsername()" style="cursor:pointer;" title="Copy Your Link"></span>
-</div>
-</nav>
+<script src="nav.js"></script>
+<script type="module" src="user-menu.js"></script>
+<script>
+(function(){
+  var chip = document.createElement('span');
+  chip.className = 'nav-user-chip';
+  chip.id = 'nav-username';
+  chip.style.cssText = 'cursor:pointer;font-size:0.7rem;font-weight:700;letter-spacing:0.05em;padding:0.25rem 0.55rem;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.04);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;color:var(--text);font-family:var(--font-display);text-transform:uppercase;';
+  chip.title = 'Copy Your Link';
+  chip.onclick = function(e){ if(window.copyUsername) window.copyUsername(e); };
+  var badge = document.getElementById('nav-user-badge');
+  if (badge) badge.appendChild(chip);
+})();
+</script>
 
 <div id="app">
 

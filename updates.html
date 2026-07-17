@@ -37,33 +37,8 @@
     font-family: var(--font-body);
     min-height: 100vh;
     overflow-x: hidden;
+    padding-top: 56px;
   }
-
-  /* NAV */
-  nav {
-    position: sticky; top: 0; z-index: 200;
-    height: 56px;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 2rem;
-    background: rgba(10,10,15,0.88);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-logo {
-    display: flex; align-items: center; gap: 0.6rem;
-    text-decoration: none;
-    font-family: var(--font-display); font-size: 1rem; font-weight: 900;
-    letter-spacing: 0.08em; color: var(--text);
-  }
-  .nav-logo img { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(168,85,247,0.7)); }
-  .nav-logo .logo-text span { color: var(--primary); }
-  .nav-links { display: flex; align-items: center; gap: 2rem; }
-  .nav-links a {
-    font-family: var(--font-display); font-size: 0.65rem; font-weight: 700;
-    letter-spacing: 0.15em; text-transform: uppercase;
-    color: var(--muted); text-decoration: none; transition: color 0.2s;
-  }
-  .nav-links a:hover, .nav-links a.active { color: var(--primary); }
 
   /* PAGE HEADER */
   .page-header {
@@ -298,16 +273,8 @@
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="index.html">
-    <img src="KnowWhere-Logo-Trans.png" alt="KnowWhere"/>
-    <span class="logo-text">KNOW<span>WHERE</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="updates.html" class="active">Updates</a>
-  </div>
-</nav>
+<script src="nav.js"></script>
+<script type="module" src="user-menu.js"></script>
 
 <div class="page-header">
   <div class="page-header-eyebrow">Changelog</div>
