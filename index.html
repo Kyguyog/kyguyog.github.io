@@ -1956,10 +1956,7 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 <!-- Actions Tab -->
 <div class="settings-tab-content" data-tab="actions" style="display:none;">
 <div style="display:flex;flex-direction:column;gap:0.75rem;">
-<label style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:0.75rem;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;cursor:pointer;">
-<span style="font-size:0.78rem;color:var(--text);font-weight:600;">Mute WASM warning popup on this device</span>
-<input id="mute-wasm-warning-toggle" type="checkbox" onchange="toggleWasmWarningMute(this.checked)" style="accent-color:var(--primary);width:16px;height:16px;cursor:pointer;"/>
-</label>
+
 <button onclick="handleSignOut()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:0.55rem;padding:0.75rem;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.35);border-radius:6px;font-family:var(--font-display);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:background 0.2s,border-color 0.2s;">
 <svg fill="none" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="14"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" x2="9" y1="12" y2="12"></line></svg>
       Sign Out
@@ -1974,31 +1971,7 @@ document.addEventListener('click',function(e){var btn=document.getElementById('n
 </div>
 </div>
 
-<script>
-(function(){
-  const KEY = 'kw_mute_wasm_warning';
-  function isMuted() {
-    try { return localStorage.getItem(KEY) === '1'; } catch (_) { return false; }
-  }
-  function syncToggle() {
-    const toggle = document.getElementById('mute-wasm-warning-toggle');
-    if (toggle) toggle.checked = isMuted();
-  }
-  window.isWasmWarningMuted = isMuted;
-  window.toggleWasmWarningMute = function(checked) {
-    try {
-      if (checked) localStorage.setItem(KEY, '1');
-      else localStorage.removeItem(KEY);
-    } catch (_) {}
-    syncToggle();
-  };
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', syncToggle, { once: true });
-  } else {
-    syncToggle();
-  }
-})();
-</script>
+
 
 <!-- Profile Modal -->
 <!-- Profile Modal -->
@@ -2826,25 +2799,7 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
     try { frame.focus(); } catch (_) {}
     try { if (frame.contentWindow && frame.contentWindow.focus) frame.contentWindow.focus(); } catch (_) {}
   }
-  let wasmUnsupportedPopupShown = false;
-  function checkWasmSupportOnLaunch() {
-    const supported = typeof WebAssembly === 'object' && typeof WebAssembly.instantiate === 'function';
-    if (supported) {
-      console.info('[WASM] Supported on this client.');
-      return true;
-    }
-    console.warn('[WASM] Not supported or blocked on this client.');
-    if (!wasmUnsupportedPopupShown) {
-      wasmUnsupportedPopupShown = true;
-      const muted = typeof window.isWasmWarningMuted === 'function' ? window.isWasmWarningMuted() : false;
-      if (!muted) {
-        alert('Your device/browser does not support WebAssembly (WASM), or it is blocked. Some games may not work correctly.');
-      } else {
-        console.info('[WASM] Warning popup is muted on this device.');
-      }
-    }
-    return false;
-  }
+
   function openGamePopup(title, src, trackPlaytime = true) {
     ensureGamePopup();
     const modal = document.getElementById('game-popup-modal');
@@ -2969,7 +2924,6 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
     if (favBtn) { e.preventDefault(); e.stopPropagation(); const name = favBtn.dataset.name; if (name) window._toggleFavorite(name); return; }
     const launchUrl = (card.dataset.launchUrl || '').trim() || card.getAttribute('href');
     if (!launchUrl) return;
-    checkWasmSupportOnLaunch();
     if (card.dataset.popup === '1') {
       e.preventDefault();
       openGamePopup(card.dataset.name || 'Game', launchUrl, true);
@@ -2981,7 +2935,6 @@ document.addEventListener('mouseover',(e)=>{const card=e.target.closest('#archiv
     if (!launch) return;
     const launchUrl = (launch.dataset.launchUrl || '').trim() || launch.getAttribute('href');
     if (!launchUrl) return;
-    checkWasmSupportOnLaunch();
     e.preventDefault();
     openGamePopup(launch.dataset.name || 'Game', launchUrl, launch.dataset.trackPlaytime === '1');
   });
