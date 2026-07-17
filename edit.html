@@ -688,7 +688,7 @@ function shopEditorCard(item, n) {
   return `
   <div class="admin-card-item">
     <div class="admin-card-header">
-      <span class="admin-card-label">Drink ${n}</span>
+      <span class="admin-card-label">Item ${n}</span>
       <button class="admin-row-remove" onclick="this.closest('.admin-card-item').remove()">✕</button>
     </div>
     <input class="shop-item-name admin-card-input" placeholder="Name (e.g. Monster Zero)" value="${safeName}" />
@@ -1310,9 +1310,9 @@ window.injectAdminPanels = function() {
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('sites')">Save Sites</button><span class="admin-status" id="status-sites"></span></div>
       </div>
       <div class="admin-section" id="admin-shop">
-        <p class="admin-hint" style="margin-bottom:1rem;">Add drinks to the shop shelf. Paste a transparent PNG image URL, set the name and price.</p>
+        <p class="admin-hint" style="margin-bottom:1rem;">Add Item to the shop shelf. Paste a transparent PNG image URL, set the name and price.</p>
         <div id="ae-shop-list" class="admin-row-list"></div>
-        <button class="admin-add-btn" onclick="adminAddShopItem()">+ Add Drink</button>
+        <button class="admin-add-btn" onclick="adminAddShopItem()">+ Add Item</button>
         <div class="admin-save-row"><button class="admin-save-btn" onclick="adminSave('shop')">Save Shop</button><span class="admin-status" id="status-shop"></span></div>
       </div>
       <div class="admin-section" id="admin-banned">
