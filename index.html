@@ -2915,6 +2915,7 @@ window.enterProfileEditMode = async function() {
   const profileData = await fetchUserProfile(email);
   
   // Populate edit form
+  document.getElementById('profile-edit-username').value = profileData.username || '';
   document.getElementById('profile-edit-fullname').value = profileData.fullName || '';
   document.getElementById('profile-edit-phone').value = profileData.phone || '';
   document.getElementById('profile-edit-bio').value = decodeBioNewLines(profileData.bio || '');
@@ -2951,6 +2952,7 @@ window.saveProfile = async function() {
   const msg = document.getElementById('profile-edit-msg');
   msg.className = 'popup-msg';
   
+  const username = document.getElementById('profile-edit-username').value.trim();
   const fullName = document.getElementById('profile-edit-fullname').value.trim();
   const phone = document.getElementById('profile-edit-phone').value.trim();
   const bio = encodeBioNewLines(document.getElementById('profile-edit-bio').value.trim());
@@ -2959,6 +2961,7 @@ window.saveProfile = async function() {
   
   try {
     await setDoc(doc(db, 'users', email), {
+      username,
       fullName,
       phone,
       bio,
