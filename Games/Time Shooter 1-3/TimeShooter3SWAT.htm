@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Time Shooter 3 SWAT</title>
+  <style>
+    :root {
+      --bg: #0f130f;
+      --panel: rgba(15, 20, 14, 0.84);
+      --text: #eef9eb;
+      --muted: #b7d6b1;
+      --accent: #7ef28f;
+      --danger: #ff9d8a;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at 84% 10%, #1f3d22 0%, var(--bg) 58%);
+      color: var(--text);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    #unity-container {
+      position: fixed;
+      inset: 0;
+    }
+    #unity-canvas {
+      width: 100%;
+      height: 100%;
+      background: #101812;
+    }
+    #loading-cover {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(to bottom, rgba(6, 11, 7, 0.78), rgba(6, 11, 7, 0.92));
+      z-index: 10;
+    }
+    #unity-loading-bar {
+      width: min(420px, 90vw);
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid rgba(183, 214, 177, 0.2);
+      border-radius: 12px;
+      backdrop-filter: blur(3px);
+    }
+    #unity-logo img {
+      display: block;
+      margin: 0 auto 14px;
+      width: min(220px, 65vw);
+      max-height: 72px;
+      object-fit: contain;
+    }
+    #unity-progress-bar-empty {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+    #unity-progress-bar-full {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, #8bf870, #a5ffd2);
+      transition: width 120ms linear;
+    }
+    .status {
+      margin-top: 10px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .warn {
+      color: var(--danger);
+      font-weight: 600;
+    }
+    #unity-fullscreen-button {
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 20;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      cursor: pointer;
+      color: #0c160c;
+      background: linear-gradient(180deg, #95ff97, #71ea86);
+      font-weight: 700;
+      box-shadow: 0 8px 18px rgba(90, 220, 127, 0.28);
+    }
+  </style>
+</head>
+<body>
+  <div id="unity-container">
+    <canvas id="unity-canvas"></canvas>
+  </div>
+
+  <div id="loading-cover">
+    <div id="unity-loading-bar">
+      <div id="unity-logo"><img id="unity-logo-image" alt="Time Shooter 3 SWAT" /></div>
+      <div id="unity-progress-bar-empty"><div id="unity-progress-bar-full"></div></div>
+      <div id="status" class="status">Loading Time Shooter 3 SWAT...</div>
+    </div>
+  </div>
+
+  <button id="unity-fullscreen-button" type="button" style="display:none;">Fullscreen</button>
+
+  <script>
+    const buildUrl = "./assets/ts3";
+    const loaderUrl = buildUrl + "/ts3.loader.js";
+
+    const config = {
+      dataUrl: buildUrl + "/ts3.data",
+      frameworkUrl: buildUrl + "/ts3.framework.js",
+      codeUrl: buildUrl + "/ts3.wasm",
+      streamingAssetsUrl: "StreamingAssets",
+      companyName: "GoGoMan",
+      productName: "Time Shooter SWAT",
+      productVersion: "0.03",
+    };
+
+    const container = document.querySelector("#unity-container");
+    const canvas = document.querySelector("#unity-canvas");
+    const loadingCover = document.querySelector("#loading-cover");
+    const progressBarFull = document.querySelector("#unity-progress-bar-full");
+    const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+    const status = document.querySelector("#status");
+    const logo = document.querySelector("#unity-logo-image");
+
+    logo.src = buildUrl + "/logo.png";
+    canvas.style.background = "url('" + buildUrl + "/ts3.jpg') center / cover";
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+      container.className = "unity-mobile";
+      config.devicePixelRatio = 1;
+    }
+
+    if (location.protocol === "file:") {
+      status.innerHTML = "<span class='warn'>Offline is supported, but run from a local server (not file://). Example: <code>python3 -m http.server 8000</code></span>";
+    }
+
+    const script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarFull.style.width = `${100 * progress}%`;
+      }).then((unityInstance) => {
+        loadingCover.style.display = "none";
+        fullscreenButton.style.display = "block";
+        fullscreenButton.onclick = () => unityInstance.SetFullscreen(1);
+      }).catch((message) => {
+        status.innerHTML = "<span class='warn'>Failed to load: " + message + "</span>";
+      });
+    };
+    script.onerror = () => {
+      status.innerHTML = "<span class='warn'>Could not load local game files. Make sure <code>assets/ts3</code> exists and open through <code>http://localhost</code>.</span>";
+    };
+
+    document.body.appendChild(script);
+  </script>
+</body>
+</html>
