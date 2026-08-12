@@ -2269,6 +2269,8 @@ window.adminAddGame = function() {
   const wrap = document.createElement('div');
   wrap.innerHTML = renderGameRow({}).trim();
   const row = wrap.firstElementChild;
+  const popupInput = row.querySelector('.game-popup-input');
+  if (popupInput) popupInput.checked = true;
   document.getElementById('ae-games-list').appendChild(row);
   row.querySelector('input').focus();
 };
